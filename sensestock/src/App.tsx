@@ -1,0 +1,1142 @@
+import { useState, useEffect, useMemo, useRef } from "react";
+
+const SIDEBAR_CSS = `
+  .ss-aside { transition: width 0.22s ease; overflow: hidden; }
+  .ss-aside.collapsed { width: 52px !important; }
+  .ss-aside.collapsed .ss-logo-name,
+  .ss-aside.collapsed .ss-nav-label,
+  .ss-aside.collapsed .ss-user-info,
+  .ss-aside.collapsed .ss-logout-btn { opacity:0; width:0; pointer-events:none; }
+  .ss-aside.collapsed .ss-avatar { margin:0 auto; }
+  .ss-logo-name,.ss-nav-label,.ss-user-info,.ss-logout-btn { opacity:1; transition:opacity 0.15s; overflow:hidden; white-space:nowrap; }
+  .ss-nav-item { position:relative; min-height:36px; }
+  .ss-tooltip { display:none; position:absolute; left:calc(100% + 8px); top:50%; transform:translateY(-50%); background:#2D2D2D; color:#fff; font-size:12px; font-weight:500; padding:4px 8px; border-radius:6px; white-space:nowrap; pointer-events:none; z-index:100; }
+  .ss-aside.collapsed .ss-nav-item:hover .ss-tooltip { display:block; }
+  .ss-toggle-btn { width:24px; height:24px; border-radius:6px; background:none; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--slate); flex-shrink:0; padding:0; }
+`;
+const STYLE_SHEET = `
+:root {
+  --primary:#6457E7; --primary-pressed:#5346D6; --primary-deep:#4538B5; --primary-soft:#EFEDFC;
+  --brand-navy:#1F1A38; --brand-yellow:#E5B72D; --brand-orange:#E48F50; --brand-orange-deep:#B25E29;
+  --brand-pink:#E2557F; --brand-pink-deep:#C03A60; --brand-purple-300:#B7A8F0; --brand-purple-800:#4A3F8F;
+  --brand-teal:#4FB2A6; --brand-green:#3BA063;
+  --tint-peach:#FAEBDD; --tint-rose:#F8E4E6; --tint-mint:#DDEDEA; --tint-lavender:#EAE4F2;
+  --tint-sky:#DCE9F4; --tint-yellow:#FDECC8; --tint-yellow-bold:#FFD059;
+  --canvas:#FFFFFF; --surface:#F7F6F3; --surface-soft:#FBFAF8;
+  --hairline:#ECEBE8; --hairline-soft:#F1F0EE; --hairline-strong:#DEDCD7;
+  --ink-deep:#1A1916; --ink:#2A2926; --charcoal:#37352F;
+  --slate:#787774; --steel:#9B9A97; --stone:#B5B3AD;
+  --on-dark:#FFFFFF; --on-dark-muted:rgba(255,255,255,0.72);
+  --error:#D03A3A; --link-blue:#2382E2;
+  --use-1:#E63946; --use-2:#C42E2E; --use-3:#A8231F; --use-4:#F4A23B; --use-5:#F0B82E;
+  --use-6:#E69A1F; --use-7:#F4D31E; --use-8:#2BAA50; --use-9:#2B7FD3; --use-10:#1A2E5C; --use-11:#A1318C;
+  --r-sm:6px; --r-md:8px; --r-lg:12px; --r-full:9999px;
+  --shadow-2:0 4px 12px rgba(15,15,15,.08); --shadow-3:0 24px 48px -8px rgba(15,15,15,.20); --shadow-4:0 16px 48px -8px rgba(15,15,15,.16);
+}
+*{box-sizing:border-box}
+body,#root{margin:0;padding:0}
+.app{font-family:'Pretendard','Inter',-apple-system,system-ui,sans-serif;color:var(--ink);background:var(--surface);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased;height:100vh;overflow:hidden}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:36px;padding:0 14px;border-radius:var(--r-md);font-size:14px;font-weight:500;border:1px solid transparent;cursor:pointer;white-space:nowrap;font-family:inherit;transition:background 120ms}
+.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-pressed)}
+.btn-primary:disabled{background:var(--hairline-strong);color:var(--steel);cursor:not-allowed}
+.btn-secondary{background:var(--canvas);color:var(--ink);border-color:var(--hairline-strong)}.btn-secondary:hover{background:var(--surface)}
+.btn-secondary:disabled{color:var(--stone);cursor:not-allowed}
+.btn-ghost{background:transparent;color:var(--ink);padding:0 10px;height:32px;border:none}.btn-ghost:hover{background:var(--surface)}
+.btn-danger{background:var(--canvas);color:var(--error);border-color:#EBC7C7}.btn-danger:hover{background:#FCEFEF}
+.btn-sm{height:30px;padding:0 10px;font-size:13px}
+.btn-icon{width:32px;height:32px;padding:0}
+.input,.select,.textarea{width:100%;height:40px;padding:0 12px;border-radius:var(--r-md);border:1px solid var(--hairline-strong);background:var(--canvas);color:var(--ink);font:inherit;font-size:14px;outline:none;transition:border-color 120ms}
+.textarea{height:auto;padding:10px 12px;resize:vertical;min-height:80px}
+.input::placeholder{color:var(--stone)}
+.input:focus,.select:focus,.textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(100,87,231,.16)}
+.is-editing{background:#FFFDF5!important;border-color:var(--brand-yellow)!important;box-shadow:0 0 0 3px rgba(229,183,45,.18)!important}
+.search-pill{height:44px;padding:0 14px 0 40px;border-radius:var(--r-md);border:1px solid var(--hairline);background:var(--surface);font:inherit;font-size:15px;outline:none;width:100%}
+.search-pill:focus{background:var(--canvas);border-color:var(--primary)}
+.field-label{display:block;font-size:12px;font-weight:600;color:var(--charcoal);margin-bottom:6px;white-space:nowrap}
+.card{background:var(--canvas);border:1px solid var(--hairline);border-radius:var(--r-lg)}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:var(--r-full);font-size:12px;font-weight:600;white-space:nowrap}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:var(--r-full);background:var(--canvas);border:1px solid var(--hairline);font-size:12px;font-weight:500;cursor:pointer;transition:background 120ms;white-space:nowrap;font-family:inherit}
+.chip:hover{background:var(--surface)}
+.chip.active{background:var(--ink-deep);color:#fff;border-color:var(--ink-deep)}
+.table{width:100%;border-collapse:separate;border-spacing:0}
+.table thead th{text-align:left;padding:12px 16px;font-size:12px;font-weight:600;color:var(--slate);border-bottom:1px solid var(--hairline);background:var(--surface-soft);position:sticky;top:0;z-index:1}
+.table tbody td{padding:12px 16px;border-bottom:1px solid var(--hairline-soft);vertical-align:middle}
+.table tbody tr{cursor:pointer}
+.table tbody tr:hover td{background:var(--surface-soft)}
+.table tbody tr.sel td{background:var(--primary-soft)}
+.swatch{display:inline-block;width:10px;height:10px;border-radius:3px;border:1px solid rgba(0,0,0,.05);flex-shrink:0}
+.row{display:flex;align-items:center}
+.col{display:flex;flex-direction:column}
+.between{justify-content:space-between}
+.wrap{flex-wrap:wrap}
+.flex1{flex:1;min-width:0}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:#D9D7D2;border-radius:4px}
+`;
+
+const USES = [
+  {id:1,name:'평가/훈련-소모품',color:'var(--use-1)',short:'평가·소모품'},
+  {id:2,name:'평가/훈련-일회용품',color:'var(--use-2)',short:'평가·일회용'},
+  {id:3,name:'평가/훈련-교구',color:'var(--use-3)',short:'평가·교구'},
+  {id:4,name:'실험/분석-소모품',color:'var(--use-4)',short:'실험·소모품'},
+  {id:5,name:'실험/분석-기구',color:'var(--use-5)',short:'실험·기구'},
+  {id:6,name:'실험/분석-장비',color:'var(--use-6)',short:'실험·장비'},
+  {id:7,name:'청소/안전',color:'var(--use-7)',short:'청소·안전'},
+  {id:8,name:'조리/그릇',color:'var(--use-8)',short:'조리·그릇'},
+  {id:9,name:'사무/공구',color:'var(--use-9)',short:'사무·공구'},
+  {id:10,name:'기타 장비',color:'var(--use-10)',short:'기타 장비'},
+  {id:11,name:'기타 소모품',color:'var(--use-11)',short:'기타 소모품'},
+];
+const FALLBACK_USE = {id:0,name:'미분류',color:'var(--steel)',short:'미분류'};
+const useById = id => USES.find(u=>u.id===id) || FALLBACK_USE;
+const QTY_REQ = [1,2,4,7,11];
+const SPACES = ['준비','서빙1','서빙2','토론1','토론2','창고'];
+const ZONES = {
+  '준비':[
+    {group:'선반',cells:['①','②','③','④']},
+    {group:'실험대 위',cells:['①','②','③','④','⑤']},
+    {group:'실험대 아래',cells:['①','②','③','④','⑤','⑥']},
+    {group:'실험대 서랍',cells:['서랍 ①','서랍 ②','서랍 ③','서랍 ④','서랍 ⑤','서랍 ⑥']},
+    {group:'조리대 좌측',cells:['서랍 ①','서랍 ②','서랍 ③','④','⑤']},
+    {group:'조리대 우측',cells:['서랍 ①','서랍 ②','서랍 ③','④','⑤']},
+    {group:'싱크대 위',cells:['①','②','③','④','⑤','⑥']},
+    {group:'싱크대 아래',cells:['①','②']},
+    {group:'저울대 위',cells:['①','②','③']},
+    {group:'저울대 아래',cells:['①','②','서랍 ①','서랍 ②','서랍 ③','서랍 ④']},
+  ],
+  '서빙1':[{group:'조리대',cells:['서랍 ①','서랍 ②','서랍 ③','④']}],
+  '서빙2':[{group:'조리대',cells:['서랍 ①','서랍 ②','서랍 ③','④']}],
+  '토론1':[{group:'서랍',cells:['서랍 ①','서랍 ②','서랍 ③']}],
+  '토론2':[{group:'서랍',cells:['서랍 ①','서랍 ②','서랍 ③']}],
+  '창고':[
+    {group:'수납장',cells:['①','②','③','④','⑤','⑥','⑦','⑧']},
+    {group:'박스',cells:['①','②','③']},
+    {group:'선반',cells:['①','②','③','④','⑤','⑥','⑦','⑧']},
+  ],
+};
+
+const mk=(id,name,useId,space,group,cell,qty,min,spec='',note='',received='2026-04')=>({
+  id,name,useId,space,group,cell,qty,min,spec,note,received,
+  createdAt:'2026-03-12',updatedAt:'2026-05-10',updatedBy:'김연구'
+});
+
+const SEED = [
+  mk(1,'투명 시약병 500mL',5,'준비','선반','①',24,null,'PYREX 500mL','뚜껑 포함','2026-02'),
+  mk(2,'피펫 팁 박스',4,'준비','선반','②',18,5,'1000μL, 96개입','','2026-04'),
+  mk(3,'정성여과지',4,'준비','선반','③',32,10,'110mm','','2026-03'),
+  mk(4,'실리콘 호스',11,'준비','선반','④',6,2,'내경 8mm','','2026-01'),
+  mk(5,'전자저울 (정밀)',6,'준비','실험대 위','①',1,null,'AND HR-200','연간 교정 필요','2025-09'),
+  mk(6,'교반기',6,'준비','실험대 위','②',2,null,'IKA RH basic','','2025-10'),
+  mk(7,'pH 미터',6,'준비','실험대 위','③',1,null,'Orion Star A211','','2025-11'),
+  mk(8,'회전증발기',6,'준비','실험대 위','④',1,null,'Buchi R-100','','2025-08'),
+  mk(9,'초음파 세척기',6,'준비','실험대 위','⑤',1,null,'Branson 2800','','2025-12'),
+  mk(10,'비커 세트',5,'준비','실험대 아래','①',28,null,'50~1000 mL','','2026-02'),
+  mk(11,'삼각플라스크',5,'준비','실험대 아래','②',22,null,'125~500 mL','','2026-02'),
+  mk(12,'메스실린더',5,'준비','실험대 아래','③',14,null,'10~100 mL','','2026-01'),
+  mk(13,'마그네틱 바',5,'준비','실험대 아래','④',36,8,'20~50mm','','2026-03'),
+  mk(14,'데시케이터',6,'준비','실험대 아래','⑤',2,null,'직경 300mm','실리카겔 포함','2025-07'),
+  mk(15,'항온수조',6,'준비','실험대 아래','⑥',1,null,'WiseBath WB-22','','2025-09'),
+  mk(16,'파라필름',4,'준비','실험대 서랍','서랍 ①',4,2,'Bemis PM-996','','2026-04'),
+  mk(17,'알루미늄 호일',4,'준비','실험대 서랍','서랍 ②',6,2,'50m','','2026-04'),
+  mk(18,'니트릴 장갑',7,'준비','실험대 서랍','서랍 ③',2,4,'L사이즈 100매입','재주문 필요','2026-05'),
+  mk(19,'실험 노트',9,'준비','실험대 서랍','서랍 ④',8,3,'A4 200매','','2026-04'),
+  mk(20,'네임펜',9,'준비','실험대 서랍','서랍 ⑤',12,4,'검정','','2026-04'),
+  mk(21,'마이크로피펫',5,'준비','실험대 서랍','서랍 ⑥',6,null,'20~200μL','연 1회 교정','2025-12'),
+  mk(22,'스테인리스 볼',8,'준비','조리대 좌측','서랍 ①',12,null,'20/25/30 cm','','2026-01'),
+  mk(23,'계량컵 세트',8,'준비','조리대 좌측','서랍 ②',4,null,'4종 1세트','','2025-12'),
+  mk(24,'실리콘 주걱',8,'준비','조리대 좌측','서랍 ③',8,null,'내열 220℃','','2026-02'),
+  mk(25,'칼·도마 세트',8,'준비','조리대 좌측','④',3,null,'시료 전용','교차오염 주의','2025-11'),
+  mk(26,'전기포트',10,'준비','조리대 좌측','⑤',2,null,'1.7L','','2025-10'),
+  mk(27,'관능평가용 컵 (100mL)',2,'준비','조리대 우측','서랍 ①',240,60,'플라스틱 일회용','','2026-04'),
+  mk(28,'관능평가용 트레이',3,'준비','조리대 우측','서랍 ②',30,null,'3구','','2025-11'),
+  mk(29,'티스푼 (시료용)',8,'준비','조리대 우측','서랍 ③',80,null,'','','2025-10'),
+  mk(30,'인덕션 (2구)',10,'준비','조리대 우측','④',1,null,'','','2025-08'),
+  mk(31,'보온병',8,'준비','조리대 우측','⑤',4,null,'1L','','2026-03'),
+  mk(32,'주방세제',7,'준비','싱크대 위','①',1,2,'5L','','2026-04'),
+  mk(33,'세척솔 (대)',7,'준비','싱크대 위','②',6,2,'','','2026-03'),
+  mk(34,'피펫 세척솔',7,'준비','싱크대 위','③',4,2,'','','2026-02'),
+  mk(35,'건조대',8,'준비','싱크대 위','④',2,null,'','','2025-10'),
+  mk(36,'마른행주',7,'준비','싱크대 위','⑤',18,6,'','','2026-04'),
+  mk(37,'키친타올',7,'준비','싱크대 위','⑥',12,4,'6롤 묶음','','2026-05'),
+  mk(38,'락스 (희석용)',7,'준비','싱크대 아래','①',3,1,'4L','','2026-03'),
+  mk(39,'쓰레기 봉투',11,'준비','싱크대 아래','②',40,10,'20L 50매','','2026-04'),
+  mk(40,'정밀저울 분동 세트',6,'준비','저울대 위','①',1,null,'E2급','연 1회 교정','2025-06'),
+  mk(41,'정전기 제거기',6,'준비','저울대 위','②',1,null,'','','2025-10'),
+  mk(42,'드라이박스 (소)',6,'준비','저울대 위','③',1,null,'','실리카겔 교체 필요','2025-11'),
+  mk(43,'칭량지',4,'준비','저울대 아래','①',8,2,'100×100mm','','2026-03'),
+  mk(44,'약수저 세트',5,'준비','저울대 아래','②',12,null,'스테인리스','','2026-01'),
+  mk(45,'미량 약병',5,'준비','저울대 아래','서랍 ①',30,null,'5mL','','2026-02'),
+  mk(46,'표준시약 (NaCl)',4,'준비','저울대 아래','서랍 ②',2,1,'500g','','2026-01'),
+  mk(47,'표준시약 (Sucrose)',4,'준비','저울대 아래','서랍 ③',2,1,'500g','','2026-01'),
+  mk(48,'표준시약 (Caffeine)',4,'준비','저울대 아래','서랍 ④',0,1,'100g','결품 — 발주 진행 중','2026-02'),
+  mk(49,'관능 부스 가림판',3,'서빙1','조리대','서랍 ①',8,null,'조립식','','2025-09'),
+  mk(50,'관능평가 카드',1,'서빙1','조리대','서랍 ②',70,100,'A5 200매입','','2026-04'),
+  mk(51,'연필 (HB)',1,'서빙1','조리대','서랍 ③',30,10,'','','2026-03'),
+  mk(52,'급수기 (개인용)',10,'서빙1','조리대','④',6,null,'500mL','','2025-08'),
+  mk(53,'일회용 시료컵 (50mL)',2,'서빙2','조리대','서랍 ①',50,100,'뚜껑 포함','재고 부족','2026-04'),
+  mk(54,'일회용 스푼',2,'서빙2','조리대','서랍 ②',480,100,'플라스틱','','2026-03'),
+  mk(55,'헹굼용 정수기 필터',7,'서빙2','조리대','서랍 ③',2,1,'6개월 교체','','2026-02'),
+  mk(56,'소형 냉장고',10,'서빙2','조리대','④',1,null,'시료 전용','','2024-11'),
+  mk(57,'회의용 보드마카',9,'토론1','서랍','서랍 ①',24,8,'4색 세트','','2026-04'),
+  mk(58,'포스트잇',9,'토론1','서랍','서랍 ②',30,10,'76×76','','2026-04'),
+  mk(59,'관능 토론 가이드북',3,'토론1','서랍','서랍 ③',12,null,'교육용','','2025-09'),
+  mk(60,'패널 트레이닝 카드',3,'토론2','서랍','서랍 ①',8,null,'향미 표준 40종','','2025-12'),
+  mk(61,'필기구 (볼펜)',9,'토론2','서랍','서랍 ②',40,12,'검정','','2026-04'),
+  mk(62,'타이머',5,'토론2','서랍','서랍 ③',4,null,'디지털','','2025-10'),
+  mk(63,'관능평가용 컵 (재고)',2,'창고','수납장','①',1200,300,'100mL','','2026-04'),
+  mk(64,'일회용 스푼 (재고)',2,'창고','수납장','②',2400,500,'','','2026-04'),
+  mk(65,'A4 용지',9,'창고','수납장','③',3,6,'500매 1박스','','2026-05'),
+  mk(66,'소독용 알코올 (70%)',7,'창고','수납장','④',12,4,'4L','','2026-03'),
+  mk(67,'정수기용 생수',11,'창고','수납장','⑤',36,10,'2L','','2026-05'),
+  mk(68,'비커 (예비)',5,'창고','수납장','⑥',20,null,'250/500 mL','','2026-01'),
+  mk(69,'실험복 (예비)',7,'창고','수납장','⑦',8,2,'L/M','','2025-12'),
+  mk(70,'보안경',7,'창고','수납장','⑧',10,3,'','','2026-01'),
+  mk(71,'표준향 키트 (보관)',3,'창고','박스','①',2,null,'40종 세트','냉장 보관','2025-08'),
+  mk(72,'교체용 필터',7,'창고','박스','②',6,2,'6개월 교체','','2026-02'),
+  mk(73,'포장재 (예비)',11,'창고','박스','③',18,4,'PE 봉투 500매','','2026-04'),
+  mk(74,'대형 비커',5,'창고','선반','①',8,null,'2000 mL','','2025-11'),
+  mk(75,'대형 깔때기',5,'창고','선반','②',6,null,'직경 200mm','','2025-11'),
+  mk(76,'스탠드 (실험용)',5,'창고','선반','③',4,null,'','','2025-09'),
+  mk(77,'교반기 (예비)',6,'창고','선반','④',1,null,'IKA','','2025-08'),
+  mk(78,'항온수조 (예비)',6,'창고','선반','⑤',1,null,'','미사용','2025-07'),
+  mk(79,'대형 보관통',8,'창고','선반','⑥',4,null,'20L','','2025-10'),
+  mk(80,'박스 보관함',11,'창고','선반','⑦',12,null,'','','2026-03'),
+  mk(81,'계측기 (예비)',6,'창고','선반','⑧',2,null,'디지털 온도계','','2025-12'),
+];
+
+const SEED_ACT = [
+  {id:1,action:'create',name:'키친타올',user:'김연구',time:'2시간 전'},
+  {id:2,action:'update',name:'관능평가용 컵 (100mL)',user:'박분석',time:'5시간 전'},
+  {id:3,action:'delete',name:'구형 pH 시약',user:'이센서',time:'어제'},
+  {id:4,action:'create',name:'소독용 알코올 (70%)',user:'김연구',time:'어제'},
+  {id:5,action:'update',name:'표준시약 (Caffeine)',user:'박분석',time:'2일 전'},
+];
+
+function Ico({path,circle,rect,poly,line,s=2,size=16}) {
+  const paths=Array.isArray(path)?path:(path?[path]:[]);
+  const circles=Array.isArray(circle)?circle:(circle?[circle]:[]);
+  const rects=Array.isArray(rect)?rect:(rect?[rect]:[]);
+  const polys=Array.isArray(poly)?poly:(poly?[poly]:[]);
+  const lines=Array.isArray(line)?line:(line?[line]:[]);
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={s} strokeLinecap="round" strokeLinejoin="round">
+      {paths.map((d,i)=><path key={i} d={d}/>)}
+      {circles.map((c,i)=><circle key={i} {...c}/>)}
+      {rects.map((r,i)=><rect key={i} {...r}/>)}
+      {polys.map((p,i)=><polyline key={i} points={p}/>)}
+      {lines.map((l,i)=><line key={i} {...l}/>)}
+    </svg>
+  );
+}
+
+const IC = {
+  search:()=><Ico circle={[{cx:11,cy:11,r:7}]} path="m20 20-3.5-3.5"/>,
+  dash:()=><Ico s={1.8} rect={[{x:3,y:3,width:7,height:9,rx:1.5},{x:14,y:3,width:7,height:5,rx:1.5},{x:14,y:12,width:7,height:9,rx:1.5},{x:3,y:16,width:7,height:5,rx:1.5}]}/>,
+  list:()=><Ico path={['M9 12h6','M9 8h6','M9 16h4']} rect={[{x:3,y:3,width:18,height:18,rx:2}]}/>,
+  map:()=><Ico s={1.8} path={['M3 6.5 9 4l6 2.5 6-2.5v13L15 19.5 9 17l-6 2.5z','M9 4v13M15 6.5v13']}/>,
+  plus:()=><Ico path="M12 5v14M5 12h14"/>,
+  chev:()=><Ico path="m9 6 6 6-6 6"/>,
+  back:()=><Ico path={['M19 12H5','M12 19l-7-7 7-7']}/>,
+  trash:()=><Ico path="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>,
+  edit:()=><Ico path={['M12 20h9','M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4z']}/>,
+  x:()=><Ico path={['M18 6 6 18','M6 6l12 12']}/>,
+  check:()=><Ico s={2.4} poly="20 6 9 17 4 12"/>,
+  alert:()=><Ico path={['M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z','M12 9v4M12 17h.01']}/>,
+  logout:()=><Ico path={['M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4','M16 17l5-5-5-5','M21 12H9']}/>,
+  refresh:()=><Ico path={['M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5','M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5']}/>,
+};
+
+function SidebarToggleIcon({open}) {
+  return open ? (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/>
+      <polyline points="15 9 12 12 15 15"/>
+    </svg>
+  ) : (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/>
+      <polyline points="12 9 15 12 12 15"/>
+    </svg>
+  );
+}
+
+function itemsByLoc(items) {
+  const m={};
+  items.forEach(it=>{const k=`${it.space}/${it.group}/${it.cell}`;(m[k]=m[k]||[]).push(it);});
+  return m;
+}
+function dominant(its) {
+  if(!its||!its.length) return null;
+  const c={};
+  its.forEach(it=>{c[it.useId]=(c[it.useId]||0)+1;});
+  return useById(+Object.entries(c).sort((a,b)=>b[1]-a[1])[0][0]);
+}
+function hi(text,q) {
+  if(!q) return text;
+  const i=text.toLowerCase().indexOf(q.toLowerCase());
+  if(i<0) return text;
+  return <>{text.slice(0,i)}<mark style={{background:'var(--tint-yellow)',color:'var(--ink)',padding:'0 1px',borderRadius:2}}>{text.slice(i,i+q.length)}</mark>{text.slice(i+q.length)}</>;
+}
+
+function Modal({open,onClose,children,width=440}) {
+  if(!open) return null;
+  return (
+    <div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(15,15,15,.4)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100}}>
+      <div onClick={e=>e.stopPropagation()} className="card" style={{width,maxWidth:'90vw',boxShadow:'var(--shadow-4)'}}>
+        {children}
+      </div>
+    </div>
+  );
+}
+function Topbar({title,sub,action}) {
+  return (
+    <div className="row between" style={{padding:'20px 32px',background:'var(--canvas)',borderBottom:'1px solid var(--hairline)',gap:24,flexShrink:0}}>
+      <div style={{minWidth:0}}>
+        <h1 style={{margin:0,fontSize:24,fontWeight:600,color:'var(--ink-deep)'}}>{title}</h1>
+        {sub&&<div style={{fontSize:13,color:'var(--slate)',marginTop:2}}>{sub}</div>}
+      </div>
+      <div style={{flexShrink:0}}>{action}</div>
+    </div>
+  );
+}
+function Field({label,required,err,children}) {
+  return (
+    <div>
+      <label className="field-label">{label}{required&&<span style={{color:'var(--brand-pink-deep)'}}> *</span>}</label>
+      {children}
+      {err&&<div style={{fontSize:12,color:'var(--error)',marginTop:4}}>{err}</div>}
+    </div>
+  );
+}
+
+function LoginDecorations() {
+  const dots=[
+    {left:"5%",top:"10%",color:"var(--brand-pink)",size:10},
+    {left:"15%",top:"80%",color:"var(--brand-yellow)",size:14},
+    {left:"90%",top:"12%",color:"var(--brand-teal)",size:8},
+    {left:"85%",top:"85%",color:"var(--brand-orange)",size:10},
+    {left:"3%",top:"50%",color:"var(--brand-purple-300)",size:16},
+    {left:"92%",top:"50%",color:"var(--brand-green)",size:6},
+    {left:"78%",top:"30%",color:"var(--brand-pink-deep)",size:8},
+    {left:"22%",top:"20%",color:"var(--brand-yellow)",size:8},
+    {left:"70%",top:"75%",color:"var(--brand-orange)",size:10},
+  ];
+  return (
+    <div style={{position:'absolute',inset:0,pointerEvents:'none',zIndex:1}}>
+      {dots.map((d,i)=>(
+        <span key={i} style={{position:'absolute',left:d.left,top:d.top,width:d.size,height:d.size,borderRadius:'50%',background:d.color,boxShadow:'0 0 0 4px rgba(255,255,255,0.04)'}}/>
+      ))}
+    </div>
+  );
+}
+
+function Login({onLogin}) {
+  const [email,setEmail]=useState('kim.research@sensorylab.co');
+  const [pw,setPw]=useState('sense1234');
+  const [rem,setRem]=useState(true);
+  const [err,setErr]=useState('');
+  const [showForgot,setShowForgot]=useState(false);
+  const [forgotEmail,setForgotEmail]=useState('');
+  const [forgotSent,setForgotSent]=useState(false);
+  const go=e=>{
+    e?.preventDefault?.();
+    if(!email||!pw){setErr('아이디와 비밀번호를 모두 입력하세요.');return;}
+    setErr('');
+    onLogin({name:'김연구',email});
+  };
+  return (
+    <>
+      <div style={{minHeight:'100vh',background:'var(--brand-navy)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',color:'#fff',position:'relative',overflow:'hidden',padding:'48px 24px'}}>
+        <LoginDecorations/>
+        <div style={{position:'relative',zIndex:2,textAlign:'center',marginBottom:40}}>
+          <div style={{marginBottom:20}}>
+            <span style={{fontSize:'clamp(36px,5vw,56px)',fontWeight:600,lineHeight:1.1,letterSpacing:'-1px',background:'linear-gradient(90deg,var(--brand-yellow),var(--brand-orange))',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>SenseStock</span>
+          </div>
+          <p style={{color:'var(--on-dark-muted)',fontSize:16,lineHeight:1.6}}>
+            누군가의 기억 대신, 팀이 함께 보는 위치·재고 정보.<br/>
+            SenseStock은 관능평가실 비품을 모두가 독립적으로 찾을 수 있게 합니다.
+          </p>
+        </div>
+        <div style={{position:'relative',zIndex:2,width:'100%',maxWidth:420}}>
+          <div className="card" style={{padding:36,background:'var(--canvas)',color:'var(--ink)',boxShadow:'var(--shadow-3)'}}>
+            <h2 style={{margin:'0 0 28px',fontSize:22,fontWeight:600,letterSpacing:'-0.3px'}}>로그인</h2>
+            <div className="col" style={{gap:16}}>
+              <div>
+                <label className="field-label">아이디</label>
+                <input className="input" placeholder="예: kim.research@sensorylab.co" value={email} onChange={e=>setEmail(e.target.value)}/>
+              </div>
+              <div>
+                <div className="row between" style={{marginBottom:6}}>
+                  <label className="field-label" style={{margin:0}}>비밀번호</label>
+                  <button style={{background:'none',border:'none',color:'#3B82F6',fontSize:12,fontFamily:'inherit',cursor:'pointer',padding:0}} onClick={()=>setShowForgot(true)}>비밀번호 찾기</button>
+                </div>
+                <input className="input" type="password" placeholder="••••••••" value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==='Enter'&&go(e)}/>
+              </div>
+              {err&&<div style={{background:'#FCEFEF',color:'var(--error)',border:'1px solid #EBC7C7',padding:'8px 12px',borderRadius:'var(--r-md)',fontSize:13}}>{err}</div>}
+              <div className="row" style={{gap:8,cursor:'pointer',userSelect:'none'}} onClick={()=>setRem(r=>!r)}>
+                <span style={{width:16,height:16,borderRadius:4,border:'1px solid var(--hairline-strong)',background:rem?'var(--primary)':'var(--canvas)',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',flexShrink:0}}>
+                  {rem&&<IC.check/>}
+                </span>
+                <span style={{fontSize:13,color:'var(--charcoal)'}}>로그인 상태 유지</span>
+              </div>
+              <button className="btn btn-primary" style={{width:'100%',height:44,fontSize:15,marginTop:8}} onClick={go}>로그인</button>
+            </div>
+            <div style={{marginTop:24,paddingTop:20,borderTop:'1px solid var(--hairline)',fontSize:12,color:'var(--steel)',textAlign:'center'}}>
+              외부 회원가입은 제공하지 않습니다.<br/>신규 계정은 관리자에게 요청하세요.
+            </div>
+          </div>
+        </div>
+      </div>
+      {showForgot&&(
+        <div onClick={()=>{setShowForgot(false);setForgotSent(false);}} style={{position:'fixed',inset:0,background:'rgba(15,15,15,0.55)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100}}>
+          <div onClick={e=>e.stopPropagation()} className="card" style={{width:420,padding:32,background:'var(--canvas)',color:'var(--ink)',boxShadow:'var(--shadow-4)'}}>
+            {!forgotSent?(
+              <>
+                <div style={{fontSize:18,fontWeight:600,marginBottom:8}}>비밀번호 재설정</div>
+                <p style={{margin:'0 0 20px',fontSize:13,color:'var(--slate)'}}>등록된 이메일로 재설정 링크를 보내드립니다.</p>
+                <input className="input" placeholder="등록된 이메일" value={forgotEmail} onChange={e=>setForgotEmail(e.target.value)}/>
+                <div className="row" style={{gap:8,marginTop:20,justifyContent:'flex-end'}}>
+                  <button className="btn btn-secondary" onClick={()=>setShowForgot(false)}>취소</button>
+                  <button className="btn btn-primary" onClick={()=>setForgotSent(true)} disabled={!forgotEmail}>재설정 링크 받기</button>
+                </div>
+              </>
+            ):(
+              <>
+                <div style={{width:40,height:40,borderRadius:'50%',background:'var(--tint-mint)',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--brand-green)',marginBottom:16}}><IC.check/></div>
+                <div style={{fontSize:18,fontWeight:600,marginBottom:8}}>전송 완료</div>
+                <p style={{margin:'0 0 20px',fontSize:13,color:'var(--slate)'}}><b>{forgotEmail}</b>로 재설정 링크를 보냈습니다.</p>
+                <div className="row" style={{justifyContent:'flex-end'}}>
+                  <button className="btn btn-primary" onClick={()=>{setShowForgot(false);setForgotSent(false);setForgotEmail('');}}>닫기</button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+function Sidebar({cur,onNav,user,onLogout}) {
+  const [collapsed,setCollapsed]=useState(false);
+  const navItems=[
+    {id:'dashboard',label:'대시 보드',I:IC.dash},
+    {id:'search',label:'품목 찾기',I:IC.list},
+    {id:'space',label:'공간 조회',I:IC.map},
+    {id:'register',label:'신규 등록',I:IC.plus},
+  ];
+  return (
+    <aside className={`ss-aside${collapsed?' collapsed':''}`} style={{width:240,background:'var(--surface)',borderRight:'1px solid var(--hairline)',display:'flex',flexDirection:'column',flexShrink:0}}>
+      <div className="row between" style={{padding:'18px 14px 18px 16px',borderBottom:'1px solid var(--hairline-soft)',minHeight:62,flexShrink:0}}>
+        <div className="row" style={{gap:10,overflow:'hidden'}}>
+          <span className="ss-logo-name" style={{fontSize:18,fontWeight:600,color:'var(--ink-deep)'}}>SenseStock</span>
+        </div>
+        <button className="ss-toggle-btn" onClick={()=>setCollapsed(c=>!c)}>
+          <SidebarToggleIcon open={!collapsed}/>
+        </button>
+      </div>
+      <nav style={{padding:'8px 6px',display:'flex',flexDirection:'column',gap:2,flex:1,overflow:'auto'}}>
+        {navItems.map(({id,label,I})=>{
+          const a=cur===id||(id==='search'&&cur==='detail');
+          return (
+            <button key={id} onClick={()=>onNav(id)} className="ss-nav-item row" style={{gap:10,padding:'8px',borderRadius:'var(--r-md)',background:a?'var(--primary-soft)':'transparent',color:a?'var(--primary-deep)':'var(--charcoal)',fontWeight:a?600:500,fontSize:14,border:'none',cursor:'pointer',textAlign:'left',fontFamily:'inherit',width:'100%'}}>
+              <span style={{color:a?'var(--primary)':'var(--slate)',display:'flex',width:20,justifyContent:'center',flexShrink:0}}><I/></span>
+              <span className="ss-nav-label">{label}</span>
+              <span className="ss-tooltip">{label}</span>
+            </button>
+          );
+        })}
+      </nav>
+      <div className="row" style={{borderTop:'1px solid var(--hairline-soft)',padding:'12px 6px',gap:10,flexShrink:0}}>
+        <div className="ss-avatar" style={{width:32,height:32,borderRadius:'50%',background:'var(--tint-lavender)',color:'var(--brand-purple-800)',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:600,fontSize:13,flexShrink:0}}>
+          {user?.name?.[0]||'U'}
+        </div>
+        <div className="ss-user-info col flex1">
+          <span style={{fontSize:13,fontWeight:600,color:'var(--charcoal)'}}>{user?.name}</span>
+          <span style={{fontSize:11,color:'var(--steel)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{user?.email}</span>
+        </div>
+        <button className="ss-logout-btn btn btn-ghost btn-icon" onClick={onLogout} style={{color:'var(--slate)',flexShrink:0}}><IC.logout/></button>
+      </div>
+    </aside>
+  );
+}
+
+function Donut({data,total,size=160}) {
+  const r=size/2-4,inner=r*0.62,circ=2*Math.PI*r,sum=data.reduce((a,b)=>a+b.v,0)||1;
+  let off=0;
+  return (
+    <div style={{position:'relative',flexShrink:0}}>
+      <svg width={size} height={size} style={{transform:'rotate(-90deg)'}}>
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="var(--hairline)" strokeWidth={r-inner}/>
+        {data.map((d,i)=>{
+          if(!d.v) return null;
+          const len=d.v/sum*circ;
+          const el=<circle key={i} cx={size/2} cy={size/2} r={r} fill="none" stroke={d.c} strokeWidth={r-inner} strokeDasharray={`${len} ${circ-len}`} strokeDashoffset={-off}/>;
+          off+=len; return el;
+        })}
+      </svg>
+      <div style={{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center'}}>
+        <span style={{fontSize:24,fontWeight:600,color:'var(--ink-deep)'}}>{total}</span>
+        <span style={{fontSize:11,color:'var(--steel)'}}>총 품목</span>
+      </div>
+    </div>
+  );
+}
+
+function Dashboard({items,activity,onNav,onItemClick}) {
+  const total=items.length;
+  const spaceC=['#6457E7','#E48F50','#3BA063','#2382E2','#E2557F','#9B6F47'];
+  const useData=USES.map(u=>({c:u.color,v:items.filter(i=>i.useId===u.id).length,name:u.name})).sort((a,b)=>b.v-a.v);
+  const spData=SPACES.map((s,i)=>({c:spaceC[i],v:items.filter(i=>i.space===s).length,name:s}));
+  const aDot={create:{bg:'var(--tint-mint)',fg:'var(--brand-green)',l:'+'},update:{bg:'var(--tint-sky)',fg:'var(--link-blue)',l:'~'},delete:{bg:'var(--tint-rose)',fg:'var(--brand-pink-deep)',l:'–'}};
+  return (
+    <div className="col" style={{height:'100%'}}>
+      <Topbar title="대시 보드" sub="관능평가실 비품 현황"/>
+      <div style={{flex:1,overflow:'auto',padding:32}}>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 2.5fr',gap:16,marginBottom:16}}>
+          <div className="card" style={{padding:24,display:'flex',flexDirection:'column',justifyContent:'center'}}>
+            <div style={{fontSize:13,color:'var(--slate)'}}>총 등록 품목</div>
+            <div style={{fontSize:48,fontWeight:600,color:'var(--ink-deep)',letterSpacing:'-1px',marginTop:8}}>{total}</div>
+            <div className="row" style={{gap:6,marginTop:12}}>
+              <span style={{padding:'2px 8px',borderRadius:'var(--r-full)',background:'var(--tint-lavender)',color:'var(--brand-purple-800)',fontSize:11,fontWeight:600}}>+12</span>
+              <span style={{fontSize:12,color:'var(--steel)'}}>이번 달</span>
+            </div>
+          </div>
+          <div className="card" style={{padding:24}}>
+            <div style={{fontWeight:600,fontSize:16,marginBottom:4}}>용도별 분포</div>
+            <div style={{fontSize:13,color:'var(--slate)',marginBottom:20}}>{USES.length}개 분류 · 총 {total}품목</div>
+            <div className="row" style={{gap:32,alignItems:'center'}}>
+              <Donut data={useData} total={total} size={180}/>
+              <div style={{flex:1,display:'grid',gridTemplateColumns:'1fr 1fr',gap:'6px 24px'}}>
+                {useData.map(u=>(
+                  <div key={u.name} className="row" style={{gap:8,padding:'4px 0'}}>
+                    <span className="swatch" style={{background:u.c}}/><span style={{flex:1,fontSize:13,color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.name}</span><span style={{fontSize:13,fontWeight:600}}>{u.v}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16}}>
+          <div className="card" style={{padding:24}}>
+            <div style={{fontWeight:600,fontSize:16,marginBottom:4}}>공간별 분포</div>
+            <div style={{fontSize:13,color:'var(--slate)',marginBottom:20}}>{SPACES.length}개 공간</div>
+            <div className="row" style={{gap:24,alignItems:'center'}}>
+              <Donut data={spData} total={total} size={160}/>
+              <div className="col" style={{flex:1,gap:6}}>
+                {spData.map(s=>(
+                  <button key={s.name} onClick={()=>onNav('space',{space:s.name})} className="row" style={{gap:8,padding:'9px 12px',borderRadius:'var(--r-md)',border:'1px solid var(--hairline)',background:'var(--canvas)',cursor:'pointer',fontFamily:'inherit'}}>
+                    <span className="swatch" style={{background:s.c}}/><span style={{flex:1,fontSize:13,fontWeight:500,color:'var(--charcoal)'}}>{s.name}</span><span style={{fontSize:13,fontWeight:600}}>{s.v}</span><IC.chev/>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="card" style={{padding:24}}>
+            <div style={{fontWeight:600,fontSize:16,marginBottom:16}}>최근 활동</div>
+            <div className="col">
+              {activity.map((a,i)=>{
+                const d=aDot[a.action]||aDot.create;
+                return (
+                  <div key={a.id} className="row" style={{gap:12,padding:'12px 0',borderBottom:i<activity.length-1?'1px solid var(--hairline-soft)':'none',alignItems:'flex-start'}}>
+                    <div style={{width:24,height:24,borderRadius:'50%',background:d.bg,color:d.fg,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:700,flexShrink:0,marginTop:1}}>{d.l}</div>
+                    <div>
+                      <div style={{fontSize:13,color:'var(--charcoal)'}}><b>{a.user}</b>님이 <b>{a.name}</b>{a.action==='create'?'을 등록':a.action==='update'?'을 수정':'을 삭제'}했습니다.</div>
+                      <div style={{fontSize:12,color:'var(--steel)',marginTop:2}}>{a.time}</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Search({items,onItemClick,onDelete}) {
+  const [submitted,setSubmitted]=useState(false);
+  const [q,setQ]=useState('');
+  const [uf,setUf]=useState(new Set());
+  const [sf,setSf]=useState(new Set());
+  const [sel,setSel]=useState(new Set());
+  const [delModal,setDelModal]=useState(false);
+  const [suggOpen,setSuggOpen]=useState(false);
+  const tog=(setter,v)=>setter(p=>{const s=new Set(p);s.has(v)?s.delete(v):s.add(v);return s;});
+  const submit=()=>{setSubmitted(true);setSuggOpen(false);};
+  const sugg=useMemo(()=>{
+    if(!q.trim()) return [];
+    const l=q.toLowerCase();
+    const seen=new Set(),out=[];
+    for(const it of items){
+      if(!it.name.toLowerCase().includes(l)) continue;
+      if(seen.has(it.name)) continue;
+      seen.add(it.name); out.push(it);
+      if(out.length>=6) break;
+    }
+    return out;
+  },[q,items]);
+  const filtered=useMemo(()=>{
+    if(!submitted) return [];
+    let r=items;
+    if(q.trim()){const l=q.toLowerCase();r=r.filter(i=>i.name.toLowerCase().includes(l));}
+    if(uf.size) r=r.filter(i=>uf.has(i.useId));
+    if(sf.size) r=r.filter(i=>sf.has(i.space));
+    return r;
+  },[items,q,uf,sf,submitted]);
+  const reset=()=>{setQ('');setUf(new Set());setSf(new Set());setSel(new Set());setSubmitted(false);};
+  return (
+    <div className="col" style={{height:'100%'}}>
+      <Topbar title="품목 찾기" sub={`전체 ${items.length}개 품목`} action={sel.size>0?(
+        <div className="row" style={{gap:8}}>
+          <span style={{fontSize:13,color:'var(--slate)'}}>{sel.size}개 선택</span>
+          <button className="btn btn-secondary btn-sm" onClick={()=>setSel(new Set())}>해제</button>
+          <button className="btn btn-danger btn-sm" onClick={()=>setDelModal(true)}><IC.trash/> 삭제</button>
+        </div>):null}/>
+      <div style={{padding:'16px 32px',borderBottom:'1px solid var(--hairline)',background:'var(--canvas)'}}>
+        <div style={{position:'relative',maxWidth:640}}>
+          <span style={{position:'absolute',left:12,top:'50%',transform:'translateY(-50%)',color:'var(--slate)',display:'flex'}}><IC.search/></span>
+          <input className="search-pill" placeholder="품목명으로 검색…" value={q} onChange={e=>{setQ(e.target.value);setSubmitted(false);setSuggOpen(true);}} onFocus={()=>setSuggOpen(true)} onBlur={()=>setTimeout(()=>setSuggOpen(false),150)} onKeyDown={e=>e.key==='Enter'&&submit()}/>
+          <button className="btn btn-primary btn-sm" onClick={submit} style={{position:'absolute',right:6,top:'50%',transform:'translateY(-50%)',height:32}}>찾기</button>
+          {suggOpen&&sugg.length>0&&(
+            <div className="card" style={{position:'absolute',top:'calc(100% + 6px)',left:0,right:0,padding:6,zIndex:10,boxShadow:'var(--shadow-2)'}}>
+              <div style={{fontSize:12,fontWeight:600,color:'var(--steel)',padding:'4px 10px'}}>추천</div>
+              {sugg.map(s=>{
+                const u=useById(s.useId);
+                return (
+                  <button key={s.id} onMouseDown={()=>{setQ(s.name);submit();}} className="row" style={{gap:8,width:'100%',padding:'8px 10px',background:'transparent',border:'none',borderRadius:'var(--r-sm)',cursor:'pointer',fontFamily:'inherit',textAlign:'left'}} onMouseEnter={e=>e.currentTarget.style.background='var(--surface)'} onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+                    <span className="swatch" style={{background:u.color,flexShrink:0}}/><span style={{fontSize:14,color:'var(--charcoal)',flex:1,textAlign:'left'}}>{hi(s.name,q)}</span><span style={{fontSize:12,color:'var(--slate)',flexShrink:0}}>{s.space}·{s.group}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+        <div className="row wrap" style={{gap:8,marginTop:12}}>
+          <span style={{fontSize:12,fontWeight:500,color:'var(--slate)'}}>용도</span>
+          {USES.map(u=><button key={u.id} className={`chip ${uf.has(u.id)?'active':''}`} onClick={()=>tog(setUf,u.id)}><span className="swatch" style={{background:u.color}}/>{u.name}</button>)}
+        </div>
+        <div className="row wrap" style={{gap:8,marginTop:8}}>
+          <span style={{fontSize:12,fontWeight:500,color:'var(--slate)'}}>공간</span>
+          {SPACES.map(s=><button key={s} className={`chip ${sf.has(s)?'active':''}`} onClick={()=>tog(setSf,s)}>{s}</button>)}
+          {(uf.size+sf.size+(q?1:0))>0&&<button style={{fontSize:12,color:'var(--link-blue)',background:'none',border:'none',cursor:'pointer'}} onClick={reset}>필터 초기화</button>}
+        </div>
+      </div>
+      <div style={{flex:1,overflow:'auto'}}>
+        <table className="table">
+          <thead><tr>
+            <th style={{width:36}}>
+              {filtered.length>0&&<input type="checkbox" checked={sel.size===filtered.length&&filtered.length>0} onChange={e=>setSel(e.target.checked?new Set(filtered.map(i=>i.id)):new Set())}/>}
+            </th>
+            <th>품목명</th><th style={{width:120}}>용도</th><th style={{width:180}}>위치</th><th style={{width:100}}>규격</th><th style={{width:120,textAlign:'right'}}>수량/최소</th><th style={{width:80}}>입고</th>
+          </tr></thead>
+          <tbody>
+            {filtered.map(it=>{
+              const u=useById(it.useId);
+              const isLow=it.min!=null&&it.qty<it.min;
+              const isSel=sel.has(it.id);
+              return (
+                <tr key={it.id} className={isSel?'sel':''} onClick={e=>{if(e.target.tagName==='INPUT') return; onItemClick(it);}}>
+                  <td onClick={e=>{e.stopPropagation();tog(setSel,it.id);}}><input type="checkbox" checked={isSel} onChange={()=>{}}/></td>
+                  <td><div style={{fontWeight:500}}>{q?hi(it.name,q):it.name}</div>{it.note&&<div style={{fontSize:12,color:'var(--steel)'}}>{it.note}</div>}</td>
+                  <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:13,color:'var(--charcoal)'}}>{u.short}</span></span></td>
+                  <td><span style={{fontSize:13}}><b>{it.space}</b><span style={{color:'var(--steel)'}}> / {it.group} / {it.cell}</span></span></td>
+                  <td><span style={{fontSize:13,color:'var(--slate)'}}>{it.spec||'–'}</span></td>
+                  <td style={{textAlign:'right'}}><span style={{fontWeight:600,color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:12,color:'var(--steel)'}}> / {it.min}</span>}{isLow&&<div style={{fontSize:11,color:'var(--error)',fontWeight:600}}>재고 부족</div>}</td>
+                  <td><span style={{fontSize:13,color:'var(--slate)'}}>{it.received}</span></td>
+                </tr>
+              );
+            })}
+            {filtered.length===0&&submitted&&<tr><td colSpan="7" style={{padding:'48px 0',textAlign:'center',color:'var(--slate)'}}>일치하는 품목이 없습니다.</td></tr>}
+            {!submitted&&<tr><td colSpan="7" style={{padding:'48px 0',textAlign:'center',color:'var(--slate)'}}>검색어를 입력하고 검색 버튼을 눌러주세요.</td></tr>}
+          </tbody>
+        </table>
+      </div>
+      <Modal open={delModal} onClose={()=>setDelModal(false)}>
+        <div style={{padding:28}}>
+          <div className="row" style={{gap:12,marginBottom:16}}>
+            <div style={{width:40,height:40,borderRadius:'50%',background:'var(--tint-rose)',color:'var(--brand-pink-deep)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><IC.alert/></div>
+            <div><div style={{fontSize:16,fontWeight:600}}>{sel.size}개 품목을 삭제할까요?</div><div style={{fontSize:13,color:'var(--slate)',marginTop:2}}>이 작업은 되돌릴 수 없습니다.</div></div>
+          </div>
+          <div className="row between" style={{marginTop:20}}>
+            <button className="btn btn-danger" onClick={()=>{onDelete([...sel]);setDelModal(false);setSel(new Set());}}><IC.trash/> 삭제</button>
+            <button className="btn btn-secondary" onClick={()=>setDelModal(false)}>취소</button>
+          </div>
+        </div>
+      </Modal>
+    </div>
+  );
+}
+
+function Cell({space,group,cell,label,x,y,w,h,vert,itemMap,selected,onToggle}) {
+  const key=`${group}||${cell}`;
+  const its=(itemMap[`${space}/${group}/${cell}`]||[]);
+  const dom=dominant(its);
+  const isSel=selected.has(key);
+  const empty=its.length===0;
+  const fill=empty?'#FAFAF8':(dom?.color||'#FAFAF8');
+  const darkColors=['var(--use-2)','var(--use-3)','var(--use-9)','var(--use-10)','var(--use-11)','var(--use-8)','var(--use-1)','var(--use-6)'];
+  const tc=darkColors.includes(fill)?'rgba(255,255,255,.9)':'var(--ink)';
+  return (
+    <div onClick={()=>onToggle(key)} style={{position:'absolute',left:x,top:y,width:w,height:h,background:fill,opacity:empty?1:.85,border:isSel?'2.5px solid var(--ink-deep)':'1px solid var(--hairline-strong)',borderRadius:4,cursor:'pointer',display:'flex',alignItems:vert?'flex-end':'flex-start',justifyContent:vert?'center':'flex-start',padding:5,boxSizing:'border-box',boxShadow:isSel?'0 4px 12px rgba(15,15,15,.16)':'none',transform:isSel?'scale(1.02)':'scale(1)',transition:'transform 80ms',zIndex:isSel?5:1}} title={its.length>0?`${its.length}개 품목`:'비어있음'}>
+      <span style={{fontSize:10,fontWeight:600,color:empty?'var(--steel)':tc,writingMode:vert?'vertical-rl':'horizontal-tb',lineHeight:1.2}}>{label}</span>
+      {its.length>0&&<span style={{position:'absolute',...(vert?{top:4,left:'50%',transform:'translateX(-50%)'}:{top:4,right:5}),background:'rgba(255,255,255,.9)',color:'var(--charcoal)',fontSize:9,fontWeight:700,borderRadius:8,padding:'1px 5px'}}>{its.length}</span>}
+    </div>
+  );
+}
+function FBox({title,x,y,w,h,tp='top',children}) {
+  const pos={
+    top:{left:x+4,top:y-20},
+    left:{left:x-4,top:y+h/2,transform:'translateX(-100%) translateY(-50%)'},
+    right:{left:x+w+6,top:y+h/2,transform:'translateY(-50%)'},
+    bottom:{left:x+4,top:y+h+4},
+  }[tp]||{left:x+4,top:y-20};
+  return (
+    <>
+      <div style={{position:'absolute',left:x,top:y,width:w,height:h,border:'1.5px solid var(--ink-deep)',borderRadius:4,pointerEvents:'none'}}/>
+      {title&&<div style={{position:'absolute',...pos,fontSize:11,fontWeight:700,color:'var(--ink-deep)',whiteSpace:'nowrap'}}>{title}</div>}
+      {children}
+    </>
+  );
+}
+function PrepPlan(p) {
+  const c=(g,ce,x,y,w,h,label,vert)=>({...p,group:g,cell:ce,label:label??ce,x,y,w,h,vert});
+  return (
+    <div style={{position:'relative',width:1280,height:760,background:'var(--canvas)',border:'1px solid var(--hairline)',borderRadius:'var(--r-lg)',margin:'0 auto'}}>
+      <FBox title="선반" x={60} y={40} w={70} h={330} tp="left">
+        {['①','②','③','④'].map((ce,i)=><Cell key={ce} {...c('선반',ce,60,40+i*82.5,70,82.5,ce,true)}/>)}
+      </FBox>
+      <FBox title="실험대 위" x={325} y={40} w={620} h={110} tp="right">
+        {['①','②','③','④','⑤'].map((ce,i)=><Cell key={ce} {...c('실험대 위',ce,325+i*124,40,124,110,ce)}/>)}
+      </FBox>
+      <FBox title="실험대 아래/서랍" x={170} y={195} w={775} h={150} tp="right">
+        <Cell {...c('실험대 아래','①',170,195,90,150,'①')}/>
+        <Cell {...c('실험대 아래','②',260,195,90,150,'②')}/>
+        {['서랍 ①','서랍 ②','서랍 ③','서랍 ④','서랍 ⑤','서랍 ⑥'].map((ce,i)=><Cell key={ce} {...c('실험대 서랍',ce,358+(i%2)*70,195+Math.floor(i/2)*50,70,50,ce)}/>)}
+        {['③','④','⑤','⑥'].map((ce,i)=><Cell key={ce} {...c('실험대 아래',ce,506+i*110,195,110,150,ce)}/>)}
+      </FBox>
+      <FBox title="조리대 좌측" x={325} y={465} w={260} h={150}>
+        {['서랍 ①','서랍 ②','서랍 ③'].map((ce,i)=><Cell key={ce} {...c('조리대 좌측',ce,325+i*87,465,87,40,ce)}/>)}
+        <Cell {...c('조리대 좌측','④',325,505,130,110,'④')}/>
+        <Cell {...c('조리대 좌측','⑤',455,505,130,110,'⑤')}/>
+      </FBox>
+      <FBox title="조리대 우측" x={625} y={465} w={260} h={150}>
+        {['서랍 ①','서랍 ②','서랍 ③'].map((ce,i)=><Cell key={ce} {...c('조리대 우측',ce,625+i*87,465,87,40,ce)}/>)}
+        <Cell {...c('조리대 우측','④',625,505,130,110,'④')}/>
+        <Cell {...c('조리대 우측','⑤',755,505,130,110,'⑤')}/>
+      </FBox>
+      <FBox title="싱크대 아래" x={170} y={580} w={145} h={48} tp="left">
+        <Cell {...c('싱크대 아래','②',170,580,72,48,'②')}/>
+        <Cell {...c('싱크대 아래','①',242,580,73,48,'①')}/>
+      </FBox>
+      <FBox title="싱크대 위" x={170} y={650} w={715} h={70} tp="left">
+        {['⑥','⑤','④','③','②','①'].map((ce,i)=><Cell key={ce} {...c('싱크대 위',ce,170+i*119,650,119,70,ce)}/>)}
+      </FBox>
+      <FBox title="저울대 아래" x={970} y={365} w={100} h={350} tp="bottom">
+        <Cell {...c('저울대 아래','①',970,365,100,130,'①',true)}/>
+        <Cell {...c('저울대 아래','②',970,495,100,130,'②',true)}/>
+        {['서랍 ①','서랍 ②','서랍 ③','서랍 ④'].map((ce,i)=><Cell key={ce} {...c('저울대 아래',ce,970+i*25,625,25,90,ce,true)}/>)}
+      </FBox>
+      <FBox title="저울대 위" x={1100} y={365} w={75} h={350} tp="bottom">
+        {['①','②','③'].map((ce,i)=><Cell key={ce} {...c('저울대 위',ce,1100,365+i*116.7,75,116.7,ce,true)}/>)}
+      </FBox>
+    </div>
+  );
+}
+function SimplePlan({space,title,p}) {
+  const g=ZONES[space]&&ZONES[space][0]?ZONES[space][0]:null;
+  if(!g) return null;
+  return (
+    <div style={{position:'relative',width:760,height:320,background:'var(--canvas)',border:'1px solid var(--hairline)',borderRadius:'var(--r-lg)',margin:'0 auto'}}>
+      <div style={{position:'absolute',left:32,top:20,fontSize:20,fontWeight:600,color:'var(--ink-deep)'}}>{title}</div>
+      <FBox title={g.group} x={120} y={100} w={520} h={180}>
+        {g.cells.slice(0,3).map((ce,i)=><Cell key={ce} {...p} group={g.group} cell={ce} label={ce} x={120+i*174} y={100} w={174} h={50}/>)}
+        {g.cells[3]&&<Cell {...p} group={g.group} cell={g.cells[3]} label={g.cells[3]} x={120} y={150} w={520} h={130}/>}
+      </FBox>
+    </div>
+  );
+}
+function DiscPlan({space,title,p}) {
+  const g=ZONES[space]&&ZONES[space][0]?ZONES[space][0]:null;
+  if(!g) return null;
+  return (
+    <div style={{position:'relative',width:600,height:320,background:'var(--canvas)',border:'1px solid var(--hairline)',borderRadius:'var(--r-lg)',margin:'0 auto'}}>
+      <div style={{position:'absolute',left:32,top:20,fontSize:20,fontWeight:600,color:'var(--ink-deep)'}}>{title}</div>
+      <FBox x={180} y={100} w={240} h={180}>
+        {g.cells.map((ce,i)=><Cell key={ce} {...p} group={g.group} cell={ce} label={ce} x={180} y={100+i*60} w={240} h={60}/>)}
+      </FBox>
+    </div>
+  );
+}
+function StorePlan(p) {
+  const c=(g,ce,x,y,w,h)=>({...p,group:g,cell:ce,label:ce,x,y,w,h});
+  return (
+    <div style={{position:'relative',width:900,height:520,background:'var(--canvas)',border:'1px solid var(--hairline)',borderRadius:'var(--r-lg)',margin:'0 auto'}}>
+      <div style={{position:'absolute',left:32,top:20,fontSize:20,fontWeight:600,color:'var(--ink-deep)'}}>창고</div>
+      <FBox title="수납장" x={50} y={80} w={240} h={400}>
+        {['①','②','③','④','⑤','⑥','⑦','⑧'].map((ce,i)=><Cell key={ce} {...c('수납장',ce,50+(i%2)*120,80+Math.floor(i/2)*100,120,100)}/>)}
+      </FBox>
+      <FBox title="박스" x={360} y={80} w={180} h={400}>
+        {['①','②','③'].map((ce,i)=><Cell key={ce} {...c('박스',ce,360,80+i*133,180,133)}/>)}
+      </FBox>
+      <FBox title="선반" x={610} y={80} w={120} h={400}>
+        {['①','②','③','④','⑤','⑥','⑦','⑧'].map((ce,i)=><Cell key={ce} {...c('선반',ce,610,80+i*50,120,50)}/>)}
+      </FBox>
+    </div>
+  );
+}
+function SpaceView({items,onNav,onItemClick,initialSpace}) {
+  const [space,setSpace]=useState(initialSpace||'준비');
+  const [sel,setSel]=useState(new Set());
+  const [showList,setShowList]=useState(false);
+  useEffect(()=>{setSel(new Set());setShowList(false);},[space]);
+  const iMap=useMemo(()=>itemsByLoc(items.filter(i=>i.space===space)),[items,space]);
+  const tog=key=>setSel(s=>{const n=new Set(s);n.has(key)?n.delete(key):n.add(key);return n;});
+  const selItems=useMemo(()=>{const out=[];for(const k of sel){const[g,c]=k.split('||');out.push(...(iMap[`${space}/${g}/${c}`]||[]));}return out;},[sel,iMap,space]);
+  const pp={space,itemMap:iMap,selected:sel,onToggle:tog};
+  return (
+    <div className="col" style={{height:'100%'}}>
+      <Topbar title="공간 조회" sub="배치도 기반 비품 위치 확인" action={
+        <div className="row" style={{gap:8}}>
+          <span style={{fontSize:13,color:'var(--slate)'}}>{sel.size}개 셀 선택</span>
+          <button className="btn btn-secondary btn-sm" disabled={!sel.size} onClick={()=>setSel(new Set())}><IC.refresh/> 초기화</button>
+          <button className="btn btn-secondary btn-sm" disabled={sel.size!==1} onClick={()=>{
+            const key=[...sel][0];
+            if(!key) return;
+            const idx=key.indexOf('||');
+            if(idx<0) return;
+            const group=key.slice(0,idx);
+            const cell=key.slice(idx+2);
+            onNav('register',{space,group,cell});
+          }}><IC.plus/> 등록</button>
+          <button className="btn btn-primary btn-sm" disabled={!sel.size} onClick={()=>setShowList(true)}>조회 ({selItems.length})</button>
+        </div>}/>
+      <div className="row" style={{padding:'0 32px',background:'var(--canvas)',borderBottom:'1px solid var(--hairline)',gap:4,flexShrink:0}}>
+        {SPACES.map(s=>{const a=space===s;const cnt=items.filter(i=>i.space===s).length;return(
+          <button key={s} onClick={()=>setSpace(s)} style={{padding:'14px 14px 12px',border:'none',background:'transparent',color:a?'var(--ink)':'var(--slate)',fontWeight:a?600:500,fontSize:14,borderBottom:a?'2px solid var(--primary)':'2px solid transparent',cursor:'pointer',position:'relative',top:1,display:'flex',alignItems:'center',gap:8,fontFamily:'inherit'}}>
+            {s}<span style={{fontSize:11,padding:'1px 6px',borderRadius:'var(--r-full)',background:a?'var(--primary-soft)':'var(--surface)',color:a?'var(--primary-deep)':'var(--slate)',fontWeight:600}}>{cnt}</span>
+          </button>
+        );})}
+      </div>
+      <div style={{padding:'12px 32px',background:'var(--surface)',borderBottom:'1px solid var(--hairline)',flexShrink:0}}>
+        <div className="row wrap" style={{gap:12}}>
+          <span style={{fontSize:12,fontWeight:600,color:'var(--steel)'}}>용도 분류</span>
+          {USES.map(u=><div key={u.id} className="row" style={{gap:5}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:11,color:'var(--charcoal)'}}>{u.name}</span></div>)}
+          <span style={{marginLeft:'auto',fontSize:11,color:'var(--steel)'}}>셀 색 = 최다 용도</span>
+        </div>
+      </div>
+      <div style={{flex:1,overflow:'auto',padding:'20px 32px',background:'var(--surface)',position:'relative'}}>
+        {space==='준비'&&<PrepPlan {...pp}/>}
+        {(space==='서빙1'||space==='서빙2')&&<SimplePlan space={space} title={space==='서빙1'?'Serving Room 1':'Serving Room 2'} p={pp}/>}
+        {(space==='토론1'||space==='토론2')&&<DiscPlan space={space} title={space==='토론1'?'Discussion Room 1':'Discussion Room 2'} p={pp}/>}
+        {space==='창고'&&<StorePlan {...pp}/>}
+        {showList&&(
+          <div onClick={()=>setShowList(false)} style={{position:'fixed',inset:0,background:'rgba(15,15,15,.3)',zIndex:30,display:'flex',alignItems:'flex-end'}}>
+            <div onClick={e=>e.stopPropagation()} className="card" style={{width:'100%',maxHeight:'65%',borderRadius:'var(--r-lg) var(--r-lg) 0 0',background:'var(--canvas)',boxShadow:'var(--shadow-4)',display:'flex',flexDirection:'column'}}>
+              <div className="row between" style={{padding:'16px 24px',borderBottom:'1px solid var(--hairline)'}}>
+                <div className="row" style={{gap:10}}>
+                  <span style={{fontSize:18,fontWeight:600}}>{space} · {sel.size}개 셀</span>
+                  <span className="badge" style={{background:'var(--primary-soft)',color:'var(--primary-deep)'}}>{selItems.length}개 품목</span>
+                </div>
+                <button className="btn btn-ghost btn-icon" onClick={()=>setShowList(false)}><IC.x/></button>
+              </div>
+              <div style={{flex:1,overflow:'auto'}}>
+                <table className="table">
+                  <thead><tr><th>품목명</th><th style={{width:140}}>용도</th><th style={{width:160}}>위치</th><th style={{width:120}}>규격</th><th style={{width:100,textAlign:'right'}}>수량</th></tr></thead>
+                  <tbody>
+                    {selItems.map(it=>{
+                      const u=useById(it.useId);
+                      const isLow=it.min!=null&&it.qty<it.min;
+                      return (
+                        <tr key={it.id} onClick={()=>{setShowList(false);onItemClick(it);}}>
+                          <td><div style={{fontWeight:500}}>{it.name}</div>{it.note&&<div style={{fontSize:12,color:'var(--steel)'}}>{it.note}</div>}</td>
+                          <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color}}/>{u.short}</span></td>
+                          <td><b>{it.group}</b> / {it.cell}</td>
+                          <td style={{fontSize:13,color:'var(--slate)'}}>{it.spec||'–'}</td>
+                          <td style={{textAlign:'right'}}><span style={{fontWeight:600,color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:12,color:'var(--slate)'}}> / {it.min}</span>}</td>
+                        </tr>
+                      );
+                    })}
+                    {selItems.length===0&&<tr><td colSpan="5" style={{padding:'40px 0',textAlign:'center',color:'var(--slate)'}}>선택한 셀에 품목이 없습니다.</td></tr>}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function UseSelect({value,onChange,editing}) {
+  const [open,setOpen]=useState(false);
+  const ref=useRef(null);
+  const u=USES.find(o=>o.id===value)||null;
+  useEffect(()=>{
+    const fn=e=>{if(ref.current&&!ref.current.contains(e.target))setOpen(false);};
+    document.addEventListener('mousedown',fn);
+    return()=>document.removeEventListener('mousedown',fn);
+  },[]);
+  return (
+    <div style={{position:'relative'}} ref={ref}>
+      <button onClick={()=>setOpen(o=>!o)} className={`input ${editing?'is-editing':''}`} style={{textAlign:'left',display:'flex',alignItems:'center',gap:8,cursor:'pointer',fontFamily:'inherit'}}>
+        {u?<><span className="swatch" style={{background:u.color}}/><span style={{flex:1}}>{u.name}</span></>:<span style={{flex:1,color:'var(--stone)'}}>선택…</span>}
+        <span style={{color:'var(--steel)'}}>▾</span>
+      </button>
+      {open&&(
+        <div className="card" style={{position:'absolute',top:'calc(100% + 4px)',left:0,right:0,padding:6,zIndex:30,boxShadow:'var(--shadow-2)',maxHeight:280,overflow:'auto'}}>
+          {USES.map(o=>(
+            <button key={o.id} onClick={()=>{onChange(o.id);setOpen(false);}} className="row" style={{gap:8,width:'100%',padding:'8px 10px',background:value===o.id?'var(--surface)':'transparent',border:'none',borderRadius:'var(--r-sm)',cursor:'pointer',fontFamily:'inherit'}} onMouseEnter={e=>e.currentTarget.style.background='var(--surface)'} onMouseLeave={e=>{if(value!==o.id)e.currentTarget.style.background='transparent';}}>
+              <span className="swatch" style={{background:o.color}}/><span style={{fontSize:14}}>{o.name}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||'',group:pre.group||'',cell:pre.cell||'',spec:'',qty:'',min:'',received:'',note:''};}
+function RegisterEdit({mode,item,prefill,onCancel,onSave,onDelete}) {
+  const isEdit=mode==='edit';
+  const [form,setForm]=useState(()=>isEdit&&item?{...item}:blank(prefill||{}));
+  const [ef,setEf]=useState(null);
+  const [errs,setErrs]=useState({});
+  const [delM,setDelM]=useState(false);
+  const [saved,setSaved]=useState(false);
+  const rq=form.useId&&QTY_REQ.includes(form.useId);
+  const setF=(k,v)=>{setForm(f=>{const n={...f,[k]:v};if(k==='space'){n.group='';n.cell='';}if(k==='group')n.cell='';return n;});setEf(k);};
+  const validate=()=>{
+    const e={};
+    if(!form.name.trim())e.name='품목명을 입력하세요.';
+    if(!form.useId)e.useId='용도를 선택하세요.';
+    if(!form.space)e.space='공간을 선택하세요.';
+    if(!form.group)e.group='구역을 선택하세요.';
+    if(!form.cell)e.cell='셀을 선택하세요.';
+    if(rq){if(form.qty==='')e.qty='수량은 필수입니다.';if(form.min==='')e.min='최소 재고는 필수입니다.';}
+    setErrs(e);return !Object.keys(e).length;
+  };
+  const submit=()=>{
+    if(!validate())return;
+    onSave({...form,qty:form.qty===''?0:+form.qty,min:form.min===''?null:+form.min});
+    setSaved(true);setTimeout(()=>setSaved(false),1200);
+  };
+  const groups=form.space?[...new Set((ZONES[form.space]||[]).map(z=>z.group))]:[];
+  const cells=form.space&&form.group?(ZONES[form.space]||[]).filter(z=>z.group===form.group).flatMap(z=>z.cells):[];
+  return (
+    <div className="col" style={{height:'100%'}}>
+      <Topbar title={isEdit?'품목 수정':'신규 등록'} sub={isEdit&&item?`최종 수정: ${item.updatedAt} · ${item.updatedBy}`:'비품 정보를 입력하세요'} action={
+        <div className="row" style={{gap:8}}>
+          {isEdit&&<button className="btn btn-danger" onClick={()=>setDelM(true)}><IC.trash/> 삭제</button>}
+          <button className="btn btn-secondary" onClick={onCancel}>취소</button>
+          <button className="btn btn-primary" onClick={submit}>{isEdit?'저장':'등록'}</button>
+        </div>}/>
+      <div style={{flex:1,overflow:'auto',padding:32}}>
+        <div style={{maxWidth:860,margin:'0 auto',display:'flex',flexDirection:'column',gap:16}}>
+          {!isEdit&&prefill?.space&&(
+            <div className="card" style={{padding:16,background:'var(--tint-lavender)',border:'1px solid var(--brand-purple-300)'}}>
+              <div className="row" style={{gap:10}}><span style={{width:22,height:22,borderRadius:'50%',background:'var(--primary)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:700,flexShrink:0}}>!</span>
+              <span style={{fontSize:13,color:'var(--brand-purple-800)'}}>공간 조회에서 <b>{prefill.space} / {prefill.group} / {prefill.cell}</b>의 신규 등록으로 이동했습니다. 위치 정보가 자동 입력되었습니다.</span></div>
+            </div>
+          )}
+          <div className="card" style={{padding:24}}>
+            <div style={{fontSize:16,fontWeight:600,marginBottom:16}}>기본 정보</div>
+            <div style={{display:'grid',gridTemplateColumns:'1.4fr 1fr',gap:16}}>
+              <Field label="품목명" required err={errs.name}><input className={`input ${ef==='name'?'is-editing':''}`} placeholder="예: 정량 피펫" value={form.name} onChange={e=>setF('name',e.target.value)}/></Field>
+              <Field label="용도 분류" required err={errs.useId}><UseSelect value={form.useId} onChange={v=>setF('useId',v)} editing={ef==='useId'}/></Field>
+            </div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginTop:16}}>
+              <Field label="규격"><input className={`input ${ef==='spec'?'is-editing':''}`} placeholder="예: 250 mL" value={form.spec} onChange={e=>setF('spec',e.target.value)}/></Field>
+              <Field label="입고 시기"><input className={`input ${ef==='received'?'is-editing':''}`} placeholder="2026-04" value={form.received} onChange={e=>setF('received',e.target.value)}/></Field>
+            </div>
+          </div>
+          <div className="card" style={{padding:24}}>
+            <div style={{fontSize:16,fontWeight:600,marginBottom:16}}>위치</div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:16}}>
+              <Field label="공간" required err={errs.space}><select className={`select ${ef==='space'?'is-editing':''}`} value={form.space} onChange={e=>setF('space',e.target.value)}><option value="">선택…</option>{SPACES.map(s=><option key={s} value={s}>{s}</option>)}</select></Field>
+              <Field label="구역" required err={errs.group}><select className={`select ${ef==='group'?'is-editing':''}`} value={form.group} onChange={e=>setF('group',e.target.value)} disabled={!form.space}><option value="">{form.space?'선택…':'공간을 먼저 선택'}</option>{groups.map(g=><option key={g} value={g}>{g}</option>)}</select></Field>
+              <Field label="셀" required err={errs.cell}><select className={`select ${ef==='cell'?'is-editing':''}`} value={form.cell} onChange={e=>setF('cell',e.target.value)} disabled={!form.group}><option value="">{form.group?'선택…':'구역을 먼저 선택'}</option>{cells.map(c=><option key={c} value={c}>{c}</option>)}</select></Field>
+            </div>
+          </div>
+          <div className="card" style={{padding:24}}>
+            <div className="row between" style={{marginBottom:16}}>
+              <div style={{fontSize:16,fontWeight:600}}>수량 정보</div>
+              {rq&&<span className="badge" style={{background:'var(--tint-peach)',color:'var(--brand-orange-deep)'}}>수량 필수</span>}
+            </div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16}}>
+              <Field label={`수량${rq?' *':''}`} err={errs.qty}><input className={`input ${ef==='qty'?'is-editing':''}`} type="number" placeholder="0" value={form.qty??''} onChange={e=>setF('qty',e.target.value)}/></Field>
+              <Field label={`최소 재고${rq?' *':''}`} err={errs.min}><input className={`input ${ef==='min'?'is-editing':''}`} type="number" placeholder={rq?'필수':'선택'} value={form.min??''} onChange={e=>setF('min',e.target.value)}/></Field>
+            </div>
+          </div>
+          <div className="card" style={{padding:24}}>
+            <div style={{fontSize:16,fontWeight:600,marginBottom:12}}>비고</div>
+            <textarea className={`textarea ${ef==='note'?'is-editing':''}`} placeholder="추가 메모" value={form.note} onChange={e=>setF('note',e.target.value)} rows={3}/>
+          </div>
+          {isEdit&&item&&(
+            <div className="card" style={{padding:16,background:'var(--surface)'}}>
+              <div style={{fontSize:12,fontWeight:600,color:'var(--steel)',marginBottom:8}}>시스템 정보</div>
+              <div className="row wrap" style={{gap:32}}>
+                {[['최초 등록일',item.createdAt],['최종 수정일',item.updatedAt],['최종 수정인',item.updatedBy],['품목 ID',`#${item.id}`]].map(([l,v])=>(
+                  <div key={l} className="col"><span style={{fontSize:11,color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>{l}</span><span style={{fontSize:13,fontWeight:500,marginTop:2}}>{v}</span></div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+      <Modal open={delM} onClose={()=>setDelM(false)}>
+        <div style={{padding:28}}>
+          <div className="row" style={{gap:12,marginBottom:16}}>
+            <div style={{width:40,height:40,borderRadius:'50%',background:'var(--tint-rose)',color:'var(--brand-pink-deep)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><IC.alert/></div>
+            <div><div style={{fontSize:16,fontWeight:600}}>이 품목을 삭제할까요?</div><div style={{fontSize:13,color:'var(--slate)',marginTop:2}}>{form.name}</div></div>
+          </div>
+          <div className="row between">
+            <button className="btn btn-danger" onClick={()=>{if(onDelete&&item)onDelete(item.id);setDelM(false);}}><IC.trash/> 삭제</button>
+            <button className="btn btn-secondary" onClick={()=>setDelM(false)}>취소</button>
+          </div>
+        </div>
+      </Modal>
+      {saved&&<div style={{position:'fixed',bottom:28,right:28,zIndex:200,background:'var(--ink-deep)',color:'#fff',padding:'10px 18px',borderRadius:'var(--r-md)',fontSize:13,fontWeight:500,boxShadow:'var(--shadow-2)'}}>{isEdit?'저장되었습니다':'등록되었습니다'}</div>}
+    </div>
+  );
+}
+
+function ItemDetail({item,onBack,onEdit,onDelete}) {
+  const u=useById(item.useId);
+  const isLow=item.min!=null&&item.qty<item.min;
+  const [delM,setDelM]=useState(false);
+  return (
+    <div className="col" style={{height:'100%'}}>
+      <Topbar title={item.name} sub={`#${item.id} · ${item.space} / ${item.group} / ${item.cell}`} action={
+        <div className="row" style={{gap:8}}>
+          <button className="btn btn-danger" onClick={()=>setDelM(true)}><IC.trash/> 삭제</button>
+          <button className="btn btn-secondary" onClick={onBack}><IC.back/> 목록</button>
+          <button className="btn btn-primary" onClick={onEdit}><IC.edit/> 수정</button>
+        </div>}/>
+      <div style={{flex:1,overflow:'auto',padding:32}}>
+        <div style={{maxWidth:860,margin:'0 auto',display:'flex',flexDirection:'column',gap:16}}>
+          <div className="card" style={{padding:24,display:'grid',gridTemplateColumns:'1.4fr 1fr',gap:24}}>
+            <div>
+              <span className="badge" style={{background:u.color,color:'#fff'}}>{u.name}</span>
+              <h2 style={{margin:'12px 0 6px',fontSize:28,fontWeight:600,color:'var(--ink-deep)'}}>{item.name}</h2>
+              <div style={{fontSize:14,color:'var(--charcoal)'}}><span style={{color:'var(--slate)'}}>위치</span> <b>{item.space} / {item.group} / {item.cell}</b></div>
+              {item.note&&<div style={{marginTop:12,padding:'10px 14px',background:'var(--tint-yellow)',borderRadius:'var(--r-md)',fontSize:13}}>📌 {item.note}</div>}
+            </div>
+            <div style={{background:isLow?'var(--tint-rose)':'var(--tint-mint)',borderRadius:'var(--r-lg)',padding:'18px 20px',display:'flex',flexDirection:'column',justifyContent:'center'}}>
+              <div style={{fontSize:12,fontWeight:600,color:isLow?'var(--brand-pink-deep)':'var(--brand-green)'}}>{isLow?'재고 부족':'재고 양호'}</div>
+              <div style={{fontSize:38,fontWeight:600,color:'var(--ink-deep)',marginTop:4}}>{item.qty}{item.min!=null&&<span style={{fontSize:18,color:'var(--slate)',fontWeight:500}}> / {item.min}</span>}</div>
+              <div style={{fontSize:12,color:'var(--slate)',marginTop:4}}>{item.min!=null?'현재 / 최소':'현재 수량'}</div>
+            </div>
+          </div>
+          <div className="card" style={{padding:24}}>
+            <div style={{fontSize:16,fontWeight:600,marginBottom:16}}>상세 정보</div>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:20}}>
+              {[['규격',item.spec||'–'],['입고 시기',item.received||'–'],['공간',item.space],['구역',item.group],['셀',item.cell]].map(([l,v])=>(
+                <div key={l}><div style={{fontSize:11,color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>{l}</div><div style={{fontSize:14,fontWeight:500,marginTop:4}}>{v}</div></div>
+              ))}
+              <div><div style={{fontSize:11,color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>용도</div><div className="row" style={{gap:6,marginTop:4}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:14,fontWeight:500}}>{u.name}</span></div></div>
+            </div>
+          </div>
+          <div className="card" style={{padding:16,background:'var(--surface)'}}>
+            <div className="row wrap" style={{gap:32}}>
+              {[['최초 등록일',item.createdAt],['최종 수정일',item.updatedAt],['최종 수정인',item.updatedBy],['품목 ID',`#${item.id}`]].map(([l,v])=>(
+                <div key={l} className="col"><span style={{fontSize:11,color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>{l}</span><span style={{fontSize:13,fontWeight:500,marginTop:2}}>{v}</span></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+      <Modal open={delM} onClose={()=>setDelM(false)}>
+        <div style={{padding:28}}>
+          <div className="row" style={{gap:12,marginBottom:16}}>
+            <div style={{width:40,height:40,borderRadius:'50%',background:'var(--tint-rose)',color:'var(--brand-pink-deep)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><IC.alert/></div>
+            <div><div style={{fontSize:16,fontWeight:600}}>이 품목을 삭제할까요?</div><div style={{fontSize:13,color:'var(--slate)',marginTop:2}}>{item.name}</div></div>
+          </div>
+          <div className="row between">
+            <button className="btn btn-danger" onClick={()=>{onDelete(item.id);setDelM(false);}}><IC.trash/> 삭제</button>
+            <button className="btn btn-secondary" onClick={()=>setDelM(false)}>취소</button>
+          </div>
+        </div>
+      </Modal>
+    </div>
+  );
+}
+
+export default function App() {
+  const [authed,setAuthed]=useState(false);
+  const [user,setUser]=useState(null);
+  const [route,setRoute]=useState({name:'dashboard'});
+  const [items,setItems]=useState(SEED);
+  const [activity,setActivity]=useState(SEED_ACT);
+
+  const nav=(name,params={})=>setRoute({name,...params});
+  const openItem=(it,fromSpace=null)=>{if(it&&it.id!=null)setRoute({name:'detail',itemId:it.id,fromSpace});};
+  const login=u=>{setUser(u);setAuthed(true);setRoute({name:'dashboard'});};
+  const logout=()=>{setAuthed(false);setUser(null);};
+
+  const upsert=data=>{
+    setItems(prev=>{
+      const idx=prev.findIndex(p=>p.id===data.id);
+      if(idx>=0){const n=[...prev];n[idx]={...data,updatedAt:'오늘',updatedBy:user.name};return n;}
+      const newId=Math.max(...prev.map(p=>p.id),0)+1;
+      return [{...data,id:newId,createdAt:'오늘',updatedAt:'오늘',updatedBy:user.name},...prev];
+    });
+    setActivity(a=>[{id:Date.now(),action:data.id?'update':'create',name:data.name,user:user.name,time:'방금'},...a].slice(0,8));
+    const savedId=data.id??Math.max(...items.map(p=>p.id),0)+1;
+    setRoute({name:'detail',itemId:savedId,fromSpace:route.fromSpace});
+  };
+
+  const remove=id=>{
+    const it=items.find(i=>i.id===id);
+    setItems(p=>p.filter(i=>i.id!==id));
+    if(it) setActivity(a=>[{id:Date.now(),action:'delete',name:it.name,user:user.name,time:'방금'},...a].slice(0,8));
+    nav('search');
+  };
+
+  const removeMany=ids=>{setItems(p=>p.filter(i=>!ids.includes(i.id)));};
+
+  if(!authed) {
+    return (
+      <>
+        <style>{SIDEBAR_CSS}{STYLE_SHEET}</style>
+        <div className="app"><Login onLogin={login}/></div>
+      </>
+    );
+  }
+
+  const getItem=id=>items.find(i=>i.id===id)||null;
+
+  let view=null;
+  if(route.name==='dashboard') {
+    view=<Dashboard items={items} activity={activity} onNav={nav} onItemClick={openItem}/>;
+  } else if(route.name==='search') {
+    view=<Search items={items} onItemClick={openItem} onDelete={removeMany}/>;
+  } else if(route.name==='space') {
+    view=<SpaceView items={items} initialSpace={route.space} onNav={nav} onItemClick={(it)=>openItem(it,route.space||'준비')}/>;
+  } else if(route.name==='register') {
+    view=<RegisterEdit mode="create" prefill={route.group?{space:route.space,group:route.group,cell:route.cell}:null} onCancel={()=>route.space?nav('space',{space:route.space}):nav('search')} onSave={upsert}/>;
+  } else if(route.name==='edit') {
+    const it=getItem(route.itemId);
+    view=it
+      ?<RegisterEdit mode="edit" item={it} onCancel={()=>setRoute({name:'detail',itemId:it.id})} onSave={upsert} onDelete={remove}/>
+      :<Search items={items} onItemClick={openItem} onDelete={removeMany}/>;
+  } else if(route.name==='detail') {
+    const it=getItem(route.itemId);
+            view=it
+      ?<ItemDetail item={it} onBack={()=>route.fromSpace?nav('space',{space:route.fromSpace}):nav('search')} onEdit={()=>setRoute({name:'edit',itemId:it.id,fromSpace:route.fromSpace})} onDelete={remove}/>
+      :<Search items={items} onItemClick={openItem} onDelete={removeMany}/>;
+  }
+
+  return (
+    <>
+      <style>{SIDEBAR_CSS}{STYLE_SHEET}</style>
+      <div className="app" style={{display:'flex'}}>
+        <Sidebar cur={route.name} onNav={nav} user={user} onLogout={logout}/>
+        <div style={{flex:1,display:'flex',flexDirection:'column',minWidth:0,height:'100vh',overflow:'hidden'}}>
+          {view}
+        </div>
+      </div>
+    </>
+  );
+}
