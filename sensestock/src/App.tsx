@@ -340,7 +340,7 @@ function Topbar({title,sub,action}) {
 }
 function Field({label,required,err,children}) {
   return (
-    <div>
+    <div style={{minWidth:0}}>
       <label className="field-label">{label}{required&&<span style={{color:'var(--brand-pink-deep)'}}> *</span>}</label>
       {children}
       {err&&<div style={{fontSize:12,color:'var(--error)',marginTop:4}}>{err}</div>}
@@ -788,7 +788,7 @@ function PrepPlan(p) {
       <FBox title="저울대 아래" x={970} y={365} w={100} h={350} tp="bottom">
         <Cell {...c('저울대 아래','①',970,365,100,130,'①',true)}/>
         <Cell {...c('저울대 아래','②',970,495,100,130,'②',true)}/>
-        {['서랍 ①','서랍 ②','서랍 ③','서랍 ④'].map((ce,i)=><Cell key={ce} {...c('저울대 아래',ce,970+i*25,625,25,90,ce,true)}/>)}
+        {['서랍 ④','서랍 ③','서랍 ②','서랍 ①'].map((ce,i)=><Cell key={ce} {...c('저울대 아래',ce,970+i*25,625,25,90,ce,true)}/>)}
       </FBox>
       <FBox title="저울대 위" x={1100} y={365} w={75} h={350} tp="bottom">
         {['①','②','③'].map((ce,i)=><Cell key={ce} {...c('저울대 위',ce,1100,365+i*116.7,75,116.7,ce,true)}/>)}
@@ -1250,10 +1250,10 @@ function MiniMapPrep({itemGroup,itemCell,itemColor}:{itemGroup:string,itemCell:s
         <div style={{position:'absolute',left:970,top:365,width:100,height:350,border:'1.5px solid #1A1916',borderRadius:4}}/>
         <MiniCell {...c('저울대 아래','①',970,365,100,130,'①',true)}/>
         <MiniCell {...c('저울대 아래','②',970,495,100,130,'②',true)}/>
-        <MiniCell {...c('저울대 아래','서랍 ①',970,625,25,90,'서①',true)}/>
-        <MiniCell {...c('저울대 아래','서랍 ②',995,625,25,90,'서②',true)}/>
-        <MiniCell {...c('저울대 아래','서랍 ③',1020,625,25,90,'서③',true)}/>
-        <MiniCell {...c('저울대 아래','서랍 ④',1045,625,25,90,'서④',true)}/>
+        <MiniCell {...c('저울대 아래','서랍 ④',970,625,25,90,'서④',true)}/>
+        <MiniCell {...c('저울대 아래','서랍 ③',995,625,25,90,'서③',true)}/>
+        <MiniCell {...c('저울대 아래','서랍 ②',1020,625,25,90,'서②',true)}/>
+        <MiniCell {...c('저울대 아래','서랍 ①',1045,625,25,90,'서①',true)}/>
         {/* 저울대 위 */}
         <div style={{position:'absolute',left:1100,top:365,width:75,height:350,border:'1.5px solid #1A1916',borderRadius:4}}/>
         <MiniCell {...c('저울대 위','①',1100,365,75,117,'①',true)}/>
