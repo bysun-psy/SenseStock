@@ -915,7 +915,7 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
                     {selItems.length===0&&<tr><td colSpan={5} style={{padding:'40px 0',textAlign:'center',color:'var(--slate)'}}>선택한 셀에 품목이 없습니다.</td></tr>}
                   </tbody>
                 </table>
-                <div className="desktop-hide" style={{display:'flex',flexDirection:'column'}}>
+                <div className="desktop-hide mobile-list" style={{display:'flex',flexDirection:'column'}}>
                   {selItems.map(it=>{
                     const u=useById(it.useId);
                     const isLow=it.min!=null&&it.qty<it.min;
@@ -1002,8 +1002,8 @@ function MonthPicker({value,onChange,editing}:{value:string,onChange:(v:string)=
   };
   const months=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
   return (
-    <div style={{position:'relative'}} ref={ref}>
-      <div className={`input ${editing?'is-editing':''}`} style={{display:'flex',alignItems:'center',gap:6,padding:'0 10px',cursor:'text'}}>
+    <div style={{position:'relative',minWidth:0}} ref={ref}>
+      <div className={`input ${editing?'is-editing':''}`} style={{display:'flex',alignItems:'center',gap:6,padding:'0 10px',cursor:'text',minWidth:0,width:'100%'}}>
         <input value={value} onChange={handleText} placeholder="YYYY-MM" maxLength={7} style={{flex:1,border:'none',outline:'none',background:'transparent',font:'inherit',fontSize:14,color:'var(--ink)',padding:0}}/>
         <button onClick={()=>{setOpen(o=>!o);if(value){const y=parseInt(value.slice(0,4));if(!isNaN(y))setViewYear(y);}}} style={{background:'none',border:'none',cursor:'pointer',padding:'2px 4px',color:'var(--slate)',display:'flex',alignItems:'center',flexShrink:0,fontSize:13}}>📅</button>
       </div>
@@ -1074,9 +1074,9 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
               <Field label="품목명" required err={errs.name}><input className={`input ${ef==='name'?'is-editing':''}`} placeholder="예: 정량 피펫" value={form.name} onChange={e=>setF('name',e.target.value)}/></Field>
               <Field label="용도 분류" required err={errs.useId}><UseSelect value={form.useId} onChange={v=>setF('useId',v)} editing={ef==='useId'}/></Field>
             </div>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginTop:16}}>
-              <Field label="규격"><input className={`input ${ef==='spec'?'is-editing':''}`} placeholder="예: 250 mL" value={form.spec} onChange={e=>setF('spec',e.target.value)}/></Field>
-              <Field label="입고 시기"><MonthPicker value={form.received} onChange={v=>setF('received',v)} editing={ef==='received'}/></Field>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginTop:16,minWidth:0}}>
+              <Field label="규격"><input className={`input ${ef==='spec'?'is-editing':''}`} placeholder="예: 250 mL" value={form.spec} onChange={e=>setF('spec',e.target.value)} style={{minWidth:0}}/></Field>
+              <Field label="입고 시기" ><MonthPicker value={form.received} onChange={v=>setF('received',v)} editing={ef==='received'}/></Field>
             </div>
           </div>
           <div className="card" style={{padding:24}}>
@@ -1169,7 +1169,7 @@ function MiniCell({group,cell,label,x,y,w,h,vert,itemGroup,itemCell,itemColor}:{
   const tc=isTarget?(darkColors.includes(itemColor)?'rgba(255,255,255,.9)':'var(--ink)'):'#9B9A97';
   return (
     <div style={{position:'absolute',left:x,top:y,width:w,height:h,background:bg,border:isTarget?'2.5px solid #1A1916':'1px solid #DEDCD7',borderRadius:4,display:'flex',alignItems:vert?'flex-end':'flex-start',justifyContent:vert?'center':'flex-start',padding:vert?5:5,boxSizing:'border-box',boxShadow:isTarget?'0 4px 12px rgba(15,15,15,.18)':'none'}}>
-      <span style={{fontSize:vert?10:label.length>2?9:10,fontWeight:isTarget?700:600,color:tc,writingMode:vert?'vertical-rl':'horizontal-tb',lineHeight:1.2}}>{label}</span>
+      <span style={{fontSize:10,fontWeight:isTarget?700:600,color:tc,writingMode:vert?'vertical-rl':'horizontal-tb',lineHeight:1.2}}>{label}</span>
     </div>
   );
 }
