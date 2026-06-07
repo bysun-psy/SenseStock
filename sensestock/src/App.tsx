@@ -915,7 +915,7 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
                     {selItems.length===0&&<tr><td colSpan={5} style={{padding:'40px 0',textAlign:'center',color:'var(--slate)'}}>선택한 셀에 품목이 없습니다.</td></tr>}
                   </tbody>
                 </table>
-                <div className="desktop-hide mobile-list" style={{display:'flex',flexDirection:'column'}}>
+                <div className="desktop-hide mobile-list" style={{flexDirection:'column'}}>
                   {selItems.map(it=>{
                     const u=useById(it.useId);
                     const isLow=it.min!=null&&it.qty<it.min;
@@ -1008,7 +1008,7 @@ function MonthPicker({value,onChange,editing}:{value:string,onChange:(v:string)=
         <button onClick={()=>{setOpen(o=>!o);if(value){const y=parseInt(value.slice(0,4));if(!isNaN(y))setViewYear(y);}}} style={{background:'none',border:'none',cursor:'pointer',padding:'2px 4px',color:'var(--slate)',display:'flex',alignItems:'center',flexShrink:0,fontSize:13}}>📅</button>
       </div>
       {open&&(
-        <div className="card" style={{position:'absolute',top:'calc(100% + 4px)',left:0,zIndex:30,padding:14,boxShadow:'var(--shadow-2)',minWidth:240}}>
+        <div className="card" style={{position:'absolute',top:'calc(100% + 4px)',left:0,right:0,zIndex:30,padding:14,boxShadow:'var(--shadow-2)'}}>
           <div className="row between" style={{marginBottom:12,alignItems:'center'}}>
             <button onClick={()=>setViewYear(y=>y-1)} style={{background:'none',border:'none',cursor:'pointer',fontSize:16,color:'var(--charcoal)',padding:'2px 8px',borderRadius:'var(--r-sm)'}}>◀</button>
             <span style={{fontWeight:600,fontSize:15,color:'var(--ink-deep)'}}>{viewYear}년</span>
@@ -1176,7 +1176,7 @@ function MiniCell({group,cell,label,x,y,w,h,vert,itemGroup,itemCell,itemColor}:{
 
 function MiniMapPrep({itemGroup,itemCell,itemColor}:{itemGroup:string,itemCell:string,itemColor:string}) {
   const p={itemGroup,itemCell,itemColor};
-  const c=(g:string,ce:string,x:number,y:number,w:number,h:number,label?:string,vert?:boolean)=>({...p,group:g,cell:ce,label:label??ce,x,y,w,h,vert});
+  const c=(g:string,ce:string,x:number,y:number,w:number,h:number,label?:string,vert?:boolean)=>({...p,group:g,cell:ce,label:toPlainLabel(label??ce),x,y,w,h,vert});
   const ORIG_W=1200,ORIG_H=730;
   const wrapRef=useRef<HTMLDivElement>(null);
   const [scale,setScale]=useState(0.47);
@@ -1290,11 +1290,11 @@ function MiniMapSimple({space,itemGroup,itemCell,itemColor}:{space:string,itemGr
         {/* 조리대 외곽 */}
         <div style={{position:'absolute',left:60,top:40,width:380,height:210,border:'1.5px solid #1A1916',borderRadius:4}}/>
         {/* 서랍 ①②③ — 상단 가로 3분할 */}
-        <MiniCell {...p} group={g.group} cell={g.cells[0]} label={g.cells[0]} x={60} y={40} w={drawerW} h={60}/>
-        <MiniCell {...p} group={g.group} cell={g.cells[1]} label={g.cells[1]} x={60+drawerW} y={40} w={drawerW} h={60}/>
-        <MiniCell {...p} group={g.group} cell={g.cells[2]} label={g.cells[2]} x={60+drawerW*2} y={40} w={lastDrawerW} h={60}/>
+        <MiniCell {...p} group={g.group} cell={g.cells[0]} label={toPlainLabel(g.cells[0])} x={60} y={40} w={drawerW} h={60}/>
+        <MiniCell {...p} group={g.group} cell={g.cells[1]} label={toPlainLabel(g.cells[1])} x={60+drawerW} y={40} w={drawerW} h={60}/>
+        <MiniCell {...p} group={g.group} cell={g.cells[2]} label={toPlainLabel(g.cells[2])} x={60+drawerW*2} y={40} w={lastDrawerW} h={60}/>
         {/* ④ — 하단 전체 너비 */}
-        {g.cells[3]&&<MiniCell {...p} group={g.group} cell={g.cells[3]} label={g.cells[3]} x={60} y={100} w={380} h={150}/>}
+        {g.cells[3]&&<MiniCell {...p} group={g.group} cell={g.cells[3]} label={toPlainLabel(g.cells[3])} x={60} y={100} w={380} h={150}/>}
       </div>
     </div>
   );
@@ -1321,7 +1321,7 @@ function MiniMapDisc({space,itemGroup,itemCell,itemColor}:{space:string,itemGrou
     <div ref={wrapRef} style={{borderRadius:8,border:'1px solid #ECEBE8',background:'#F7F6F3',overflow:'hidden',position:'relative',height:rh}}>
       <div style={{transform:`scale(${scale})`,transformOrigin:'top left',width:ORIG_W,height:ORIG_H,position:'absolute',top:0,left:0,pointerEvents:'none'}}>
         <div style={{position:'absolute',left:100,top:40,width:300,height:g.cells.length*60,border:'1.5px solid #1A1916',borderRadius:4}}/>
-        {g.cells.map((ce,i)=><MiniCell key={ce} {...p} group={g.group} cell={ce} label={ce} x={100} y={40+i*60} w={300} h={60}/>)}
+        {g.cells.map((ce,i)=><MiniCell key={ce} {...p} group={g.group} cell={ce} label={toPlainLabel(ce)} x={100} y={40+i*60} w={300} h={60}/>)}
       </div>
     </div>
   );
@@ -1347,13 +1347,13 @@ function MiniMapStore({itemGroup,itemCell,itemColor}:{itemGroup:string,itemCell:
       <div style={{transform:`scale(${scale})`,transformOrigin:'top left',width:ORIG_W,height:ORIG_H,position:'absolute',top:0,left:0,pointerEvents:'none'}}>
         {/* 수납장 */}
         <div style={{position:'absolute',left:50,top:80,width:240,height:400,border:'1.5px solid #1A1916',borderRadius:4}}/>
-        {['①','②','③','④','⑤','⑥','⑦','⑧'].map((ce,i)=><MiniCell key={ce} {...p} group="수납장" cell={ce} label={ce} x={50+(i%2)*120} y={80+Math.floor(i/2)*100} w={120} h={100}/>)}
+        {['①','②','③','④','⑤','⑥','⑦','⑧'].map((ce,i)=><MiniCell key={ce} {...p} group="수납장" cell={ce} label={toPlainLabel(ce)} x={50+(i%2)*120} y={80+Math.floor(i/2)*100} w={120} h={100}/>)}
         {/* 박스 */}
         <div style={{position:'absolute',left:360,top:80,width:180,height:400,border:'1.5px solid #1A1916',borderRadius:4}}/>
-        {['①','②','③'].map((ce,i)=><MiniCell key={ce} {...p} group="박스" cell={ce} label={ce} x={360} y={80+i*133} w={180} h={133}/>)}
+        {['①','②','③'].map((ce,i)=><MiniCell key={ce} {...p} group="박스" cell={ce} label={toPlainLabel(ce)} x={360} y={80+i*133} w={180} h={133}/>)}
         {/* 선반 */}
         <div style={{position:'absolute',left:610,top:80,width:120,height:400,border:'1.5px solid #1A1916',borderRadius:4}}/>
-        {['①','②','③','④','⑤','⑥','⑦','⑧'].map((ce,i)=><MiniCell key={ce} {...p} group="선반" cell={ce} label={ce} x={610} y={80+i*50} w={120} h={50}/>)}
+        {['①','②','③','④','⑤','⑥','⑦','⑧'].map((ce,i)=><MiniCell key={ce} {...p} group="선반" cell={ce} label={toPlainLabel(ce)} x={610} y={80+i*50} w={120} h={50}/>)}
       </div>
     </div>
   );
