@@ -1,6 +1,18 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { supabase } from "./supabaseClient";
 
+function useMediaQuery(query:string):boolean {
+  const [matches,setMatches]=useState(()=>typeof window!=='undefined'?window.matchMedia(query).matches:false);
+  useEffect(()=>{
+    const mq=window.matchMedia(query);
+    setMatches(mq.matches);
+    const fn=(e:MediaQueryListEvent)=>setMatches(e.matches);
+    mq.addEventListener('change',fn);
+    return()=>mq.removeEventListener('change',fn);
+  },[query]);
+  return matches;
+}
+
 const SIDEBAR_CSS = `
   .ss-aside { transition: width 0.22s ease; overflow: hidden; }
   .ss-aside.collapsed { width: 52px !important; }
@@ -14,6 +26,32 @@ const SIDEBAR_CSS = `
   .ss-tooltip { display:none; position:absolute; left:calc(100% + 8px); top:50%; transform:translateY(-50%); background:#2D2D2D; color:#fff; font-size:12px; font-weight:500; padding:4px 8px; border-radius:6px; white-space:nowrap; pointer-events:none; z-index:100; }
   .ss-aside.collapsed .ss-nav-item:hover .ss-tooltip { display:block; }
   .ss-toggle-btn { width:24px; height:24px; border-radius:6px; background:none; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--slate); flex-shrink:0; padding:0; }
+  .bottom-nav { display:none; }
+  .desktop-hide { display:none; }
+  @media (max-width:768px) {
+    .ss-aside { display:none !important; }
+    .bottom-nav { display:flex !important; position:fixed; bottom:0; left:0; right:0; height:60px; background:var(--canvas); border-top:1px solid var(--hairline); z-index:50; align-items:stretch; }
+    .bottom-nav-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; border:none; background:transparent; cursor:pointer; font-family:inherit; font-size:10px; font-weight:500; color:var(--slate); padding:0; }
+    .bottom-nav-item.active { color:var(--primary); }
+    .bottom-nav-item.active .bnav-icon { color:var(--primary); }
+    .bnav-icon { color:var(--slate); display:flex; }
+    .mobile-content { padding-bottom:100px !important; }
+    .app { height:100dvh !important; }
+    .mobile-topbar { padding:14px 16px !important; }
+    .mobile-topbar h1 { font-size:17px !important; white-space:nowrap; overflow:visible !important; text-overflow:clip !important; }
+    .mobile-topbar .topbar-sub { display:none; }
+    .mobile-topbar .topbar-actions { gap:6px !important; flex-shrink:1 !important; min-width:0; }
+    .mobile-topbar .topbar-actions .btn { flex-shrink:0; }
+    .mobile-pad { padding:16px !important; }
+    .mobile-pad-x { padding-left:16px !important; padding-right:16px !important; }
+    .mobile-grid-1 { grid-template-columns:1fr !important; }
+    .mobile-grid-2 { grid-template-columns:1fr 1fr !important; }
+    .mobile-hide { display:none !important; }
+    .desktop-hide { display:block !important; }
+    .mobile-scroll-x { overflow-x:auto !important; -webkit-overflow-scrolling:touch; }
+    .mobile-h2 { font-size:20px !important; }
+    .mobile-full { width:100% !important; max-width:100% !important; }
+  }
 `;
 const STYLE_SHEET = `
 :root {
@@ -36,7 +74,7 @@ const STYLE_SHEET = `
 }
 *{box-sizing:border-box}
 body,#root{margin:0;padding:0}
-.app{font-family:'Pretendard','Inter',-apple-system,system-ui,sans-serif;color:var(--ink);background:var(--surface);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased;height:100vh;overflow:hidden}
+.app{font-family:'Pretendard','Inter',-apple-system,system-ui,sans-serif;color:var(--ink);background:var(--surface);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased;height:100vh;height:100dvh;overflow:hidden}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:36px;padding:0 14px;border-radius:var(--r-md);font-size:14px;font-weight:500;border:1px solid transparent;cursor:pointer;white-space:nowrap;font-family:inherit;transition:background 120ms}
 .btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-pressed)}
 .btn-primary:disabled{background:var(--hairline-strong);color:var(--steel);cursor:not-allowed}
@@ -245,6 +283,7 @@ const IC = {
   alert:()=><Ico path={['M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z','M12 9v4M12 17h.01']}/>,
   logout:()=><Ico path={['M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4','M16 17l5-5-5-5','M21 12H9']}/>,
   refresh:()=><Ico path={['M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5','M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5']}/>,
+  user:()=><Ico circle={[{cx:12,cy:8,r:4}]} path="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>,
 };
 
 function SidebarToggleIcon({open}) {
@@ -291,18 +330,18 @@ function Modal({open,onClose,children,width=440}) {
 }
 function Topbar({title,sub,action}) {
   return (
-    <div className="row between" style={{padding:'20px 32px',background:'var(--canvas)',borderBottom:'1px solid var(--hairline)',gap:24,flexShrink:0}}>
-      <div style={{minWidth:0}}>
-        <h1 style={{margin:0,fontSize:24,fontWeight:600,color:'var(--ink-deep)'}}>{title}</h1>
-        {sub&&<div style={{fontSize:13,color:'var(--slate)',marginTop:2}}>{sub}</div>}
+    <div className="row between mobile-topbar" style={{padding:'20px 32px',background:'var(--canvas)',borderBottom:'1px solid var(--hairline)',gap:16,flexShrink:0}}>
+      <div style={{minWidth:0,flex:1}}>
+        <h1 style={{margin:0,fontSize:24,fontWeight:600,color:'var(--ink-deep)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{title}</h1>
+        {sub&&<div className="topbar-sub" style={{fontSize:13,color:'var(--slate)',marginTop:2}}>{sub}</div>}
       </div>
-      <div style={{flexShrink:0}}>{action}</div>
+      {action&&<div className="topbar-actions row" style={{flexShrink:0,gap:12,flexWrap:'nowrap'}}>{action}</div>}
     </div>
   );
 }
 function Field({label,required,err,children}) {
   return (
-    <div>
+    <div style={{minWidth:0}}>
       <label className="field-label">{label}{required&&<span style={{color:'var(--brand-pink-deep)'}}> *</span>}</label>
       {children}
       {err&&<div style={{fontSize:12,color:'var(--error)',marginTop:4}}>{err}</div>}
@@ -384,10 +423,10 @@ function Login() {
 function Sidebar({cur,onNav,user,onLogout}) {
   const [collapsed,setCollapsed]=useState(false);
   const navItems=[
-    {id:'dashboard',label:'대시 보드',I:IC.dash},
     {id:'search',label:'품목 찾기',I:IC.list},
     {id:'space',label:'공간 조회',I:IC.map},
     {id:'register',label:'신규 등록',I:IC.plus},
+    {id:'dashboard',label:'대시 보드',I:IC.dash},
   ];
   return (
     <aside className={`ss-aside${collapsed?' collapsed':''}`} style={{width:240,background:'var(--surface)',borderRight:'1px solid var(--hairline)',display:'flex',flexDirection:'column',flexShrink:0}}>
@@ -448,6 +487,7 @@ function Donut({data,total,size=160}) {
 }
 
 function Dashboard({items,activity,onNav,onItemClick}) {
+  const isMobile=useMediaQuery('(max-width:768px)');
   const total=items.length;
   const spaceC=['#6457E7','#E48F50','#3BA063','#2382E2','#E2557F','#9B6F47'];
   const useData=USES.map(u=>({c:u.color,v:items.filter(i=>i.useId===u.id).length,name:u.name})).sort((a,b)=>b.v-a.v);
@@ -456,8 +496,8 @@ function Dashboard({items,activity,onNav,onItemClick}) {
   return (
     <div className="col" style={{height:'100%'}}>
       <Topbar title="대시 보드" sub="관능평가실 비품 현황"/>
-      <div style={{flex:1,overflow:'auto',padding:32}}>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 2.5fr',gap:16,marginBottom:16}}>
+      <div className={`mobile-content mobile-pad`} style={{flex:1,overflow:'auto',padding:32,paddingBottom:100}}>
+        <div className="mobile-grid-1" style={{display:'grid',gridTemplateColumns:'1fr 2.5fr',gap:16,marginBottom:16}}>
           <div className="card" style={{padding:24,display:'flex',flexDirection:'column',justifyContent:'center'}}>
             <div style={{fontSize:13,color:'var(--slate)'}}>총 등록 품목</div>
             <div style={{fontSize:48,fontWeight:600,color:'var(--ink-deep)',letterSpacing:'-1px',marginTop:8}}>{total}</div>
@@ -469,27 +509,40 @@ function Dashboard({items,activity,onNav,onItemClick}) {
           <div className="card" style={{padding:24}}>
             <div style={{fontWeight:600,fontSize:16,marginBottom:4}}>용도별 분포</div>
             <div style={{fontSize:13,color:'var(--slate)',marginBottom:20}}>{USES.length}개 분류 · 총 {total}품목</div>
-            <div className="row" style={{gap:32,alignItems:'center'}}>
-              <Donut data={useData} total={total} size={180}/>
-              <div style={{flex:1,display:'grid',gridTemplateColumns:'1fr 1fr',gap:'6px 24px'}}>
-                {useData.map(u=>(
-                  <div key={u.name} className="row" style={{gap:8,padding:'4px 0'}}>
-                    <span className="swatch" style={{background:u.c}}/><span style={{flex:1,fontSize:13,color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.name}</span><span style={{fontSize:13,fontWeight:600}}>{u.v}</span>
-                  </div>
-                ))}
+            {isMobile?(
+              <div className="col" style={{gap:16,alignItems:'center'}}>
+                <Donut data={useData} total={total} size={140}/>
+                <div style={{width:'100%',display:'grid',gridTemplateColumns:'1fr 1fr',gap:'6px 12px'}}>
+                  {useData.map(u=>(
+                    <div key={u.name} className="row" style={{gap:6,padding:'3px 0',minWidth:0}}>
+                      <span className="swatch" style={{background:u.c,flexShrink:0}}/><span style={{flex:1,fontSize:12,color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.name}</span><span style={{fontSize:12,fontWeight:600,flexShrink:0}}>{u.v}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            ):(
+              <div className="row" style={{gap:32,alignItems:'center'}}>
+                <Donut data={useData} total={total} size={180}/>
+                <div style={{flex:1,display:'grid',gridTemplateColumns:'1fr 1fr',gap:'6px 24px'}}>
+                  {useData.map(u=>(
+                    <div key={u.name} className="row" style={{gap:8,padding:'4px 0'}}>
+                      <span className="swatch" style={{background:u.c}}/><span style={{flex:1,fontSize:13,color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.name}</span><span style={{fontSize:13,fontWeight:600}}>{u.v}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16}}>
+        <div className="mobile-grid-1" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16}}>
           <div className="card" style={{padding:24}}>
             <div style={{fontWeight:600,fontSize:16,marginBottom:4}}>공간별 분포</div>
             <div style={{fontSize:13,color:'var(--slate)',marginBottom:20}}>{SPACES.length}개 공간</div>
-            <div className="row" style={{gap:24,alignItems:'center'}}>
-              <Donut data={spData} total={total} size={160}/>
-              <div className="col" style={{flex:1,gap:6}}>
+            <div className="row" style={{gap:isMobile?12:24,alignItems:'center',flexWrap:isMobile?'wrap':'nowrap'}}>
+              <Donut data={spData} total={total} size={isMobile?100:160}/>
+              <div className="col" style={{flex:1,gap:6,minWidth:0}}>
                 {spData.map(s=>(
-                  <button key={s.name} onClick={()=>onNav('space',{space:s.name})} className="row" style={{gap:8,padding:'9px 12px',borderRadius:'var(--r-md)',border:'1px solid var(--hairline)',background:'var(--canvas)',cursor:'pointer',fontFamily:'inherit'}}>
+                  <button key={s.name} onClick={()=>onNav('space',{space:s.name})} className="row" style={{gap:8,padding:'9px 12px',borderRadius:'var(--r-md)',border:'1px solid var(--hairline)',background:'var(--canvas)',cursor:'pointer',fontFamily:'inherit',minWidth:0}}>
                     <span className="swatch" style={{background:s.c}}/><span style={{flex:1,fontSize:13,fontWeight:500,color:'var(--charcoal)'}}>{s.name}</span><span style={{fontSize:13,fontWeight:600}}>{s.v}</span><IC.chev/>
                   </button>
                 ))}
@@ -504,8 +557,8 @@ function Dashboard({items,activity,onNav,onItemClick}) {
                 return (
                   <div key={a.id} className="row" style={{gap:12,padding:'12px 0',borderBottom:i<activity.length-1?'1px solid var(--hairline-soft)':'none',alignItems:'flex-start'}}>
                     <div style={{width:24,height:24,borderRadius:'50%',background:d.bg,color:d.fg,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:700,flexShrink:0,marginTop:1}}>{d.l}</div>
-                    <div>
-                      <div style={{fontSize:13,color:'var(--charcoal)'}}><b>{a.user}</b>님이 <b>{a.name}</b>{a.action==='create'?'을 등록':a.action==='update'?'을 수정':'을 삭제'}했습니다.</div>
+                    <div style={{minWidth:0}}>
+                      <div style={{fontSize:13,color:'var(--charcoal)',overflow:'hidden'}}><b>{a.user}</b>님이 <b>{a.name}</b>{a.action==='create'?'을 등록':a.action==='update'?'을 수정':'을 삭제'}했습니다.</div>
                       <div style={{fontSize:12,color:'var(--steel)',marginTop:2}}>{a.time}</div>
                     </div>
                   </div>
@@ -553,12 +606,12 @@ function Search({items,onItemClick,onDelete}) {
   return (
     <div className="col" style={{height:'100%'}}>
       <Topbar title="품목 찾기" sub={`전체 ${items.length}개 품목`} action={sel.size>0?(
-        <div className="row" style={{gap:8}}>
+        <div className="row" style={{gap:12}}>
           <span style={{fontSize:13,color:'var(--slate)'}}>{sel.size}개 선택</span>
           <button className="btn btn-secondary btn-sm" onClick={()=>setSel(new Set())}>해제</button>
           <button className="btn btn-danger btn-sm" onClick={()=>setDelModal(true)}><IC.trash/> 삭제</button>
         </div>):null}/>
-      <div style={{padding:'16px 32px',borderBottom:'1px solid var(--hairline)',background:'var(--canvas)'}}>
+      <div className="mobile-pad-x" style={{padding:'16px 32px',borderBottom:'1px solid var(--hairline)',background:'var(--canvas)'}}>
         <div style={{position:'relative',maxWidth:640}}>
           <span style={{position:'absolute',left:12,top:'50%',transform:'translateY(-50%)',color:'var(--slate)',display:'flex'}}><IC.search/></span>
           <input className="search-pill" placeholder="품목명으로 검색…" value={q} onChange={e=>{setQ(e.target.value);setSubmitted(false);setSuggOpen(true);}} onFocus={()=>setSuggOpen(true)} onBlur={()=>setTimeout(()=>setSuggOpen(false),150)} onKeyDown={e=>e.key==='Enter'&&submit()}/>
@@ -579,7 +632,7 @@ function Search({items,onItemClick,onDelete}) {
         </div>
         <div className="row wrap" style={{gap:8,marginTop:12}}>
           <span style={{fontSize:12,fontWeight:500,color:'var(--slate)'}}>용도</span>
-          {USES.map(u=><button key={u.id} className={`chip ${uf.has(u.id)?'active':''}`} onClick={()=>tog(setUf,u.id)}><span className="swatch" style={{background:u.color}}/>{u.name}</button>)}
+          {USES.map(u=><button key={u.id} className={`chip ${uf.has(u.id)?'active':''}`} onClick={()=>tog(setUf,u.id)}><span className="swatch" style={{background:u.color}}/>{u.short}</button>)}
         </div>
         <div className="row wrap" style={{gap:8,marginTop:8}}>
           <span style={{fontSize:12,fontWeight:500,color:'var(--slate)'}}>공간</span>
@@ -587,13 +640,14 @@ function Search({items,onItemClick,onDelete}) {
           {(uf.size+sf.size+(q?1:0))>0&&<button style={{fontSize:12,color:'var(--link-blue)',background:'none',border:'none',cursor:'pointer'}} onClick={reset}>필터 초기화</button>}
         </div>
       </div>
-      <div style={{flex:1,overflow:'auto'}}>
-        <table className="table">
+      <div className="mobile-content mobile-scroll-x" style={{flex:1,overflow:'auto'}}>
+        {/* 데스크탑 테이블 */}
+        <table className="table mobile-hide" style={{minWidth:700}}>
           <thead><tr>
             <th style={{width:36}}>
               {filtered.length>0&&<input type="checkbox" checked={sel.size===filtered.length&&filtered.length>0} onChange={e=>setSel(e.target.checked?new Set(filtered.map(i=>i.id)):new Set())}/>}
             </th>
-            <th>품목명</th><th style={{width:120}}>용도</th><th style={{width:180}}>위치</th><th style={{width:100}}>규격</th><th style={{width:120,textAlign:'right'}}>수량/최소</th><th style={{width:80}}>입고</th>
+            <th style={{width:220}}>품목명</th><th style={{width:130}}>용도</th><th style={{width:180}}>위치</th><th style={{width:110}}>규격</th><th style={{width:110,textAlign:'right'}}>수량/최소</th><th style={{width:70}}>입고</th>
           </tr></thead>
           <tbody>
             {filtered.map(it=>{
@@ -603,19 +657,51 @@ function Search({items,onItemClick,onDelete}) {
               return (
                 <tr key={it.id} className={isSel?'sel':''} onClick={e=>{if(e.target.tagName==='INPUT') return; onItemClick(it);}}>
                   <td onClick={e=>{e.stopPropagation();tog(setSel,it.id);}}><input type="checkbox" checked={isSel} onChange={()=>{}}/></td>
-                  <td><div style={{fontWeight:500}}>{q?hi(it.name,q):it.name}</div>{it.note&&<div style={{fontSize:12,color:'var(--steel)'}}>{it.note}</div>}</td>
-                  <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:13,color:'var(--charcoal)'}}>{u.short}</span></span></td>
-                  <td><span style={{fontSize:13}}><b>{it.space}</b><span style={{color:'var(--steel)'}}> / {it.group} / {it.cell}</span></span></td>
-                  <td><span style={{fontSize:13,color:'var(--slate)'}}>{it.spec||'–'}</span></td>
+                  <td style={{maxWidth:220}}><div style={{fontWeight:500,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{q?hi(it.name,q):it.name}</div>{it.note&&<div style={{fontSize:12,color:'var(--steel)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.note}</div>}</td>
+                  <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color,flexShrink:0}}/><span style={{fontSize:13,color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.short}</span></span></td>
+                  <td><span style={{fontSize:13}}><b>{it.space}</b><span style={{color:'var(--slate)'}}> / {it.group} / {it.cell}</span></span></td>
+                  <td><span style={{fontSize:13,color:'var(--slate)',whiteSpace:'nowrap'}}>{it.spec||'–'}</span></td>
                   <td style={{textAlign:'right'}}><span style={{fontWeight:600,color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:12,color:'var(--steel)'}}> / {it.min}</span>}{isLow&&<div style={{fontSize:11,color:'var(--error)',fontWeight:600}}>재고 부족</div>}</td>
-                  <td><span style={{fontSize:13,color:'var(--slate)'}}>{it.received}</span></td>
+                  <td><span style={{fontSize:13,color:'var(--slate)',whiteSpace:'nowrap'}}>{it.received}</span></td>
                 </tr>
               );
             })}
-            {filtered.length===0&&submitted&&<tr><td colSpan="7" style={{padding:'48px 0',textAlign:'center',color:'var(--slate)'}}>일치하는 품목이 없습니다.</td></tr>}
-            {!submitted&&<tr><td colSpan="7" style={{padding:'48px 0',textAlign:'center',color:'var(--slate)'}}>검색어를 입력하고 검색 버튼을 눌러주세요.</td></tr>}
+            {filtered.length===0&&submitted&&<tr><td colSpan={7} style={{padding:'48px 0',textAlign:'center',color:'var(--slate)'}}>일치하는 품목이 없습니다.</td></tr>}
+            {!submitted&&<tr><td colSpan={7} style={{padding:'48px 0',textAlign:'center',color:'var(--slate)'}}>검색어를 입력하고 검색 버튼을 눌러주세요.</td></tr>}
           </tbody>
         </table>
+        {/* 모바일 카드 리스트 */}
+        <div className="mobile-list desktop-hide">
+          {!submitted&&<div style={{padding:'48px 24px',textAlign:'center',color:'var(--slate)',fontSize:14}}>검색어를 입력하고 검색 버튼을 눌러주세요.</div>}
+          {submitted&&filtered.length===0&&<div style={{padding:'48px 24px',textAlign:'center',color:'var(--slate)',fontSize:14}}>일치하는 품목이 없습니다.</div>}
+          {filtered.map(it=>{
+            const u=useById(it.useId);
+            const isLow=it.min!=null&&it.qty<it.min;
+            const isSel=sel.has(it.id);
+            return (
+              <div key={it.id} onClick={()=>onItemClick(it)} style={{padding:'14px 16px',borderBottom:'1px solid var(--hairline)',background:isSel?'var(--primary-soft)':'var(--canvas)',display:'flex',alignItems:'center',gap:12,cursor:'pointer'}}>
+                <div onClick={e=>{e.stopPropagation();tog(setSel,it.id);}} style={{flexShrink:0}}>
+                  <input type="checkbox" checked={isSel} onChange={()=>{}} style={{width:16,height:16}}/>
+                </div>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontWeight:500,fontSize:14,color:'var(--ink-deep)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{q?hi(it.name,q):it.name}</div>
+                  <div className="row" style={{gap:6,marginTop:3,alignItems:'center'}}>
+                    <span className="swatch" style={{background:u.color,flexShrink:0}}/><span style={{fontSize:12,color:'var(--slate)'}}>{u.short}</span>
+                    <span style={{fontSize:12,color:'var(--steel)'}}>·</span>
+                    <span style={{fontSize:12,color:'var(--slate)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.space} / {it.group} / {it.cell}</span>
+                  </div>
+                  {it.note&&<div style={{fontSize:11,color:'var(--steel)',marginTop:2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.note}</div>}
+                </div>
+                <div style={{textAlign:'right',flexShrink:0}}>
+                  <div style={{fontWeight:600,fontSize:15,color:isLow?'var(--error)':'var(--ink-deep)'}}>{it.qty}{it.min!=null&&<span style={{fontSize:12,color:'var(--slate)',fontWeight:400}}> / {it.min}</span>}</div>
+                  {isLow&&<div style={{fontSize:10,color:'var(--error)',fontWeight:600}}>재고 부족</div>}
+                  <div style={{fontSize:11,color:'var(--steel)',marginTop:1}}>{it.received}</div>
+                </div>
+              </div>
+            );
+          })}
+          <div style={{height:24}}/>
+        </div>
       </div>
       <Modal open={delModal} onClose={()=>setDelModal(false)}>
         <div style={{padding:28}}>
@@ -633,6 +719,8 @@ function Search({items,onItemClick,onDelete}) {
   );
 }
 
+const CIRCLE_TO_NUM:Record<string,string>={'①':'1','②':'2','③':'3','④':'4','⑤':'5','⑥':'6','⑦':'7','⑧':'8','⑨':'9','⑩':'10'};
+function toPlainLabel(s:string):string{return s.replace(/[①②③④⑤⑥⑦⑧⑨⑩]/g,c=>CIRCLE_TO_NUM[c]??c);}
 function Cell({space,group,cell,label,x,y,w,h,vert,itemMap,selected,onToggle}) {
   const key=`${group}||${cell}`;
   const its=(itemMap[`${space}/${group}/${cell}`]||[]);
@@ -642,10 +730,11 @@ function Cell({space,group,cell,label,x,y,w,h,vert,itemMap,selected,onToggle}) {
   const fill=empty?'#FAFAF8':(dom?.color||'#FAFAF8');
   const darkColors=['var(--use-2)','var(--use-3)','var(--use-9)','var(--use-10)','var(--use-11)','var(--use-8)','var(--use-1)','var(--use-6)'];
   const tc=darkColors.includes(fill)?'rgba(255,255,255,.9)':'var(--ink)';
+  const displayLabel=toPlainLabel(label);
   return (
-    <div onClick={()=>onToggle(key)} style={{position:'absolute',left:x,top:y,width:w,height:h,background:fill,opacity:empty?1:.85,border:isSel?'2.5px solid var(--ink-deep)':'1px solid var(--hairline-strong)',borderRadius:4,cursor:'pointer',display:'flex',alignItems:vert?'flex-end':'flex-start',justifyContent:vert?'center':'flex-start',padding:5,boxSizing:'border-box',boxShadow:isSel?'0 4px 12px rgba(15,15,15,.16)':'none',transform:isSel?'scale(1.02)':'scale(1)',transition:'transform 80ms',zIndex:isSel?5:1}} title={its.length>0?`${its.length}개 품목`:'비어있음'}>
-      <span style={{fontSize:10,fontWeight:600,color:empty?'var(--steel)':tc,writingMode:vert?'vertical-rl':'horizontal-tb',lineHeight:1.2}}>{label}</span>
-      {its.length>0&&<span style={{position:'absolute',...(vert?{top:4,left:'50%',transform:'translateX(-50%)'}:{top:4,right:5}),background:'rgba(255,255,255,.9)',color:'var(--charcoal)',fontSize:9,fontWeight:700,borderRadius:8,padding:'1px 5px'}}>{its.length}</span>}
+    <div onClick={()=>onToggle(key)} style={{position:'absolute',left:x,top:y,width:w,height:h,background:fill,opacity:empty?1:.85,border:isSel?'2.5px solid var(--ink-deep)':'1px solid var(--hairline-strong)',borderRadius:4,cursor:'pointer',display:'flex',alignItems:'flex-start',justifyContent:'flex-start',padding:4,boxSizing:'border-box',boxShadow:isSel?'0 4px 12px rgba(15,15,15,.16)':'none',transform:isSel?'scale(1.02)':'scale(1)',transition:'transform 80ms',zIndex:isSel?5:1}} title={its.length>0?`${its.length}개 품목`:'비어있음'}>
+      <span style={{fontSize:12,fontWeight:600,color:empty?'var(--steel)':tc,writingMode:vert?'vertical-rl':'horizontal-tb',lineHeight:1.2}}>{displayLabel}</span>
+      {its.length>0&&<span style={{position:'absolute',...(vert?(w<40?{bottom:4,left:'50%',transform:'translateX(-50%)'}:{top:4,right:4}):{top:4,right:4}),background:'rgba(255,255,255,.9)',color:'var(--charcoal)',fontSize:9,fontWeight:700,borderRadius:8,padding:'1px 4px'}}>{its.length}</span>}
     </div>
   );
 }
@@ -700,7 +789,7 @@ function PrepPlan(p) {
       <FBox title="저울대 아래" x={970} y={365} w={100} h={350} tp="bottom">
         <Cell {...c('저울대 아래','①',970,365,100,130,'①',true)}/>
         <Cell {...c('저울대 아래','②',970,495,100,130,'②',true)}/>
-        {['서랍 ①','서랍 ②','서랍 ③','서랍 ④'].map((ce,i)=><Cell key={ce} {...c('저울대 아래',ce,970+i*25,625,25,90,ce,true)}/>)}
+        {['서랍 ④','서랍 ③','서랍 ②','서랍 ①'].map((ce,i)=><Cell key={ce} {...c('저울대 아래',ce,970+i*25,625,25,90,ce,true)}/>)}
       </FBox>
       <FBox title="저울대 위" x={1100} y={365} w={75} h={350} tp="bottom">
         {['①','②','③'].map((ce,i)=><Cell key={ce} {...c('저울대 위',ce,1100,365+i*116.7,75,116.7,ce,true)}/>)}
@@ -754,6 +843,7 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
   const [space,setSpace]=useState(initialSpace||'준비');
   const [sel,setSel]=useState(new Set());
   const [showList,setShowList]=useState(false);
+  const isMobile=useMediaQuery('(max-width:768px)');
   useEffect(()=>{setSel(new Set());setShowList(false);},[space]);
   const iMap=useMemo(()=>itemsByLoc(items.filter(i=>i.space===space)),[items,space]);
   const tog=key=>setSel(s=>{const n=new Set(s);n.has(key)?n.delete(key):n.add(key);return n;});
@@ -762,10 +852,10 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
   return (
     <div className="col" style={{height:'100%'}}>
       <Topbar title="공간 조회" sub="배치도 기반 비품 위치 확인" action={
-        <div className="row" style={{gap:8}}>
-          <span style={{fontSize:13,color:'var(--slate)'}}>{sel.size}개 셀 선택</span>
-          <button className="btn btn-secondary btn-sm" disabled={!sel.size} onClick={()=>setSel(new Set())}><IC.refresh/> 초기화</button>
-          <button className="btn btn-secondary btn-sm" disabled={sel.size!==1} onClick={()=>{
+        <div className="row" style={{gap:12}}>
+          {!isMobile&&<span style={{fontSize:13,color:'var(--slate)'}}>{sel.size}개 셀 선택</span>}
+          <button className="btn btn-secondary btn-sm" disabled={!sel.size} onClick={()=>setSel(new Set())} title="초기화" style={isMobile?{width:30,padding:0}:{}}><IC.refresh/>{!isMobile&&<span> 초기화</span>}</button>
+          <button className="btn btn-primary btn-sm" disabled={sel.size!==1} onClick={()=>{
             const key=[...sel][0];
             if(!key) return;
             const idx=key.indexOf('||');
@@ -773,40 +863,42 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
             const group=key.slice(0,idx);
             const cell=key.slice(idx+2);
             onNav('register',{space,group,cell});
-          }}><IC.plus/> 등록</button>
+          }} title="등록"><IC.plus/> 등록</button>
           <button className="btn btn-primary btn-sm" disabled={!sel.size} onClick={()=>setShowList(true)}>조회 ({selItems.length})</button>
         </div>}/>
-      <div className="row" style={{padding:'0 32px',background:'var(--canvas)',borderBottom:'1px solid var(--hairline)',gap:4,flexShrink:0}}>
+      <div style={{overflowX:'auto',overflowY:'hidden',WebkitOverflowScrolling:'touch',background:'var(--canvas)',borderBottom:'1px solid var(--hairline)',flexShrink:0}}>
+        <div className="row" style={{padding:'0 16px',gap:0,minWidth:'max-content'}}>
         {SPACES.map(s=>{const a=space===s;const cnt=items.filter(i=>i.space===s).length;return(
-          <button key={s} onClick={()=>setSpace(s)} style={{padding:'14px 14px 12px',border:'none',background:'transparent',color:a?'var(--ink)':'var(--slate)',fontWeight:a?600:500,fontSize:14,borderBottom:a?'2px solid var(--primary)':'2px solid transparent',cursor:'pointer',position:'relative',top:1,display:'flex',alignItems:'center',gap:8,fontFamily:'inherit'}}>
+          <button key={s} onClick={()=>setSpace(s)} style={{padding:'14px 14px 12px',border:'none',background:'transparent',color:a?'var(--ink)':'var(--slate)',fontWeight:a?600:500,fontSize:14,borderBottom:a?'2px solid var(--primary)':'2px solid transparent',cursor:'pointer',position:'relative',top:1,display:'flex',alignItems:'center',gap:8,fontFamily:'inherit',whiteSpace:'nowrap'}}>
             {s}<span style={{fontSize:11,padding:'1px 6px',borderRadius:'var(--r-full)',background:a?'var(--primary-soft)':'var(--surface)',color:a?'var(--primary-deep)':'var(--slate)',fontWeight:600}}>{cnt}</span>
           </button>
         );})}
-      </div>
-      <div style={{padding:'12px 32px',background:'var(--surface)',borderBottom:'1px solid var(--hairline)',flexShrink:0}}>
-        <div className="row wrap" style={{gap:12}}>
-          <span style={{fontSize:12,fontWeight:600,color:'var(--steel)'}}>용도 분류</span>
-          {USES.map(u=><div key={u.id} className="row" style={{gap:5}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:11,color:'var(--charcoal)'}}>{u.name}</span></div>)}
-          <span style={{marginLeft:'auto',fontSize:11,color:'var(--steel)'}}>셀 색 = 최다 용도</span>
         </div>
       </div>
-      <div style={{flex:1,overflow:'auto',padding:'20px 32px',background:'var(--surface)',position:'relative'}}>
+      <div className="mobile-pad-x" style={{padding:'12px 32px',background:'var(--surface)',borderBottom:'1px solid var(--hairline)',flexShrink:0}}>
+        <div className="row wrap" style={{gap:8}}>
+          <span style={{fontSize:12,fontWeight:600,color:'var(--steel)'}}>용도</span>
+          {USES.map(u=><div key={u.id} className="row" style={{gap:4}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:11,color:'var(--charcoal)'}}>{u.short}</span></div>)}
+          <span style={{marginLeft:'auto',fontSize:11,color:'var(--steel)',whiteSpace:'nowrap'}}>셀 색 = 최다 용도</span>
+        </div>
+      </div>
+      <div className="mobile-content mobile-scroll-x" style={{flex:1,overflow:'auto',padding:'20px 32px',paddingBottom:100,background:'var(--surface)',position:'relative'}}>
         {space==='준비'&&<PrepPlan {...pp}/>}
         {(space==='서빙1'||space==='서빙2')&&<SimplePlan space={space} title={space==='서빙1'?'Serving Room 1':'Serving Room 2'} p={pp}/>}
         {(space==='토론1'||space==='토론2')&&<DiscPlan space={space} title={space==='토론1'?'Discussion Room 1':'Discussion Room 2'} p={pp}/>}
         {space==='창고'&&<StorePlan {...pp}/>}
         {showList&&(
-          <div onClick={()=>setShowList(false)} style={{position:'fixed',inset:0,background:'rgba(15,15,15,.3)',zIndex:30,display:'flex',alignItems:'flex-end'}}>
+          <div onClick={()=>setShowList(false)} style={{position:'fixed',inset:0,bottom:60,background:'rgba(15,15,15,.3)',zIndex:30,display:'flex',alignItems:'flex-end'}}>
             <div onClick={e=>e.stopPropagation()} className="card" style={{width:'100%',maxHeight:'65%',borderRadius:'var(--r-lg) var(--r-lg) 0 0',background:'var(--canvas)',boxShadow:'var(--shadow-4)',display:'flex',flexDirection:'column'}}>
-              <div className="row between" style={{padding:'16px 24px',borderBottom:'1px solid var(--hairline)'}}>
+              <div className="row between" style={{padding:'16px 24px',borderBottom:'1px solid var(--hairline)',flexShrink:0}}>
                 <div className="row" style={{gap:10}}>
                   <span style={{fontSize:18,fontWeight:600}}>{space} · {sel.size}개 셀</span>
                   <span className="badge" style={{background:'var(--primary-soft)',color:'var(--primary-deep)'}}>{selItems.length}개 품목</span>
                 </div>
                 <button className="btn btn-ghost btn-icon" onClick={()=>setShowList(false)}><IC.x/></button>
               </div>
-              <div style={{flex:1,overflow:'auto'}}>
-                <table className="table">
+              <div style={{flex:1,overflow:'auto',paddingBottom:8}}>
+                <table className="table mobile-hide">
                   <thead><tr><th>품목명</th><th style={{width:140}}>용도</th><th style={{width:160}}>위치</th><th style={{width:120}}>규격</th><th style={{width:100,textAlign:'right'}}>수량</th></tr></thead>
                   <tbody>
                     {selItems.map(it=>{
@@ -822,9 +914,35 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
                         </tr>
                       );
                     })}
-                    {selItems.length===0&&<tr><td colSpan="5" style={{padding:'40px 0',textAlign:'center',color:'var(--slate)'}}>선택한 셀에 품목이 없습니다.</td></tr>}
+                    {selItems.length===0&&<tr><td colSpan={5} style={{padding:'40px 0',textAlign:'center',color:'var(--slate)'}}>선택한 셀에 품목이 없습니다.</td></tr>}
                   </tbody>
                 </table>
+                <div className="desktop-hide mobile-list" style={{flexDirection:'column'}}>
+                  {selItems.map(it=>{
+                    const u=useById(it.useId);
+                    const isLow=it.min!=null&&it.qty<it.min;
+                    return (
+                      <div key={it.id} onClick={()=>{setShowList(false);onItemClick(it);}} style={{padding:'12px 20px',borderBottom:'1px solid var(--hairline)',cursor:'pointer'}}>
+                        <div className="row between" style={{alignItems:'flex-start',gap:8}}>
+                          <div style={{flex:1,minWidth:0}}>
+                            <div style={{fontWeight:600,fontSize:15,color:'var(--ink-deep)',marginBottom:4}}>{it.name}</div>
+                            <div className="row" style={{gap:6,flexWrap:'wrap'}}>
+                              <span className="row" style={{gap:4}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:12,color:'var(--slate)'}}>{u.short}</span></span>
+                              <span style={{fontSize:12,color:'var(--steel)'}}>·</span>
+                              <span style={{fontSize:12,color:'var(--slate)'}}><b style={{color:'var(--charcoal)'}}>{it.group}</b> / {it.cell}</span>
+                            </div>
+                          </div>
+                          <div style={{textAlign:'right',flexShrink:0}}>
+                            <span style={{fontWeight:700,fontSize:16,color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>
+                            {it.min!=null&&<span style={{fontSize:12,color:'var(--slate)'}}> / {it.min}</span>}
+                            {isLow&&<div style={{fontSize:11,color:'var(--error)',fontWeight:500}}>재고 부족</div>}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {selItems.length===0&&<div style={{padding:'40px 0',textAlign:'center',color:'var(--slate)',fontSize:14}}>선택한 셀에 품목이 없습니다.</div>}
+                </div>
               </div>
             </div>
           </div>
@@ -861,8 +979,56 @@ function UseSelect({value,onChange,editing}) {
     </div>
   );
 }
-function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||'',group:pre.group||'',cell:pre.cell||'',spec:'',qty:'',min:'',received:'',note:''};}
-function RegisterEdit({mode,item,prefill,onCancel,onSave,onDelete}) {
+function formatReceived(raw:string):string {
+  const digits=raw.replace(/\D/g,'').slice(0,6);
+  if(digits.length<=4) return digits;
+  return digits.slice(0,4)+'-'+digits.slice(4);
+}
+function MonthPicker({value,onChange,editing}:{value:string,onChange:(v:string)=>void,editing:boolean}) {
+  const [open,setOpen]=useState(false);
+  const [viewYear,setViewYear]=useState(()=>{const y=parseInt(value?.slice(0,4));return isNaN(y)?new Date().getFullYear():y;});
+  const ref=useRef<HTMLDivElement>(null);
+  const selectedYear=value?.slice(0,4);
+  const selectedMonth=value?.slice(5,7);
+  useEffect(()=>{
+    const fn=(e:MouseEvent)=>{if(ref.current&&!ref.current.contains(e.target as Node))setOpen(false);};
+    document.addEventListener('mousedown',fn);
+    return()=>document.removeEventListener('mousedown',fn);
+  },[]);
+  const select=(m:number)=>{onChange(`${viewYear}-${String(m).padStart(2,'0')}`);setOpen(false);};
+  const handleText=(e:React.ChangeEvent<HTMLInputElement>)=>{
+    const formatted=formatReceived(e.target.value);
+    onChange(formatted);
+    const y=parseInt(formatted.slice(0,4));
+    if(!isNaN(y)&&y>1900&&y<2100) setViewYear(y);
+  };
+  const months=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  return (
+    <div style={{position:'relative',minWidth:0}} ref={ref}>
+      <div className={`input ${editing?'is-editing':''}`} style={{display:'flex',alignItems:'center',gap:4,padding:'0 8px',cursor:'text',minWidth:0,width:'100%',overflow:'hidden'}}>
+        <input value={value} onChange={handleText} placeholder="YYYY-MM" maxLength={7} size={1} style={{flex:1,minWidth:0,border:'none',outline:'none',background:'transparent',font:'inherit',fontSize:14,color:'var(--ink)',padding:0}}/>
+        <button onClick={()=>{setOpen(o=>!o);if(value){const y=parseInt(value.slice(0,4));if(!isNaN(y))setViewYear(y);}}} style={{background:'none',border:'none',cursor:'pointer',padding:'2px 2px',color:'var(--slate)',display:'flex',alignItems:'center',flexShrink:0,fontSize:13}}>📅</button>
+      </div>
+      {open&&(
+        <div className="card" style={{position:'absolute',top:'calc(100% + 4px)',left:0,right:0,zIndex:30,padding:14,boxShadow:'var(--shadow-2)'}}>
+          <div className="row between" style={{marginBottom:12,alignItems:'center'}}>
+            <button onClick={()=>setViewYear(y=>y-1)} style={{background:'none',border:'none',cursor:'pointer',fontSize:16,color:'var(--charcoal)',padding:'2px 8px',borderRadius:'var(--r-sm)'}}>◀</button>
+            <span style={{fontWeight:600,fontSize:15,color:'var(--ink-deep)'}}>{viewYear}년</span>
+            <button onClick={()=>setViewYear(y=>y+1)} style={{background:'none',border:'none',cursor:'pointer',fontSize:16,color:'var(--charcoal)',padding:'2px 8px',borderRadius:'var(--r-sm)'}}>▶</button>
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:6}}>
+            {months.map((m,i)=>{
+              const mon=String(i+1).padStart(2,'0');
+              const isSel=selectedYear===String(viewYear)&&selectedMonth===mon;
+              return (<button key={m} onClick={()=>select(i+1)} style={{padding:'8px 4px',borderRadius:'var(--r-md)',border:isSel?'2px solid var(--primary)':'1px solid var(--hairline)',background:isSel?'var(--primary-soft)':'var(--canvas)',color:isSel?'var(--primary-deep)':'var(--charcoal)',fontWeight:isSel?600:400,fontSize:13,cursor:'pointer',fontFamily:'inherit'}}>{m}</button>);
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||'',group:pre.group||'',cell:pre.cell||'',spec:'',qty:'',min:'',received:'',note:''};}function RegisterEdit({mode,item,prefill,onCancel,onSave,onDelete}) {
   const isEdit=mode==='edit';
   const [form,setForm]=useState(()=>isEdit&&item?{...item}:blank(prefill||{}));
   const [ef,setEf]=useState(null);
@@ -891,12 +1057,12 @@ function RegisterEdit({mode,item,prefill,onCancel,onSave,onDelete}) {
   return (
     <div className="col" style={{height:'100%'}}>
       <Topbar title={isEdit?'품목 수정':'신규 등록'} sub={isEdit&&item?`최종 수정: ${item.updatedAt} · ${item.updatedBy}`:'비품 정보를 입력하세요'} action={
-        <div className="row" style={{gap:8}}>
-          {isEdit&&<button className="btn btn-danger" onClick={()=>setDelM(true)}><IC.trash/> 삭제</button>}
-          <button className="btn btn-secondary" onClick={onCancel}>취소</button>
-          <button className="btn btn-primary" onClick={submit}>{isEdit?'저장':'등록'}</button>
+        <div className="row" style={{gap:12}}>
+          {isEdit&&<button className="btn btn-danger btn-sm" onClick={()=>setDelM(true)}><IC.trash/> 삭제</button>}
+          <button className="btn btn-secondary btn-sm" onClick={onCancel} style={{minWidth:68}}>취소</button>
+          <button className="btn btn-primary btn-sm" onClick={submit} style={{minWidth:68}}>{isEdit?'저장':'등록'}</button>
         </div>}/>
-      <div style={{flex:1,overflow:'auto',padding:32}}>
+      <div className="mobile-content mobile-pad" style={{flex:1,overflow:'auto',padding:32,paddingBottom:100}}>
         <div style={{maxWidth:860,margin:'0 auto',display:'flex',flexDirection:'column',gap:16}}>
           {!isEdit&&prefill?.space&&(
             <div className="card" style={{padding:16,background:'var(--tint-lavender)',border:'1px solid var(--brand-purple-300)'}}>
@@ -910,9 +1076,9 @@ function RegisterEdit({mode,item,prefill,onCancel,onSave,onDelete}) {
               <Field label="품목명" required err={errs.name}><input className={`input ${ef==='name'?'is-editing':''}`} placeholder="예: 정량 피펫" value={form.name} onChange={e=>setF('name',e.target.value)}/></Field>
               <Field label="용도 분류" required err={errs.useId}><UseSelect value={form.useId} onChange={v=>setF('useId',v)} editing={ef==='useId'}/></Field>
             </div>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginTop:16}}>
-              <Field label="규격"><input className={`input ${ef==='spec'?'is-editing':''}`} placeholder="예: 250 mL" value={form.spec} onChange={e=>setF('spec',e.target.value)}/></Field>
-              <Field label="입고 시기"><input className={`input ${ef==='received'?'is-editing':''}`} placeholder="2026-04" value={form.received} onChange={e=>setF('received',e.target.value)}/></Field>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginTop:16,minWidth:0}}>
+              <Field label="규격"><input className={`input ${ef==='spec'?'is-editing':''}`} placeholder="예: 250 mL" value={form.spec} onChange={e=>setF('spec',e.target.value)} style={{minWidth:0}}/></Field>
+              <Field label="입고 시기" ><MonthPicker value={form.received} onChange={v=>setF('received',v)} editing={ef==='received'}/></Field>
             </div>
           </div>
           <div className="card" style={{padding:24}}>
@@ -947,6 +1113,7 @@ function RegisterEdit({mode,item,prefill,onCancel,onSave,onDelete}) {
               </div>
             </div>
           )}
+          <div style={{height:24}}/>
         </div>
       </div>
       <Modal open={delM} onClose={()=>setDelM(false)}>
@@ -966,24 +1133,268 @@ function RegisterEdit({mode,item,prefill,onCancel,onSave,onDelete}) {
   );
 }
 
+function Profile({user,onLogout}) {
+  const initial=(user?.name||'?').charAt(0);
+  return (
+    <div className="col" style={{height:'100%'}}>
+      <Topbar title="내 계정" sub="로그인 정보 및 설정"/>
+      <div className="mobile-content mobile-pad" style={{flex:1,overflow:'auto',padding:32,paddingBottom:100}}>
+        <div style={{maxWidth:480,margin:'0 auto',display:'flex',flexDirection:'column',gap:12}}>
+          <div className="card" style={{padding:32,display:'flex',flexDirection:'column',alignItems:'center',gap:12,textAlign:'center'}}>
+            <div style={{width:72,height:72,borderRadius:'50%',background:'var(--brand-navy)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:28,fontWeight:600,flexShrink:0}}>{initial}</div>
+            <div>
+              <div style={{fontSize:20,fontWeight:600,color:'var(--ink-deep)',marginBottom:4}}>{user?.name||'사용자'}</div>
+              <div style={{fontSize:14,color:'var(--slate)'}}>{user?.email||''}</div>
+            </div>
+            <div style={{width:'100%',height:1,background:'var(--hairline)',margin:'4px 0'}}/>
+            <button className="btn btn-secondary" style={{width:'100%',height:44,color:'var(--error)',borderColor:'var(--hairline-strong)'}} onClick={onLogout}>
+              <IC.logout/> 로그아웃
+            </button>
+          </div>
+          <div className="card" style={{padding:20}}>
+            <div style={{fontSize:12,color:'var(--slate)',marginBottom:8}}>접속 권한</div>
+            <div className="row" style={{gap:8,alignItems:'center'}}>
+              <span style={{width:8,height:8,borderRadius:'50%',background:'var(--brand-green)',display:'inline-block',flexShrink:0}}/>
+              <span style={{fontSize:14,fontWeight:500,color:'var(--ink)'}}>관능평가실 구성원</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MiniCell({group,cell,label,x,y,w,h,vert,itemGroup,itemCell,itemColor}:{group:string,cell:string,label:string,x:number,y:number,w:number,h:number,vert?:boolean,itemGroup:string,itemCell:string,itemColor:string}) {
+  const isTarget=group===itemGroup&&cell===itemCell;
+  const bg=isTarget?itemColor:'#FFFFFF';
+  const darkColors=['var(--use-2)','var(--use-3)','var(--use-9)','var(--use-10)','var(--use-11)','var(--use-8)','var(--use-1)','var(--use-6)'];
+  const tc=isTarget?(darkColors.includes(itemColor)?'rgba(255,255,255,.9)':'var(--ink)'):'#9B9A97';
+  return (
+    <div style={{position:'absolute',left:x,top:y,width:w,height:h,background:bg,border:isTarget?'2.5px solid #1A1916':'1px solid #DEDCD7',borderRadius:4,display:'flex',alignItems:vert?'flex-end':'flex-start',justifyContent:vert?'center':'flex-start',padding:vert?5:5,boxSizing:'border-box',boxShadow:isTarget?'0 4px 12px rgba(15,15,15,.18)':'none'}}>
+      <span style={{fontSize:10,fontWeight:isTarget?700:600,color:tc,writingMode:vert?'vertical-rl':'horizontal-tb',lineHeight:1.2}}>{label}</span>
+    </div>
+  );
+}
+
+function MiniMapPrep({itemGroup,itemCell,itemColor}:{itemGroup:string,itemCell:string,itemColor:string}) {
+  const p={itemGroup,itemCell,itemColor};
+  const c=(g:string,ce:string,x:number,y:number,w:number,h:number,label?:string,vert?:boolean)=>({...p,group:g,cell:ce,label:toPlainLabel(label??ce),x,y,w,h,vert});
+  const ORIG_W=1200,ORIG_H=730;
+  const wrapRef=useRef<HTMLDivElement>(null);
+  const [scale,setScale]=useState(0.47);
+  useEffect(()=>{
+    const el=wrapRef.current;
+    if(!el) return;
+    const update=()=>setScale(Math.min(0.67,el.clientWidth/ORIG_W));
+    update();
+    const ro=new ResizeObserver(update);
+    ro.observe(el);
+    return()=>ro.disconnect();
+  },[]);
+  const rh=Math.round(ORIG_H*scale);
+  return (
+    <div ref={wrapRef} style={{borderRadius:8,border:'1px solid #ECEBE8',background:'#F7F6F3',overflow:'hidden',position:'relative',height:rh}}>
+      <div style={{transform:`scale(${scale})`,transformOrigin:'top left',width:ORIG_W,height:ORIG_H,position:'absolute',top:0,left:0,pointerEvents:'none'}}>
+        {/* 선반 */}
+        <div style={{position:'absolute',left:60,top:40,width:70,height:330,border:'1.5px solid #1A1916',borderRadius:4}}/>
+        <MiniCell {...c('선반','①',60,40,70,82,'①',true)}/>
+        <MiniCell {...c('선반','②',60,122,70,82,'②',true)}/>
+        <MiniCell {...c('선반','③',60,204,70,82,'③',true)}/>
+        <MiniCell {...c('선반','④',60,286,70,84,'④',true)}/>
+        {/* 실험대 위 */}
+        <div style={{position:'absolute',left:325,top:40,width:620,height:110,border:'1.5px solid #1A1916',borderRadius:4}}/>
+        <MiniCell {...c('실험대 위','①',325,40,124,110)}/>
+        <MiniCell {...c('실험대 위','②',449,40,124,110)}/>
+        <MiniCell {...c('실험대 위','③',573,40,124,110)}/>
+        <MiniCell {...c('실험대 위','④',697,40,124,110)}/>
+        <MiniCell {...c('실험대 위','⑤',821,40,124,110)}/>
+        {/* 실험대 아래/서랍 */}
+        <div style={{position:'absolute',left:170,top:195,width:775,height:150,border:'1.5px solid #1A1916',borderRadius:4}}/>
+        <MiniCell {...c('실험대 아래','①',170,195,90,150)}/>
+        <MiniCell {...c('실험대 아래','②',260,195,90,150)}/>
+        <MiniCell {...c('실험대 서랍','서랍 ①',358,195,70,50,'서①')}/>
+        <MiniCell {...c('실험대 서랍','서랍 ②',428,195,70,50,'서②')}/>
+        <MiniCell {...c('실험대 서랍','서랍 ③',358,245,70,50,'서③')}/>
+        <MiniCell {...c('실험대 서랍','서랍 ④',428,245,70,50,'서④')}/>
+        <MiniCell {...c('실험대 서랍','서랍 ⑤',358,295,70,50,'서⑤')}/>
+        <MiniCell {...c('실험대 서랍','서랍 ⑥',428,295,70,50,'서⑥')}/>
+        <MiniCell {...c('실험대 아래','③',506,195,110,150)}/>
+        <MiniCell {...c('실험대 아래','④',616,195,110,150)}/>
+        <MiniCell {...c('실험대 아래','⑤',726,195,110,150)}/>
+        <MiniCell {...c('실험대 아래','⑥',836,195,110,150)}/>
+        {/* 조리대 좌측 */}
+        <div style={{position:'absolute',left:325,top:465,width:260,height:150,border:'1.5px solid #1A1916',borderRadius:4}}/>
+        <MiniCell {...c('조리대 좌측','서랍 ①',325,465,87,40,'서①')}/>
+        <MiniCell {...c('조리대 좌측','서랍 ②',412,465,87,40,'서②')}/>
+        <MiniCell {...c('조리대 좌측','서랍 ③',499,465,87,40,'서③')}/>
+        <MiniCell {...c('조리대 좌측','④',325,505,130,110)}/>
+        <MiniCell {...c('조리대 좌측','⑤',455,505,130,110)}/>
+        {/* 조리대 우측 */}
+        <div style={{position:'absolute',left:625,top:465,width:260,height:150,border:'1.5px solid #1A1916',borderRadius:4}}/>
+        <MiniCell {...c('조리대 우측','서랍 ①',625,465,87,40,'서①')}/>
+        <MiniCell {...c('조리대 우측','서랍 ②',712,465,87,40,'서②')}/>
+        <MiniCell {...c('조리대 우측','서랍 ③',799,465,87,40,'서③')}/>
+        <MiniCell {...c('조리대 우측','④',625,505,130,110)}/>
+        <MiniCell {...c('조리대 우측','⑤',755,505,130,110)}/>
+        {/* 싱크대 아래 */}
+        <div style={{position:'absolute',left:170,top:580,width:145,height:48,border:'1.5px solid #1A1916',borderRadius:4}}/>
+        <MiniCell {...c('싱크대 아래','②',170,580,72,48)}/>
+        <MiniCell {...c('싱크대 아래','①',242,580,73,48)}/>
+        {/* 싱크대 위 */}
+        <div style={{position:'absolute',left:170,top:650,width:715,height:70,border:'1.5px solid #1A1916',borderRadius:4}}/>
+        <MiniCell {...c('싱크대 위','⑥',170,650,119,70)}/>
+        <MiniCell {...c('싱크대 위','⑤',289,650,119,70)}/>
+        <MiniCell {...c('싱크대 위','④',408,650,119,70)}/>
+        <MiniCell {...c('싱크대 위','③',527,650,119,70)}/>
+        <MiniCell {...c('싱크대 위','②',646,650,119,70)}/>
+        <MiniCell {...c('싱크대 위','①',765,650,120,70)}/>
+        {/* 저울대 아래 */}
+        <div style={{position:'absolute',left:970,top:365,width:100,height:350,border:'1.5px solid #1A1916',borderRadius:4}}/>
+        <MiniCell {...c('저울대 아래','①',970,365,100,130,'①',true)}/>
+        <MiniCell {...c('저울대 아래','②',970,495,100,130,'②',true)}/>
+        <MiniCell {...c('저울대 아래','서랍 ④',970,625,25,90,'서④',true)}/>
+        <MiniCell {...c('저울대 아래','서랍 ③',995,625,25,90,'서③',true)}/>
+        <MiniCell {...c('저울대 아래','서랍 ②',1020,625,25,90,'서②',true)}/>
+        <MiniCell {...c('저울대 아래','서랍 ①',1045,625,25,90,'서①',true)}/>
+        {/* 저울대 위 */}
+        <div style={{position:'absolute',left:1100,top:365,width:75,height:350,border:'1.5px solid #1A1916',borderRadius:4}}/>
+        <MiniCell {...c('저울대 위','①',1100,365,75,117,'①',true)}/>
+        <MiniCell {...c('저울대 위','②',1100,482,75,117,'②',true)}/>
+        <MiniCell {...c('저울대 위','③',1100,599,75,116,'③',true)}/>
+      </div>
+    </div>
+  );
+}
+
+function MiniMapSimple({space,itemGroup,itemCell,itemColor}:{space:string,itemGroup:string,itemCell:string,itemColor:string}) {
+  const p={itemGroup,itemCell,itemColor};
+  const g=ZONES[space]?.[0];
+  if(!g) return null;
+  // 서빙1/2: 조리대 — 서랍①②③(상단 가로) + ④(하단 전체)
+  const ORIG_W=500,ORIG_H=280;
+  const wrapRef=useRef<HTMLDivElement>(null);
+  const [scale,setScale]=useState(0.47);
+  useEffect(()=>{
+    const el=wrapRef.current;
+    if(!el) return;
+    const update=()=>setScale(Math.min(0.9,el.clientWidth/ORIG_W));
+    update();
+    const ro=new ResizeObserver(update);
+    ro.observe(el);
+    return()=>ro.disconnect();
+  },[]);
+  const rh=Math.round(ORIG_H*scale);
+  const drawerW=Math.floor(380/3); // 서랍 3개가 외곽(380px) 균등 분할
+  const lastDrawerW=380-drawerW*2; // 나머지 오차 마지막 셀에 흡수
+  return (
+    <div ref={wrapRef} style={{borderRadius:8,border:'1px solid #ECEBE8',background:'#F7F6F3',overflow:'hidden',position:'relative',height:rh}}>
+      <div style={{transform:`scale(${scale})`,transformOrigin:'top left',width:ORIG_W,height:ORIG_H,position:'absolute',top:0,left:0,pointerEvents:'none'}}>
+        {/* 조리대 외곽 */}
+        <div style={{position:'absolute',left:60,top:40,width:380,height:210,border:'1.5px solid #1A1916',borderRadius:4}}/>
+        {/* 서랍 ①②③ — 상단 가로 3분할 */}
+        <MiniCell {...p} group={g.group} cell={g.cells[0]} label={toPlainLabel(g.cells[0])} x={60} y={40} w={drawerW} h={60}/>
+        <MiniCell {...p} group={g.group} cell={g.cells[1]} label={toPlainLabel(g.cells[1])} x={60+drawerW} y={40} w={drawerW} h={60}/>
+        <MiniCell {...p} group={g.group} cell={g.cells[2]} label={toPlainLabel(g.cells[2])} x={60+drawerW*2} y={40} w={lastDrawerW} h={60}/>
+        {/* ④ — 하단 전체 너비 */}
+        {g.cells[3]&&<MiniCell {...p} group={g.group} cell={g.cells[3]} label={toPlainLabel(g.cells[3])} x={60} y={100} w={380} h={150}/>}
+      </div>
+    </div>
+  );
+}
+
+function MiniMapDisc({space,itemGroup,itemCell,itemColor}:{space:string,itemGroup:string,itemCell:string,itemColor:string}) {
+  const p={itemGroup,itemCell,itemColor};
+  const g=ZONES[space]?.[0];
+  if(!g) return null;
+  const ORIG_W=500,ORIG_H=280;
+  const wrapRef=useRef<HTMLDivElement>(null);
+  const [scale,setScale]=useState(0.47);
+  useEffect(()=>{
+    const el=wrapRef.current;
+    if(!el) return;
+    const update=()=>setScale(Math.min(0.9,el.clientWidth/ORIG_W));
+    update();
+    const ro=new ResizeObserver(update);
+    ro.observe(el);
+    return()=>ro.disconnect();
+  },[]);
+  const rh=Math.round(ORIG_H*scale);
+  return (
+    <div ref={wrapRef} style={{borderRadius:8,border:'1px solid #ECEBE8',background:'#F7F6F3',overflow:'hidden',position:'relative',height:rh}}>
+      <div style={{transform:`scale(${scale})`,transformOrigin:'top left',width:ORIG_W,height:ORIG_H,position:'absolute',top:0,left:0,pointerEvents:'none'}}>
+        <div style={{position:'absolute',left:100,top:40,width:300,height:g.cells.length*60,border:'1.5px solid #1A1916',borderRadius:4}}/>
+        {g.cells.map((ce,i)=><MiniCell key={ce} {...p} group={g.group} cell={ce} label={toPlainLabel(ce)} x={100} y={40+i*60} w={300} h={60}/>)}
+      </div>
+    </div>
+  );
+}
+
+function MiniMapStore({itemGroup,itemCell,itemColor}:{itemGroup:string,itemCell:string,itemColor:string}) {
+  const p={itemGroup,itemCell,itemColor};
+  const ORIG_W=900,ORIG_H=520;
+  const wrapRef=useRef<HTMLDivElement>(null);
+  const [scale,setScale]=useState(0.47);
+  useEffect(()=>{
+    const el=wrapRef.current;
+    if(!el) return;
+    const update=()=>setScale(Math.min(0.67,el.clientWidth/ORIG_W));
+    update();
+    const ro=new ResizeObserver(update);
+    ro.observe(el);
+    return()=>ro.disconnect();
+  },[]);
+  const rh=Math.round(ORIG_H*scale);
+  return (
+    <div ref={wrapRef} style={{borderRadius:8,border:'1px solid #ECEBE8',background:'#F7F6F3',overflow:'hidden',position:'relative',height:rh}}>
+      <div style={{transform:`scale(${scale})`,transformOrigin:'top left',width:ORIG_W,height:ORIG_H,position:'absolute',top:0,left:0,pointerEvents:'none'}}>
+        {/* 수납장 */}
+        <div style={{position:'absolute',left:50,top:80,width:240,height:400,border:'1.5px solid #1A1916',borderRadius:4}}/>
+        {['①','②','③','④','⑤','⑥','⑦','⑧'].map((ce,i)=><MiniCell key={ce} {...p} group="수납장" cell={ce} label={toPlainLabel(ce)} x={50+(i%2)*120} y={80+Math.floor(i/2)*100} w={120} h={100}/>)}
+        {/* 박스 */}
+        <div style={{position:'absolute',left:360,top:80,width:180,height:400,border:'1.5px solid #1A1916',borderRadius:4}}/>
+        {['①','②','③'].map((ce,i)=><MiniCell key={ce} {...p} group="박스" cell={ce} label={toPlainLabel(ce)} x={360} y={80+i*133} w={180} h={133}/>)}
+        {/* 선반 */}
+        <div style={{position:'absolute',left:610,top:80,width:120,height:400,border:'1.5px solid #1A1916',borderRadius:4}}/>
+        {['①','②','③','④','⑤','⑥','⑦','⑧'].map((ce,i)=><MiniCell key={ce} {...p} group="선반" cell={ce} label={toPlainLabel(ce)} x={610} y={80+i*50} w={120} h={50}/>)}
+      </div>
+    </div>
+  );
+}
+
+function ItemMiniMap({item,u}:{item:any,u:any}) {
+  const props={itemGroup:item.group,itemCell:item.cell,itemColor:u.color};
+  if(item.space==='준비') return <MiniMapPrep {...props}/>;
+  if(item.space==='서빙1'||item.space==='서빙2') return <MiniMapSimple space={item.space} {...props}/>;
+  if(item.space==='토론1'||item.space==='토론2') return <MiniMapDisc space={item.space} {...props}/>;
+  if(item.space==='창고') return <MiniMapStore {...props}/>;
+  return null;
+}
+
 function ItemDetail({item,onBack,onEdit,onDelete}) {
   const u=useById(item.useId);
   const isLow=item.min!=null&&item.qty<item.min;
   const [delM,setDelM]=useState(false);
+  const isMobile=useMediaQuery('(max-width:768px)');
   return (
     <div className="col" style={{height:'100%'}}>
       <Topbar title={item.name} sub={`#${item.id} · ${item.space} / ${item.group} / ${item.cell}`} action={
-        <div className="row" style={{gap:8}}>
-          <button className="btn btn-danger" onClick={()=>setDelM(true)}><IC.trash/> 삭제</button>
-          <button className="btn btn-secondary" onClick={onBack}><IC.back/> 목록</button>
-          <button className="btn btn-primary" onClick={onEdit}><IC.edit/> 수정</button>
+        <div className="row" style={{gap:isMobile?6:12}}>
+          <button className="btn btn-danger btn-sm" onClick={()=>setDelM(true)} style={{gap:isMobile?0:6,paddingLeft:isMobile?8:12,paddingRight:isMobile?8:12}}>
+            <IC.trash/>{!isMobile&&<span>삭제</span>}
+          </button>
+          <button className="btn btn-secondary btn-sm" onClick={onBack} style={{gap:isMobile?0:6,paddingLeft:isMobile?8:12,paddingRight:isMobile?8:12}}>
+            <IC.back/>{!isMobile&&<span>이전</span>}
+          </button>
+          <button className="btn btn-primary btn-sm" onClick={onEdit} style={{gap:isMobile?0:6,paddingLeft:isMobile?8:12,paddingRight:isMobile?8:12}}>
+            <IC.edit/>{!isMobile&&<span>수정</span>}
+          </button>
         </div>}/>
-      <div style={{flex:1,overflow:'auto',padding:32}}>
+      <div className="mobile-content mobile-pad" style={{flex:1,overflow:'auto',padding:32,paddingBottom:100}}>
         <div style={{maxWidth:860,margin:'0 auto',display:'flex',flexDirection:'column',gap:16}}>
-          <div className="card" style={{padding:24,display:'grid',gridTemplateColumns:'1.4fr 1fr',gap:24}}>
+          <div className="card mobile-grid-1" style={{padding:24,display:'grid',gridTemplateColumns:'1.4fr 1fr',gap:24}}>
             <div>
               <span className="badge" style={{background:u.color,color:'#fff'}}>{u.name}</span>
-              <h2 style={{margin:'12px 0 6px',fontSize:28,fontWeight:600,color:'var(--ink-deep)'}}>{item.name}</h2>
+              <h2 className="mobile-h2" style={{margin:'12px 0 6px',fontSize:28,fontWeight:600,color:'var(--ink-deep)'}}>{item.name}</h2>
               <div style={{fontSize:14,color:'var(--charcoal)'}}><span style={{color:'var(--slate)'}}>위치</span> <b>{item.space} / {item.group} / {item.cell}</b></div>
               {item.note&&<div style={{marginTop:12,padding:'10px 14px',background:'var(--tint-yellow)',borderRadius:'var(--r-md)',fontSize:13}}>📌 {item.note}</div>}
             </div>
@@ -995,20 +1406,26 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
           </div>
           <div className="card" style={{padding:24}}>
             <div style={{fontSize:16,fontWeight:600,marginBottom:16}}>상세 정보</div>
-            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:20}}>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:20,marginBottom:20}}>
+              <div>
+                <div style={{fontSize:11,color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>용도</div>
+                <div className="row" style={{gap:6,marginTop:4}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:14,fontWeight:500}}>{u.name}</span></div>
+              </div>
               {[['규격',item.spec||'–'],['입고 시기',item.received||'–'],['공간',item.space],['구역',item.group],['셀',item.cell]].map(([l,v])=>(
                 <div key={l}><div style={{fontSize:11,color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>{l}</div><div style={{fontSize:14,fontWeight:500,marginTop:4}}>{v}</div></div>
               ))}
-              <div><div style={{fontSize:11,color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>용도</div><div className="row" style={{gap:6,marginTop:4}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:14,fontWeight:500}}>{u.name}</span></div></div>
             </div>
+            <div style={{borderTop:'1px solid var(--hairline)',marginBottom:14}}/>
+            <ItemMiniMap item={item} u={u}/>
           </div>
-          <div className="card" style={{padding:16,background:'var(--surface)'}}>
-            <div className="row wrap" style={{gap:32}}>
+          <div className="card" style={{padding:16,background:'var(--surface)',marginBottom:0}}>
+            <div className="row wrap" style={{gap:'12px 32px'}}>
               {[['최초 등록일',item.createdAt],['최종 수정일',item.updatedAt],['최종 수정인',item.updatedBy],['품목 ID',`#${item.id}`]].map(([l,v])=>(
                 <div key={l} className="col"><span style={{fontSize:11,color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>{l}</span><span style={{fontSize:13,fontWeight:500,marginTop:2}}>{v}</span></div>
               ))}
             </div>
           </div>
+          <div style={{height:24}}/>
         </div>
       </div>
       <Modal open={delM} onClose={()=>setDelM(false)}>
@@ -1032,7 +1449,7 @@ export default function App() {
   const [user,setUser]=useState(null);
   const [authLoading,setAuthLoading]=useState(true);
   const [accessDenied,setAccessDenied]=useState(false);
-  const [route,setRoute]=useState({name:'dashboard'});
+  const [route,setRoute]=useState({name:'search'});
   const [items,setItems]=useState(SEED);
   const [activity,setActivity]=useState(SEED_ACT);
 
@@ -1090,7 +1507,7 @@ export default function App() {
     return (
       <>
         <style>{SIDEBAR_CSS}{STYLE_SHEET}</style>
-        <div className="app" style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',background:'var(--brand-navy)'}}>
+        <div className="app" style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',height:'100dvh',background:'var(--brand-navy)'}}>
           <div style={{color:'#fff',fontSize:16,opacity:0.7}}>로딩 중...</div>
         </div>
       </>
@@ -1101,7 +1518,7 @@ export default function App() {
     return (
       <>
         <style>{SIDEBAR_CSS}{STYLE_SHEET}</style>
-        <div className="app" style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',background:'var(--brand-navy)'}}>
+        <div className="app" style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',height:'100dvh',background:'var(--brand-navy)'}}>
           <div className="card" style={{padding:36,maxWidth:400,textAlign:'center',color:'var(--ink)'}}>
             <div style={{fontSize:32,marginBottom:16}}>🚫</div>
             <div style={{fontSize:18,fontWeight:600,marginBottom:8}}>접근 권한 없음</div>
@@ -1140,20 +1557,42 @@ export default function App() {
       :<Search items={items} onItemClick={openItem} onDelete={removeMany}/>;
   } else if(route.name==='detail') {
     const it=getItem(route.itemId);
-            view=it
+    view=it
       ?<ItemDetail item={it} onBack={()=>route.fromSpace?nav('space',{space:route.fromSpace}):nav('search')} onEdit={()=>setRoute({name:'edit',itemId:it.id,fromSpace:route.fromSpace})} onDelete={remove}/>
       :<Search items={items} onItemClick={openItem} onDelete={removeMany}/>;
+  } else if(route.name==='profile') {
+    view=<Profile user={user} onLogout={logout}/>;
   }
+
+  const navItems=[
+    {id:'search',label:'품목 찾기',I:IC.list},
+    {id:'space',label:'공간 조회',I:IC.map},
+    {id:'register',label:'신규 등록',I:IC.plus},
+    {id:'dashboard',label:'대시보드',I:IC.dash},
+    {id:'profile',label:'내 계정',I:IC.user},
+  ];
+  const curTab=route.name==='detail'?'search':route.name==='edit'?'search':route.name;
 
   return (
     <>
       <style>{SIDEBAR_CSS}{STYLE_SHEET}</style>
       <div className="app" style={{display:'flex'}}>
         <Sidebar cur={route.name} onNav={nav} user={user} onLogout={logout}/>
-        <div style={{flex:1,display:'flex',flexDirection:'column',minWidth:0,height:'100vh',overflow:'hidden'}}>
+        <div style={{flex:1,display:'flex',flexDirection:'column',minWidth:0,minHeight:0,overflow:'hidden'}}>
           {view}
         </div>
       </div>
+      <nav className="bottom-nav">
+        {navItems.map(({id,label,I})=>{
+          const a=curTab===id;
+          return (
+            <button key={id} className={`bottom-nav-item${a?' active':''}`} onClick={()=>nav(id)}>
+              <span className="bnav-icon"><I/></span>
+              <span>{label}</span>
+            </button>
+          );
+        })}
+      </nav>
     </>
   );
 }
