@@ -34,7 +34,8 @@ const SIDEBAR_CSS = `
     .bottom-nav-item.active { color:var(--primary); }
     .bottom-nav-item.active .bnav-icon { color:var(--primary); }
     .bnav-icon { color:var(--slate); display:flex; }
-    .mobile-content { padding-bottom:60px !important; }
+    .mobile-content { padding-bottom:80px !important; }
+    .app { height:100dvh !important; }
     .mobile-topbar { padding:14px 16px !important; }
     .mobile-topbar h1 { font-size:17px !important; }
     .mobile-topbar .topbar-sub { display:none; }
@@ -70,7 +71,7 @@ const STYLE_SHEET = `
 }
 *{box-sizing:border-box}
 body,#root{margin:0;padding:0}
-.app{font-family:'Pretendard','Inter',-apple-system,system-ui,sans-serif;color:var(--ink);background:var(--surface);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased;height:100vh;overflow:hidden}
+.app{font-family:'Pretendard','Inter',-apple-system,system-ui,sans-serif;color:var(--ink);background:var(--surface);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased;height:100vh;height:100dvh;overflow:hidden}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:36px;padding:0 14px;border-radius:var(--r-md);font-size:14px;font-weight:500;border:1px solid transparent;cursor:pointer;white-space:nowrap;font-family:inherit;transition:background 120ms}
 .btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-pressed)}
 .btn-primary:disabled{background:var(--hairline-strong);color:var(--steel);cursor:not-allowed}
@@ -824,7 +825,7 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
           }}><IC.plus/> 등록</button>
           <button className="btn btn-primary btn-sm" disabled={!sel.size} onClick={()=>setShowList(true)}>조회 ({selItems.length})</button>
         </div>}/>
-      <div style={{overflowX:'auto',WebkitOverflowScrolling:'touch',background:'var(--canvas)',borderBottom:'1px solid var(--hairline)',flexShrink:0}}>
+      <div style={{overflowX:'auto',overflowY:'hidden',WebkitOverflowScrolling:'touch',background:'var(--canvas)',borderBottom:'1px solid var(--hairline)',flexShrink:0}}>
         <div className="row" style={{padding:'0 16px',gap:0,minWidth:'max-content'}}>
         {SPACES.map(s=>{const a=space===s;const cnt=items.filter(i=>i.space===s).length;return(
           <button key={s} onClick={()=>setSpace(s)} style={{padding:'14px 14px 12px',border:'none',background:'transparent',color:a?'var(--ink)':'var(--slate)',fontWeight:a?600:500,fontSize:14,borderBottom:a?'2px solid var(--primary)':'2px solid transparent',cursor:'pointer',position:'relative',top:1,display:'flex',alignItems:'center',gap:8,fontFamily:'inherit',whiteSpace:'nowrap'}}>
@@ -1351,7 +1352,7 @@ export default function App() {
     return (
       <>
         <style>{SIDEBAR_CSS}{STYLE_SHEET}</style>
-        <div className="app" style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',background:'var(--brand-navy)'}}>
+        <div className="app" style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',height:'100dvh',background:'var(--brand-navy)'}}>
           <div style={{color:'#fff',fontSize:16,opacity:0.7}}>로딩 중...</div>
         </div>
       </>
@@ -1362,7 +1363,7 @@ export default function App() {
     return (
       <>
         <style>{SIDEBAR_CSS}{STYLE_SHEET}</style>
-        <div className="app" style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',background:'var(--brand-navy)'}}>
+        <div className="app" style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',height:'100dvh',background:'var(--brand-navy)'}}>
           <div className="card" style={{padding:36,maxWidth:400,textAlign:'center',color:'var(--ink)'}}>
             <div style={{fontSize:32,marginBottom:16}}>🚫</div>
             <div style={{fontSize:18,fontWeight:600,marginBottom:8}}>접근 권한 없음</div>
@@ -1419,7 +1420,7 @@ export default function App() {
       <style>{SIDEBAR_CSS}{STYLE_SHEET}</style>
       <div className="app" style={{display:'flex'}}>
         <Sidebar cur={route.name} onNav={nav} user={user} onLogout={logout}/>
-        <div style={{flex:1,display:'flex',flexDirection:'column',minWidth:0,height:'100vh',overflow:'hidden'}}>
+        <div style={{flex:1,display:'flex',flexDirection:'column',minWidth:0,height:'100vh',maxHeight:'100dvh',overflow:'hidden'}}>
           {view}
         </div>
       </div>
