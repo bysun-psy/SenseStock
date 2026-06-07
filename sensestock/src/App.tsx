@@ -38,9 +38,10 @@ const SIDEBAR_CSS = `
     .mobile-content { padding-bottom:100px !important; }
     .app { height:100dvh !important; }
     .mobile-topbar { padding:14px 16px !important; }
-    .mobile-topbar h1 { font-size:17px !important; }
+    .mobile-topbar h1 { font-size:17px !important; white-space:nowrap; overflow:visible !important; text-overflow:clip !important; }
     .mobile-topbar .topbar-sub { display:none; }
-    .mobile-topbar .topbar-actions { gap:6px !important; }
+    .mobile-topbar .topbar-actions { gap:6px !important; flex-shrink:1 !important; min-width:0; }
+    .mobile-topbar .topbar-actions .btn { flex-shrink:0; }
     .mobile-pad { padding:16px !important; }
     .mobile-pad-x { padding-left:16px !important; padding-right:16px !important; }
     .mobile-grid-1 { grid-template-columns:1fr !important; }
@@ -334,7 +335,7 @@ function Topbar({title,sub,action}) {
         <h1 style={{margin:0,fontSize:24,fontWeight:600,color:'var(--ink-deep)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{title}</h1>
         {sub&&<div className="topbar-sub" style={{fontSize:13,color:'var(--slate)',marginTop:2}}>{sub}</div>}
       </div>
-      {action&&<div className="topbar-actions row" style={{flexShrink:0,gap:12}}>{action}</div>}
+      {action&&<div className="topbar-actions row" style={{flexShrink:0,gap:12,flexWrap:'nowrap'}}>{action}</div>}
     </div>
   );
 }
@@ -842,6 +843,7 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
   const [space,setSpace]=useState(initialSpace||'준비');
   const [sel,setSel]=useState(new Set());
   const [showList,setShowList]=useState(false);
+  const isMobile=useMediaQuery('(max-width:768px)');
   useEffect(()=>{setSel(new Set());setShowList(false);},[space]);
   const iMap=useMemo(()=>itemsByLoc(items.filter(i=>i.space===space)),[items,space]);
   const tog=key=>setSel(s=>{const n=new Set(s);n.has(key)?n.delete(key):n.add(key);return n;});
@@ -851,8 +853,8 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
     <div className="col" style={{height:'100%'}}>
       <Topbar title="공간 조회" sub="배치도 기반 비품 위치 확인" action={
         <div className="row" style={{gap:12}}>
-          <span style={{fontSize:13,color:'var(--slate)'}}>{sel.size}개 셀 선택</span>
-          <button className="btn btn-secondary btn-sm" disabled={!sel.size} onClick={()=>setSel(new Set())}><IC.refresh/> 초기화</button>
+          {!isMobile&&<span style={{fontSize:13,color:'var(--slate)'}}>{sel.size}개 셀 선택</span>}
+          <button className="btn btn-secondary btn-sm" disabled={!sel.size} onClick={()=>setSel(new Set())} title="초기화"><IC.refresh/>{!isMobile&&<span> 초기화</span>}</button>
           <button className="btn btn-secondary btn-sm" disabled={sel.size!==1} onClick={()=>{
             const key=[...sel][0];
             if(!key) return;
@@ -861,8 +863,8 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
             const group=key.slice(0,idx);
             const cell=key.slice(idx+2);
             onNav('register',{space,group,cell});
-          }}><IC.plus/> 등록</button>
-          <button className="btn btn-primary btn-sm" disabled={!sel.size} onClick={()=>setShowList(true)}>조회 ({selItems.length})</button>
+          }} title="등록"><IC.plus/>{!isMobile&&<span> 등록</span>}</button>
+          <button className="btn btn-primary btn-sm" disabled={!sel.size} onClick={()=>setShowList(true)}>{isMobile?`조회(${selItems.length})`:`조회 (${selItems.length})`}</button>
         </div>}/>
       <div style={{overflowX:'auto',overflowY:'hidden',WebkitOverflowScrolling:'touch',background:'var(--canvas)',borderBottom:'1px solid var(--hairline)',flexShrink:0}}>
         <div className="row" style={{padding:'0 16px',gap:0,minWidth:'max-content'}}>
