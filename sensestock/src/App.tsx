@@ -854,7 +854,7 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
       <Topbar title="공간 조회" sub="배치도 기반 비품 위치 확인" action={
         <div className="row" style={{gap:12}}>
           {!isMobile&&<span style={{fontSize:13,color:'var(--slate)'}}>{sel.size}개 셀 선택</span>}
-          <button className="btn btn-secondary btn-sm" disabled={!sel.size} onClick={()=>setSel(new Set())} title="초기화"><IC.refresh/>{!isMobile&&<span> 초기화</span>}</button>
+          <button className="btn btn-secondary btn-sm" disabled={!sel.size} onClick={()=>setSel(new Set())} title="초기화" style={isMobile?{width:30,padding:0}:{}}><IC.refresh/>{!isMobile&&<span> 초기화</span>}</button>
           <button className="btn btn-primary btn-sm" disabled={sel.size!==1} onClick={()=>{
             const key=[...sel][0];
             if(!key) return;
@@ -863,8 +863,8 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
             const group=key.slice(0,idx);
             const cell=key.slice(idx+2);
             onNav('register',{space,group,cell});
-          }} title="등록" style={{minWidth:68}}><IC.plus/>{!isMobile&&<span> 등록</span>}</button>
-          <button className="btn btn-primary btn-sm" disabled={!sel.size} onClick={()=>setShowList(true)}>{isMobile?`조회(${selItems.length})`:`조회 (${selItems.length})`}</button>
+          }} title="등록"><IC.plus/> 등록</button>
+          <button className="btn btn-primary btn-sm" disabled={!sel.size} onClick={()=>setShowList(true)}>조회 ({selItems.length})</button>
         </div>}/>
       <div style={{overflowX:'auto',overflowY:'hidden',WebkitOverflowScrolling:'touch',background:'var(--canvas)',borderBottom:'1px solid var(--hairline)',flexShrink:0}}>
         <div className="row" style={{padding:'0 16px',gap:0,minWidth:'max-content'}}>
