@@ -1116,6 +1116,7 @@ function Profile({user,onLogout}) {
       <div className="mobile-content mobile-pad" style={{flex:1,overflow:'auto',padding:32,paddingBottom:100}}>
         <div style={{maxWidth:860,margin:'0 auto',display:'flex',flexDirection:'column',gap:16}}>
           {!isEdit&&prefill?.space&&(
+            <div className="card" style={{padding:16,background:'var(--tint-lavender)',border:'1px solid var(--brand-purple-300)'}}>
               <div className="row" style={{gap:10}}><span style={{width:22,height:22,borderRadius:'50%',background:'var(--primary)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:700,flexShrink:0}}>!</span>
               <span style={{fontSize:13,color:'var(--brand-purple-800)'}}>공간 조회에서 <b>{prefill.space} / {prefill.group} / {prefill.cell}</b>의 신규 등록으로 이동했습니다. 위치 정보가 자동 입력되었습니다.</span></div>
             </div>
