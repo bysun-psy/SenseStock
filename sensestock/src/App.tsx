@@ -282,6 +282,7 @@ const IC = {
   alert:()=><Ico path={['M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z','M12 9v4M12 17h.01']}/>,
   logout:()=><Ico path={['M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4','M16 17l5-5-5-5','M21 12H9']}/>,
   refresh:()=><Ico path={['M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5','M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5']}/>,
+  user:()=><Ico circle={[{cx:12,cy:8,r:4}]} path="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>,
 };
 
 function SidebarToggleIcon({open}) {
@@ -425,6 +426,7 @@ function Sidebar({cur,onNav,user,onLogout}) {
     {id:'space',label:'공간 조회',I:IC.map},
     {id:'register',label:'신규 등록',I:IC.plus},
     {id:'dashboard',label:'대시 보드',I:IC.dash},
+    {id:'profile',label:'내 계정',I:IC.user},
   ];
   return (
     <aside className={`ss-aside${collapsed?' collapsed':''}`} style={{width:240,background:'var(--surface)',borderRight:'1px solid var(--hairline)',display:'flex',flexDirection:'column',flexShrink:0}}>
@@ -494,7 +496,7 @@ function Dashboard({items,activity,onNav,onItemClick}) {
   return (
     <div className="col" style={{height:'100%'}}>
       <Topbar title="대시 보드" sub="관능평가실 비품 현황"/>
-      <div className={`mobile-content mobile-pad`} style={{flex:1,overflow:'auto',padding:32}}>
+      <div className={`mobile-content mobile-pad`} style={{flex:1,overflow:'auto',padding:32,paddingBottom:100}}>
         <div className="mobile-grid-1" style={{display:'grid',gridTemplateColumns:'1fr 2.5fr',gap:16,marginBottom:16}}>
           <div className="card" style={{padding:24,display:'flex',flexDirection:'column',justifyContent:'center'}}>
             <div style={{fontSize:13,color:'var(--slate)'}}>총 등록 품목</div>
@@ -717,6 +719,8 @@ function Search({items,onItemClick,onDelete}) {
   );
 }
 
+const CIRCLE_TO_NUM:Record<string,string>={'①':'1','②':'2','③':'3','④':'4','⑤':'5','⑥':'6','⑦':'7','⑧':'8','⑨':'9','⑩':'10'};
+function toPlainLabel(s:string):string{return s.replace(/[①-⑩]/g,c=>CIRCLE_TO_NUM[c]??c);}
 function Cell({space,group,cell,label,x,y,w,h,vert,itemMap,selected,onToggle}) {
   const key=`${group}||${cell}`;
   const its=(itemMap[`${space}/${group}/${cell}`]||[]);
@@ -726,10 +730,11 @@ function Cell({space,group,cell,label,x,y,w,h,vert,itemMap,selected,onToggle}) {
   const fill=empty?'#FAFAF8':(dom?.color||'#FAFAF8');
   const darkColors=['var(--use-2)','var(--use-3)','var(--use-9)','var(--use-10)','var(--use-11)','var(--use-8)','var(--use-1)','var(--use-6)'];
   const tc=darkColors.includes(fill)?'rgba(255,255,255,.9)':'var(--ink)';
+  const displayLabel=toPlainLabel(label);
   return (
-    <div onClick={()=>onToggle(key)} style={{position:'absolute',left:x,top:y,width:w,height:h,background:fill,opacity:empty?1:.85,border:isSel?'2.5px solid var(--ink-deep)':'1px solid var(--hairline-strong)',borderRadius:4,cursor:'pointer',display:'flex',alignItems:vert?'flex-end':'flex-start',justifyContent:vert?'center':'flex-start',padding:5,boxSizing:'border-box',boxShadow:isSel?'0 4px 12px rgba(15,15,15,.16)':'none',transform:isSel?'scale(1.02)':'scale(1)',transition:'transform 80ms',zIndex:isSel?5:1}} title={its.length>0?`${its.length}개 품목`:'비어있음'}>
-      <span style={{fontSize:13,fontWeight:600,color:empty?'var(--steel)':tc,writingMode:vert?'vertical-rl':'horizontal-tb',lineHeight:1.2}}>{label}</span>
-      {its.length>0&&<span style={{position:'absolute',...(vert?{top:4,left:'50%',transform:'translateX(-50%)'}:{top:4,right:5}),background:'rgba(255,255,255,.9)',color:'var(--charcoal)',fontSize:9,fontWeight:700,borderRadius:8,padding:'1px 5px'}}>{its.length}</span>}
+    <div onClick={()=>onToggle(key)} style={{position:'absolute',left:x,top:y,width:w,height:h,background:fill,opacity:empty?1:.85,border:isSel?'2.5px solid var(--ink-deep)':'1px solid var(--hairline-strong)',borderRadius:4,cursor:'pointer',display:'flex',alignItems:'flex-start',justifyContent:'flex-start',padding:4,boxSizing:'border-box',boxShadow:isSel?'0 4px 12px rgba(15,15,15,.16)':'none',transform:isSel?'scale(1.02)':'scale(1)',transition:'transform 80ms',zIndex:isSel?5:1}} title={its.length>0?`${its.length}개 품목`:'비어있음'}>
+      <span style={{fontSize:10,fontWeight:600,color:empty?'var(--steel)':tc,writingMode:vert?'vertical-rl':'horizontal-tb',lineHeight:1.2}}>{displayLabel}</span>
+      {its.length>0&&<span style={{position:'absolute',...(vert?{top:4,left:'50%',transform:'translateX(-50%)'}:{top:4,right:4}),background:'rgba(255,255,255,.9)',color:'var(--charcoal)',fontSize:9,fontWeight:700,borderRadius:8,padding:'1px 4px'}}>{its.length}</span>}
     </div>
   );
 }
@@ -876,23 +881,24 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
           <span style={{marginLeft:'auto',fontSize:11,color:'var(--steel)',whiteSpace:'nowrap'}}>셀 색 = 최다 용도</span>
         </div>
       </div>
-      <div className="mobile-content mobile-scroll-x" style={{flex:1,overflow:'auto',padding:'20px 32px',background:'var(--surface)',position:'relative'}}>
+      <div className="mobile-content mobile-scroll-x" style={{flex:1,overflow:'auto',padding:'20px 32px',paddingBottom:100,background:'var(--surface)',position:'relative'}}>
         {space==='준비'&&<PrepPlan {...pp}/>}
         {(space==='서빙1'||space==='서빙2')&&<SimplePlan space={space} title={space==='서빙1'?'Serving Room 1':'Serving Room 2'} p={pp}/>}
         {(space==='토론1'||space==='토론2')&&<DiscPlan space={space} title={space==='토론1'?'Discussion Room 1':'Discussion Room 2'} p={pp}/>}
         {space==='창고'&&<StorePlan {...pp}/>}
         {showList&&(
-          <div onClick={()=>setShowList(false)} style={{position:'fixed',inset:0,background:'rgba(15,15,15,.3)',zIndex:30,display:'flex',alignItems:'flex-end'}}>
+          <div onClick={()=>setShowList(false)} style={{position:'fixed',inset:0,bottom:60,background:'rgba(15,15,15,.3)',zIndex:30,display:'flex',alignItems:'flex-end'}}>
             <div onClick={e=>e.stopPropagation()} className="card" style={{width:'100%',maxHeight:'65%',borderRadius:'var(--r-lg) var(--r-lg) 0 0',background:'var(--canvas)',boxShadow:'var(--shadow-4)',display:'flex',flexDirection:'column'}}>
-              <div className="row between" style={{padding:'16px 24px',borderBottom:'1px solid var(--hairline)'}}>
+              <div className="row between" style={{padding:'16px 24px',borderBottom:'1px solid var(--hairline)',flexShrink:0}}>
                 <div className="row" style={{gap:10}}>
                   <span style={{fontSize:18,fontWeight:600}}>{space} · {sel.size}개 셀</span>
                   <span className="badge" style={{background:'var(--primary-soft)',color:'var(--primary-deep)'}}>{selItems.length}개 품목</span>
                 </div>
                 <button className="btn btn-ghost btn-icon" onClick={()=>setShowList(false)}><IC.x/></button>
               </div>
-              <div style={{flex:1,overflow:'auto'}}>
-                <table className="table">
+              <div style={{flex:1,overflow:'auto',paddingBottom:8}}>
+                {/* 데스크탑: 테이블 */}
+                <table className="table mobile-hide">
                   <thead><tr><th>품목명</th><th style={{width:140}}>용도</th><th style={{width:160}}>위치</th><th style={{width:120}}>규격</th><th style={{width:100,textAlign:'right'}}>수량</th></tr></thead>
                   <tbody>
                     {selItems.map(it=>{
@@ -908,9 +914,37 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
                         </tr>
                       );
                     })}
-                    {selItems.length===0&&<tr><td colSpan="5" style={{padding:'40px 0',textAlign:'center',color:'var(--slate)'}}>선택한 셀에 품목이 없습니다.</td></tr>}
+                    {selItems.length===0&&<tr><td colSpan={5} style={{padding:'40px 0',textAlign:'center',color:'var(--slate)'}}>선택한 셀에 품목이 없습니다.</td></tr>}
                   </tbody>
                 </table>
+                {/* 모바일: 카드형 리스트 */}
+                <div className="desktop-hide" style={{display:'flex',flexDirection:'column',gap:1}}>
+                  {selItems.map(it=>{
+                    const u=useById(it.useId);
+                    const isLow=it.min!=null&&it.qty<it.min;
+                    return (
+                      <div key={it.id} onClick={()=>{setShowList(false);onItemClick(it);}} style={{padding:'12px 20px',borderBottom:'1px solid var(--hairline)',cursor:'pointer',background:'var(--canvas)'}}>
+                        <div className="row between" style={{alignItems:'flex-start',gap:8}}>
+                          <div style={{flex:1,minWidth:0}}>
+                            <div style={{fontWeight:600,fontSize:15,color:'var(--ink-deep)',marginBottom:4}}>{it.name}</div>
+                            <div className="row" style={{gap:6,flexWrap:'wrap'}}>
+                              <span className="row" style={{gap:4}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:12,color:'var(--slate)'}}>{u.short}</span></span>
+                              <span style={{fontSize:12,color:'var(--steel)'}}>·</span>
+                              <span style={{fontSize:12,color:'var(--slate)'}}><b style={{color:'var(--charcoal)'}}>{it.group}</b> / {it.cell}</span>
+                              {it.spec&&<><span style={{fontSize:12,color:'var(--steel)'}}>·</span><span style={{fontSize:12,color:'var(--slate)'}}>{it.spec}</span></>}
+                            </div>
+                          </div>
+                          <div style={{textAlign:'right',flexShrink:0}}>
+                            <span style={{fontWeight:700,fontSize:16,color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>
+                            {it.min!=null&&<span style={{fontSize:12,color:'var(--slate)'}}> / {it.min}</span>}
+                            {isLow&&<div style={{fontSize:11,color:'var(--error)',fontWeight:500}}>재고 부족</div>}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {selItems.length===0&&<div style={{padding:'40px 0',textAlign:'center',color:'var(--slate)',fontSize:14}}>선택한 셀에 품목이 없습니다.</div>}
+                </div>
               </div>
             </div>
           </div>
@@ -1014,8 +1048,38 @@ function MonthPicker({value,onChange,editing}:{value:string,onChange:(v:string)=
   );
 }
 
-function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||'',group:pre.group||'',cell:pre.cell||'',spec:'',qty:'',min:'',received:'',note:''};}
-function RegisterEdit({mode,item,prefill,onCancel,onSave,onDelete}) {
+function Profile({user,onLogout}) {
+  const initial=(user?.name||'?').charAt(0);
+  return (
+    <div className="col" style={{height:'100%'}}>
+      <Topbar title="내 계정" sub="로그인 정보 및 설정"/>
+      <div className="mobile-content mobile-pad" style={{flex:1,overflow:'auto',padding:32,paddingBottom:100}}>
+        <div style={{maxWidth:480,margin:'0 auto',display:'flex',flexDirection:'column',gap:12}}>
+          <div className="card" style={{padding:32,display:'flex',flexDirection:'column',alignItems:'center',gap:12,textAlign:'center'}}>
+            <div style={{width:72,height:72,borderRadius:'50%',background:'var(--brand-navy)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:28,fontWeight:600,flexShrink:0}}>{initial}</div>
+            <div>
+              <div style={{fontSize:20,fontWeight:600,color:'var(--ink-deep)',marginBottom:4}}>{user?.name||'사용자'}</div>
+              <div style={{fontSize:14,color:'var(--slate)'}}>{user?.email||''}</div>
+            </div>
+            <div style={{width:'100%',height:1,background:'var(--hairline)',margin:'4px 0'}}/>
+            <button className="btn btn-secondary" style={{width:'100%',height:44,color:'var(--error)',borderColor:'var(--hairline-strong)'}} onClick={onLogout}>
+              <IC.logout/> 로그아웃
+            </button>
+          </div>
+          <div className="card" style={{padding:20}}>
+            <div style={{fontSize:12,color:'var(--slate)',marginBottom:8}}>접속 권한</div>
+            <div className="row" style={{gap:8,alignItems:'center'}}>
+              <span style={{width:8,height:8,borderRadius:'50%',background:'var(--brand-green)',display:'inline-block',flexShrink:0}}/>
+              <span style={{fontSize:14,fontWeight:500,color:'var(--ink)'}}>관능평가실 구성원</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
   const isEdit=mode==='edit';
   const [form,setForm]=useState(()=>isEdit&&item?{...item}:blank(prefill||{}));
   const [ef,setEf]=useState(null);
@@ -1049,10 +1113,9 @@ function RegisterEdit({mode,item,prefill,onCancel,onSave,onDelete}) {
           <button className="btn btn-secondary" onClick={onCancel}>취소</button>
           <button className="btn btn-primary" onClick={submit}>{isEdit?'저장':'등록'}</button>
         </div>}/>
-      <div className="mobile-content mobile-pad" style={{flex:1,overflow:'auto',padding:32}}>
+      <div className="mobile-content mobile-pad" style={{flex:1,overflow:'auto',padding:32,paddingBottom:100}}>
         <div style={{maxWidth:860,margin:'0 auto',display:'flex',flexDirection:'column',gap:16}}>
           {!isEdit&&prefill?.space&&(
-            <div className="card" style={{padding:16,background:'var(--tint-lavender)',border:'1px solid var(--brand-purple-300)'}}>
               <div className="row" style={{gap:10}}><span style={{width:22,height:22,borderRadius:'50%',background:'var(--primary)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:700,flexShrink:0}}>!</span>
               <span style={{fontSize:13,color:'var(--brand-purple-800)'}}>공간 조회에서 <b>{prefill.space} / {prefill.group} / {prefill.cell}</b>의 신규 등록으로 이동했습니다. 위치 정보가 자동 입력되었습니다.</span></div>
             </div>
@@ -1338,10 +1401,9 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
           <button className="btn btn-secondary btn-sm" onClick={onBack}><IC.back/></button>
           <button className="btn btn-primary btn-sm" onClick={onEdit}><IC.edit/></button>
         </div>}/>
-      <div className="mobile-content mobile-pad" style={{flex:1,overflow:'auto',padding:32}}>
+      <div className="mobile-content mobile-pad" style={{flex:1,overflow:'auto',padding:32,paddingBottom:100}}>
         <div style={{maxWidth:860,margin:'0 auto',display:'flex',flexDirection:'column',gap:16}}>
           <div className="card mobile-grid-1" style={{padding:24,display:'grid',gridTemplateColumns:'1.4fr 1fr',gap:24}}>
-            <div>
               <span className="badge" style={{background:u.color,color:'#fff'}}>{u.name}</span>
               <h2 className="mobile-h2" style={{margin:'12px 0 6px',fontSize:28,fontWeight:600,color:'var(--ink-deep)'}}>{item.name}</h2>
               <div style={{fontSize:14,color:'var(--charcoal)'}}><span style={{color:'var(--slate)'}}>위치</span> <b>{item.space} / {item.group} / {item.cell}</b></div>
@@ -1509,6 +1571,8 @@ export default function App() {
     view=it
       ?<ItemDetail item={it} onBack={()=>route.fromSpace?nav('space',{space:route.fromSpace}):nav('search')} onEdit={()=>setRoute({name:'edit',itemId:it.id,fromSpace:route.fromSpace})} onDelete={remove}/>
       :<Search items={items} onItemClick={openItem} onDelete={removeMany}/>;
+  } else if(route.name==='profile') {
+    view=<Profile user={user} onLogout={logout}/>;
   }
 
   const navItems=[
@@ -1516,6 +1580,7 @@ export default function App() {
     {id:'space',label:'공간 조회',I:IC.map},
     {id:'register',label:'신규 등록',I:IC.plus},
     {id:'dashboard',label:'대시보드',I:IC.dash},
+    {id:'profile',label:'내 계정',I:IC.user},
   ];
   const curTab=route.name==='detail'?'search':route.name==='edit'?'search':route.name;
 
