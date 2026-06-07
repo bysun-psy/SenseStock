@@ -1079,7 +1079,8 @@ function Profile({user,onLogout}) {
   );
 }
 
-
+function blank(pre:any={}){return{name:'',useId:pre.useId||null,space:pre.space||'',group:pre.group||'',cell:pre.cell||'',spec:'',qty:'',min:'',received:'',note:''} as any;}
+function RegisterEdit({mode,item,prefill,onCancel,onSave,onDelete}:any) {
   const isEdit=mode==='edit';
   const [form,setForm]=useState(()=>isEdit&&item?{...item}:blank(prefill||{}));
   const [ef,setEf]=useState(null);
