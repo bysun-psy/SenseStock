@@ -1003,9 +1003,9 @@ function MonthPicker({value,onChange,editing}:{value:string,onChange:(v:string)=
   const months=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
   return (
     <div style={{position:'relative',minWidth:0}} ref={ref}>
-      <div className={`input ${editing?'is-editing':''}`} style={{display:'flex',alignItems:'center',gap:6,padding:'0 10px',cursor:'text',minWidth:0,width:'100%'}}>
-        <input value={value} onChange={handleText} placeholder="YYYY-MM" maxLength={7} style={{flex:1,border:'none',outline:'none',background:'transparent',font:'inherit',fontSize:14,color:'var(--ink)',padding:0}}/>
-        <button onClick={()=>{setOpen(o=>!o);if(value){const y=parseInt(value.slice(0,4));if(!isNaN(y))setViewYear(y);}}} style={{background:'none',border:'none',cursor:'pointer',padding:'2px 4px',color:'var(--slate)',display:'flex',alignItems:'center',flexShrink:0,fontSize:13}}>📅</button>
+      <div className={`input ${editing?'is-editing':''}`} style={{display:'flex',alignItems:'center',gap:4,padding:'0 8px',cursor:'text',minWidth:0,width:'100%',overflow:'hidden'}}>
+        <input value={value} onChange={handleText} placeholder="YYYY-MM" maxLength={7} size={1} style={{flex:1,minWidth:0,border:'none',outline:'none',background:'transparent',font:'inherit',fontSize:14,color:'var(--ink)',padding:0}}/>
+        <button onClick={()=>{setOpen(o=>!o);if(value){const y=parseInt(value.slice(0,4));if(!isNaN(y))setViewYear(y);}}} style={{background:'none',border:'none',cursor:'pointer',padding:'2px 2px',color:'var(--slate)',display:'flex',alignItems:'center',flexShrink:0,fontSize:13}}>📅</button>
       </div>
       {open&&(
         <div className="card" style={{position:'absolute',top:'calc(100% + 4px)',left:0,right:0,zIndex:30,padding:14,boxShadow:'var(--shadow-2)'}}>
