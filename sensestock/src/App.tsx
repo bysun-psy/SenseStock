@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from "react";
+import { supabase } from "./supabaseClient";
 
 const SIDEBAR_CSS = `
   .ss-aside { transition: width 0.22s ease; overflow: hidden; }
@@ -330,90 +331,53 @@ function LoginDecorations() {
   );
 }
 
-function Login({onLogin}) {
-  const [email,setEmail]=useState('kim.research@sensorylab.co');
-  const [pw,setPw]=useState('sense1234');
-  const [rem,setRem]=useState(true);
+function Login() {
+  const [loading,setLoading]=useState(false);
   const [err,setErr]=useState('');
-  const [showForgot,setShowForgot]=useState(false);
-  const [forgotEmail,setForgotEmail]=useState('');
-  const [forgotSent,setForgotSent]=useState(false);
-  const go=e=>{
-    e?.preventDefault?.();
-    if(!email||!pw){setErr('아이디와 비밀번호를 모두 입력하세요.');return;}
-    setErr('');
-    onLogin({name:'김연구',email});
+  const handleGoogleLogin=async()=>{
+    setLoading(true); setErr('');
+    const {error}=await supabase.auth.signInWithOAuth({
+      provider:'google',
+      options:{redirectTo:window.location.origin},
+    });
+    if(error){setErr('로그인 중 오류가 발생했습니다.');setLoading(false);}
   };
   return (
-    <>
-      <div style={{minHeight:'100vh',background:'var(--brand-navy)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',color:'#fff',position:'relative',overflow:'hidden',padding:'48px 24px'}}>
-        <LoginDecorations/>
-        <div style={{position:'relative',zIndex:2,textAlign:'center',marginBottom:40}}>
-          <div style={{marginBottom:20}}>
-            <span style={{fontSize:'clamp(36px,5vw,56px)',fontWeight:600,lineHeight:1.1,letterSpacing:'-1px',background:'linear-gradient(90deg,var(--brand-yellow),var(--brand-orange))',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>SenseStock</span>
-          </div>
-          <p style={{color:'var(--on-dark-muted)',fontSize:16,lineHeight:1.6}}>
-            누군가의 기억 대신, 팀이 함께 보는 위치·재고 정보.<br/>
-            SenseStock은 관능평가실 비품을 모두가 독립적으로 찾을 수 있게 합니다.
-          </p>
+    <div style={{minHeight:'100vh',background:'var(--brand-navy)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',color:'#fff',position:'relative',overflow:'hidden',padding:'48px 24px'}}>
+      <LoginDecorations/>
+      <div style={{position:'relative',zIndex:2,textAlign:'center',marginBottom:40}}>
+        <div style={{marginBottom:20}}>
+          <span style={{fontSize:'clamp(36px,5vw,56px)',fontWeight:600,lineHeight:1.1,letterSpacing:'-1px',background:'linear-gradient(90deg,var(--brand-yellow),var(--brand-orange))',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>SenseStock</span>
         </div>
-        <div style={{position:'relative',zIndex:2,width:'100%',maxWidth:420}}>
-          <div className="card" style={{padding:36,background:'var(--canvas)',color:'var(--ink)',boxShadow:'var(--shadow-3)'}}>
-            <h2 style={{margin:'0 0 28px',fontSize:22,fontWeight:600,letterSpacing:'-0.3px'}}>로그인</h2>
-            <div className="col" style={{gap:16}}>
-              <div>
-                <label className="field-label">아이디</label>
-                <input className="input" placeholder="예: kim.research@sensorylab.co" value={email} onChange={e=>setEmail(e.target.value)}/>
-              </div>
-              <div>
-                <div className="row between" style={{marginBottom:6}}>
-                  <label className="field-label" style={{margin:0}}>비밀번호</label>
-                  <button style={{background:'none',border:'none',color:'#3B82F6',fontSize:12,fontFamily:'inherit',cursor:'pointer',padding:0}} onClick={()=>setShowForgot(true)}>비밀번호 찾기</button>
-                </div>
-                <input className="input" type="password" placeholder="••••••••" value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==='Enter'&&go(e)}/>
-              </div>
-              {err&&<div style={{background:'#FCEFEF',color:'var(--error)',border:'1px solid #EBC7C7',padding:'8px 12px',borderRadius:'var(--r-md)',fontSize:13}}>{err}</div>}
-              <div className="row" style={{gap:8,cursor:'pointer',userSelect:'none'}} onClick={()=>setRem(r=>!r)}>
-                <span style={{width:16,height:16,borderRadius:4,border:'1px solid var(--hairline-strong)',background:rem?'var(--primary)':'var(--canvas)',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',flexShrink:0}}>
-                  {rem&&<IC.check/>}
-                </span>
-                <span style={{fontSize:13,color:'var(--charcoal)'}}>로그인 상태 유지</span>
-              </div>
-              <button className="btn btn-primary" style={{width:'100%',height:44,fontSize:15,marginTop:8}} onClick={go}>로그인</button>
-            </div>
-            <div style={{marginTop:24,paddingTop:20,borderTop:'1px solid var(--hairline)',fontSize:12,color:'var(--steel)',textAlign:'center'}}>
-              외부 회원가입은 제공하지 않습니다.<br/>신규 계정은 관리자에게 요청하세요.
-            </div>
+        <p style={{color:'var(--on-dark-muted)',fontSize:16,lineHeight:1.6}}>
+          누군가의 기억 대신, 팀이 함께 보는 위치·재고 정보.<br/>
+          SenseStock은 관능평가실 비품을 모두가 독립적으로 찾을 수 있게 합니다.
+        </p>
+      </div>
+      <div style={{position:'relative',zIndex:2,width:'100%',maxWidth:420}}>
+        <div className="card" style={{padding:36,background:'var(--canvas)',color:'var(--ink)',boxShadow:'var(--shadow-3)'}}>
+          <h2 style={{margin:'0 0 8px',fontSize:22,fontWeight:600,letterSpacing:'-0.3px'}}>로그인</h2>
+          <p style={{margin:'0 0 28px',fontSize:13,color:'var(--slate)'}}>허가된 Google 계정으로만 접속할 수 있습니다.</p>
+          {err&&<div style={{background:'#FCEFEF',color:'var(--error)',border:'1px solid #EBC7C7',padding:'8px 12px',borderRadius:'var(--r-md)',fontSize:13,marginBottom:16}}>{err}</div>}
+          <button
+            onClick={handleGoogleLogin}
+            disabled={loading}
+            style={{width:'100%',height:48,borderRadius:'var(--r-md)',border:'1px solid var(--hairline-strong)',background:'var(--canvas)',color:'var(--ink)',fontSize:15,fontWeight:500,cursor:loading?'not-allowed':'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:12,fontFamily:'inherit'}}
+          >
+            <svg width="20" height="20" viewBox="0 0 48 48">
+              <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.8 2.5 30.2 0 24 0 14.7 0 6.7 5.4 2.8 13.3l7.8 6C12.4 13 17.8 9.5 24 9.5z"/>
+              <path fill="#4285F4" d="M46.6 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4 6.9-10 6.9-17z"/>
+              <path fill="#FBBC05" d="M10.6 28.7A14.6 14.6 0 0 1 9.5 24c0-1.6.3-3.2.7-4.7l-7.8-6A23.9 23.9 0 0 0 0 24c0 3.9.9 7.5 2.6 10.8l8-6.1z"/>
+              <path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.5-5.8c-2 1.4-4.6 2.2-7.7 2.2-6.2 0-11.5-4.2-13.4-9.9l-8 6.1C6.6 42.5 14.7 48 24 48z"/>
+            </svg>
+            {loading?'로그인 중...':'Google 계정으로 로그인'}
+          </button>
+          <div style={{marginTop:20,fontSize:12,color:'var(--steel)',textAlign:'center'}}>
+            외부 회원가입은 제공하지 않습니다.<br/>접속 권한은 관리자에게 요청하세요.
           </div>
         </div>
       </div>
-      {showForgot&&(
-        <div onClick={()=>{setShowForgot(false);setForgotSent(false);}} style={{position:'fixed',inset:0,background:'rgba(15,15,15,0.55)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100}}>
-          <div onClick={e=>e.stopPropagation()} className="card" style={{width:420,padding:32,background:'var(--canvas)',color:'var(--ink)',boxShadow:'var(--shadow-4)'}}>
-            {!forgotSent?(
-              <>
-                <div style={{fontSize:18,fontWeight:600,marginBottom:8}}>비밀번호 재설정</div>
-                <p style={{margin:'0 0 20px',fontSize:13,color:'var(--slate)'}}>등록된 이메일로 재설정 링크를 보내드립니다.</p>
-                <input className="input" placeholder="등록된 이메일" value={forgotEmail} onChange={e=>setForgotEmail(e.target.value)}/>
-                <div className="row" style={{gap:8,marginTop:20,justifyContent:'flex-end'}}>
-                  <button className="btn btn-secondary" onClick={()=>setShowForgot(false)}>취소</button>
-                  <button className="btn btn-primary" onClick={()=>setForgotSent(true)} disabled={!forgotEmail}>재설정 링크 받기</button>
-                </div>
-              </>
-            ):(
-              <>
-                <div style={{width:40,height:40,borderRadius:'50%',background:'var(--tint-mint)',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--brand-green)',marginBottom:16}}><IC.check/></div>
-                <div style={{fontSize:18,fontWeight:600,marginBottom:8}}>전송 완료</div>
-                <p style={{margin:'0 0 20px',fontSize:13,color:'var(--slate)'}}><b>{forgotEmail}</b>로 재설정 링크를 보냈습니다.</p>
-                <div className="row" style={{justifyContent:'flex-end'}}>
-                  <button className="btn btn-primary" onClick={()=>{setShowForgot(false);setForgotSent(false);setForgotEmail('');}}>닫기</button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
-    </>
+    </div>
   );
 }
 
@@ -1066,14 +1030,40 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
 export default function App() {
   const [authed,setAuthed]=useState(false);
   const [user,setUser]=useState(null);
+  const [authLoading,setAuthLoading]=useState(true);
+  const [accessDenied,setAccessDenied]=useState(false);
   const [route,setRoute]=useState({name:'dashboard'});
   const [items,setItems]=useState(SEED);
   const [activity,setActivity]=useState(SEED_ACT);
 
+  useEffect(()=>{
+    // 세션 확인 및 화이트리스트 체크
+    const checkSession = async (session) => {
+      if (!session) { setAuthed(false); setUser(null); setAuthLoading(false); return; }
+      const email = session.user.email;
+      const { data } = await supabase.from('allowed_emails').select('email').eq('email', email).single();
+      if (data) {
+        const name = session.user.user_metadata?.full_name || email.split('@')[0];
+        setUser({ name, email });
+        setAuthed(true);
+        setAccessDenied(false);
+      } else {
+        await supabase.auth.signOut();
+        setAccessDenied(true);
+        setAuthed(false);
+        setUser(null);
+      }
+      setAuthLoading(false);
+    };
+
+    supabase.auth.getSession().then(({ data: { session } }) => checkSession(session));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => checkSession(session));
+    return () => subscription.unsubscribe();
+  }, []);
+
   const nav=(name,params={})=>setRoute({name,...params});
   const openItem=(it,fromSpace=null)=>{if(it&&it.id!=null)setRoute({name:'detail',itemId:it.id,fromSpace});};
-  const login=u=>{setUser(u);setAuthed(true);setRoute({name:'dashboard'});};
-  const logout=()=>{setAuthed(false);setUser(null);};
+  const logout=async()=>{ await supabase.auth.signOut(); setAuthed(false); setUser(null); };
 
   const upsert=data=>{
     setItems(prev=>{
@@ -1096,11 +1086,38 @@ export default function App() {
 
   const removeMany=ids=>{setItems(p=>p.filter(i=>!ids.includes(i.id)));};
 
+  if(authLoading) {
+    return (
+      <>
+        <style>{SIDEBAR_CSS}{STYLE_SHEET}</style>
+        <div className="app" style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',background:'var(--brand-navy)'}}>
+          <div style={{color:'#fff',fontSize:16,opacity:0.7}}>로딩 중...</div>
+        </div>
+      </>
+    );
+  }
+
+  if(accessDenied) {
+    return (
+      <>
+        <style>{SIDEBAR_CSS}{STYLE_SHEET}</style>
+        <div className="app" style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',background:'var(--brand-navy)'}}>
+          <div className="card" style={{padding:36,maxWidth:400,textAlign:'center',color:'var(--ink)'}}>
+            <div style={{fontSize:32,marginBottom:16}}>🚫</div>
+            <div style={{fontSize:18,fontWeight:600,marginBottom:8}}>접근 권한 없음</div>
+            <p style={{fontSize:13,color:'var(--slate)',marginBottom:24}}>이 이메일은 접근이 허용되지 않습니다.<br/>관리자에게 권한을 요청하세요.</p>
+            <button className="btn btn-secondary" onClick={()=>setAccessDenied(false)}>다른 계정으로 로그인</button>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   if(!authed) {
     return (
       <>
         <style>{SIDEBAR_CSS}{STYLE_SHEET}</style>
-        <div className="app"><Login onLogin={login}/></div>
+        <div className="app"><Login/></div>
       </>
     );
   }
