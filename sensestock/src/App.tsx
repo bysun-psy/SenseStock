@@ -1,6 +1,18 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { supabase } from "./supabaseClient";
 
+function useMediaQuery(query:string):boolean {
+  const [matches,setMatches]=useState(()=>typeof window!=='undefined'?window.matchMedia(query).matches:false);
+  useEffect(()=>{
+    const mq=window.matchMedia(query);
+    setMatches(mq.matches);
+    const fn=(e:MediaQueryListEvent)=>setMatches(e.matches);
+    mq.addEventListener('change',fn);
+    return()=>mq.removeEventListener('change',fn);
+  },[query]);
+  return matches;
+}
+
 const SIDEBAR_CSS = `
   .ss-aside { transition: width 0.22s ease; overflow: hidden; }
   .ss-aside.collapsed { width: 52px !important; }
@@ -14,6 +26,28 @@ const SIDEBAR_CSS = `
   .ss-tooltip { display:none; position:absolute; left:calc(100% + 8px); top:50%; transform:translateY(-50%); background:#2D2D2D; color:#fff; font-size:12px; font-weight:500; padding:4px 8px; border-radius:6px; white-space:nowrap; pointer-events:none; z-index:100; }
   .ss-aside.collapsed .ss-nav-item:hover .ss-tooltip { display:block; }
   .ss-toggle-btn { width:24px; height:24px; border-radius:6px; background:none; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--slate); flex-shrink:0; padding:0; }
+  .bottom-nav { display:none; }
+  @media (max-width:768px) {
+    .ss-aside { display:none !important; }
+    .bottom-nav { display:flex !important; position:fixed; bottom:0; left:0; right:0; height:60px; background:var(--canvas); border-top:1px solid var(--hairline); z-index:50; align-items:stretch; }
+    .bottom-nav-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; border:none; background:transparent; cursor:pointer; font-family:inherit; font-size:10px; font-weight:500; color:var(--slate); padding:0; }
+    .bottom-nav-item.active { color:var(--primary); }
+    .bottom-nav-item.active .bnav-icon { color:var(--primary); }
+    .bnav-icon { color:var(--slate); display:flex; }
+    .mobile-content { padding-bottom:60px !important; }
+    .mobile-topbar { padding:14px 16px !important; }
+    .mobile-topbar h1 { font-size:17px !important; }
+    .mobile-topbar .topbar-sub { display:none; }
+    .mobile-topbar .topbar-actions { gap:6px !important; }
+    .mobile-pad { padding:16px !important; }
+    .mobile-pad-x { padding-left:16px !important; padding-right:16px !important; }
+    .mobile-grid-1 { grid-template-columns:1fr !important; }
+    .mobile-grid-2 { grid-template-columns:1fr 1fr !important; }
+    .mobile-hide { display:none !important; }
+    .mobile-scroll-x { overflow-x:auto !important; -webkit-overflow-scrolling:touch; }
+    .mobile-h2 { font-size:20px !important; }
+    .mobile-full { width:100% !important; max-width:100% !important; }
+  }
 `;
 const STYLE_SHEET = `
 :root {
@@ -291,12 +325,12 @@ function Modal({open,onClose,children,width=440}) {
 }
 function Topbar({title,sub,action}) {
   return (
-    <div className="row between" style={{padding:'20px 32px',background:'var(--canvas)',borderBottom:'1px solid var(--hairline)',gap:24,flexShrink:0}}>
-      <div style={{minWidth:0}}>
-        <h1 style={{margin:0,fontSize:24,fontWeight:600,color:'var(--ink-deep)'}}>{title}</h1>
-        {sub&&<div style={{fontSize:13,color:'var(--slate)',marginTop:2}}>{sub}</div>}
+    <div className="row between mobile-topbar" style={{padding:'20px 32px',background:'var(--canvas)',borderBottom:'1px solid var(--hairline)',gap:16,flexShrink:0}}>
+      <div style={{minWidth:0,flex:1}}>
+        <h1 style={{margin:0,fontSize:24,fontWeight:600,color:'var(--ink-deep)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{title}</h1>
+        {sub&&<div className="topbar-sub" style={{fontSize:13,color:'var(--slate)',marginTop:2}}>{sub}</div>}
       </div>
-      <div style={{flexShrink:0}}>{action}</div>
+      {action&&<div className="topbar-actions row" style={{flexShrink:0,gap:8}}>{action}</div>}
     </div>
   );
 }
@@ -448,6 +482,7 @@ function Donut({data,total,size=160}) {
 }
 
 function Dashboard({items,activity,onNav,onItemClick}) {
+  const isMobile=useMediaQuery('(max-width:768px)');
   const total=items.length;
   const spaceC=['#6457E7','#E48F50','#3BA063','#2382E2','#E2557F','#9B6F47'];
   const useData=USES.map(u=>({c:u.color,v:items.filter(i=>i.useId===u.id).length,name:u.name})).sort((a,b)=>b.v-a.v);
@@ -456,8 +491,8 @@ function Dashboard({items,activity,onNav,onItemClick}) {
   return (
     <div className="col" style={{height:'100%'}}>
       <Topbar title="대시 보드" sub="관능평가실 비품 현황"/>
-      <div style={{flex:1,overflow:'auto',padding:32}}>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 2.5fr',gap:16,marginBottom:16}}>
+      <div className={`mobile-content mobile-pad`} style={{flex:1,overflow:'auto',padding:32}}>
+        <div className="mobile-grid-1" style={{display:'grid',gridTemplateColumns:'1fr 2.5fr',gap:16,marginBottom:16}}>
           <div className="card" style={{padding:24,display:'flex',flexDirection:'column',justifyContent:'center'}}>
             <div style={{fontSize:13,color:'var(--slate)'}}>총 등록 품목</div>
             <div style={{fontSize:48,fontWeight:600,color:'var(--ink-deep)',letterSpacing:'-1px',marginTop:8}}>{total}</div>
@@ -469,27 +504,27 @@ function Dashboard({items,activity,onNav,onItemClick}) {
           <div className="card" style={{padding:24}}>
             <div style={{fontWeight:600,fontSize:16,marginBottom:4}}>용도별 분포</div>
             <div style={{fontSize:13,color:'var(--slate)',marginBottom:20}}>{USES.length}개 분류 · 총 {total}품목</div>
-            <div className="row" style={{gap:32,alignItems:'center'}}>
-              <Donut data={useData} total={total} size={180}/>
-              <div style={{flex:1,display:'grid',gridTemplateColumns:'1fr 1fr',gap:'6px 24px'}}>
+            <div className="row" style={{gap:isMobile?16:32,alignItems:'center',flexWrap:isMobile?'wrap':'nowrap'}}>
+              <Donut data={useData} total={total} size={isMobile?120:180}/>
+              <div style={{flex:1,display:'grid',gridTemplateColumns:'1fr 1fr',gap:isMobile?'4px 12px':'6px 24px',minWidth:0}}>
                 {useData.map(u=>(
-                  <div key={u.name} className="row" style={{gap:8,padding:'4px 0'}}>
-                    <span className="swatch" style={{background:u.c}}/><span style={{flex:1,fontSize:13,color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.name}</span><span style={{fontSize:13,fontWeight:600}}>{u.v}</span>
+                  <div key={u.name} className="row" style={{gap:6,padding:'3px 0'}}>
+                    <span className="swatch" style={{background:u.c}}/><span style={{flex:1,fontSize:isMobile?11:13,color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.name}</span><span style={{fontSize:isMobile?11:13,fontWeight:600}}>{u.v}</span>
                   </div>
                 ))}
               </div>
             </div>
           </div>
         </div>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16}}>
+        <div className="mobile-grid-1" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16}}>
           <div className="card" style={{padding:24}}>
             <div style={{fontWeight:600,fontSize:16,marginBottom:4}}>공간별 분포</div>
             <div style={{fontSize:13,color:'var(--slate)',marginBottom:20}}>{SPACES.length}개 공간</div>
-            <div className="row" style={{gap:24,alignItems:'center'}}>
-              <Donut data={spData} total={total} size={160}/>
-              <div className="col" style={{flex:1,gap:6}}>
+            <div className="row" style={{gap:isMobile?12:24,alignItems:'center',flexWrap:isMobile?'wrap':'nowrap'}}>
+              <Donut data={spData} total={total} size={isMobile?100:160}/>
+              <div className="col" style={{flex:1,gap:6,minWidth:0}}>
                 {spData.map(s=>(
-                  <button key={s.name} onClick={()=>onNav('space',{space:s.name})} className="row" style={{gap:8,padding:'9px 12px',borderRadius:'var(--r-md)',border:'1px solid var(--hairline)',background:'var(--canvas)',cursor:'pointer',fontFamily:'inherit'}}>
+                  <button key={s.name} onClick={()=>onNav('space',{space:s.name})} className="row" style={{gap:8,padding:'9px 12px',borderRadius:'var(--r-md)',border:'1px solid var(--hairline)',background:'var(--canvas)',cursor:'pointer',fontFamily:'inherit',minWidth:0}}>
                     <span className="swatch" style={{background:s.c}}/><span style={{flex:1,fontSize:13,fontWeight:500,color:'var(--charcoal)'}}>{s.name}</span><span style={{fontSize:13,fontWeight:600}}>{s.v}</span><IC.chev/>
                   </button>
                 ))}
@@ -504,8 +539,8 @@ function Dashboard({items,activity,onNav,onItemClick}) {
                 return (
                   <div key={a.id} className="row" style={{gap:12,padding:'12px 0',borderBottom:i<activity.length-1?'1px solid var(--hairline-soft)':'none',alignItems:'flex-start'}}>
                     <div style={{width:24,height:24,borderRadius:'50%',background:d.bg,color:d.fg,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:700,flexShrink:0,marginTop:1}}>{d.l}</div>
-                    <div>
-                      <div style={{fontSize:13,color:'var(--charcoal)'}}><b>{a.user}</b>님이 <b>{a.name}</b>{a.action==='create'?'을 등록':a.action==='update'?'을 수정':'을 삭제'}했습니다.</div>
+                    <div style={{minWidth:0}}>
+                      <div style={{fontSize:13,color:'var(--charcoal)',overflow:'hidden'}}><b>{a.user}</b>님이 <b>{a.name}</b>{a.action==='create'?'을 등록':a.action==='update'?'을 수정':'을 삭제'}했습니다.</div>
                       <div style={{fontSize:12,color:'var(--steel)',marginTop:2}}>{a.time}</div>
                     </div>
                   </div>
@@ -553,12 +588,12 @@ function Search({items,onItemClick,onDelete}) {
   return (
     <div className="col" style={{height:'100%'}}>
       <Topbar title="품목 찾기" sub={`전체 ${items.length}개 품목`} action={sel.size>0?(
-        <div className="row" style={{gap:8}}>
+        <div className="row" style={{gap:6}}>
           <span style={{fontSize:13,color:'var(--slate)'}}>{sel.size}개 선택</span>
           <button className="btn btn-secondary btn-sm" onClick={()=>setSel(new Set())}>해제</button>
           <button className="btn btn-danger btn-sm" onClick={()=>setDelModal(true)}><IC.trash/> 삭제</button>
         </div>):null}/>
-      <div style={{padding:'16px 32px',borderBottom:'1px solid var(--hairline)',background:'var(--canvas)'}}>
+      <div className="mobile-pad-x" style={{padding:'16px 32px',borderBottom:'1px solid var(--hairline)',background:'var(--canvas)'}}>
         <div style={{position:'relative',maxWidth:640}}>
           <span style={{position:'absolute',left:12,top:'50%',transform:'translateY(-50%)',color:'var(--slate)',display:'flex'}}><IC.search/></span>
           <input className="search-pill" placeholder="품목명으로 검색…" value={q} onChange={e=>{setQ(e.target.value);setSubmitted(false);setSuggOpen(true);}} onFocus={()=>setSuggOpen(true)} onBlur={()=>setTimeout(()=>setSuggOpen(false),150)} onKeyDown={e=>e.key==='Enter'&&submit()}/>
@@ -579,7 +614,7 @@ function Search({items,onItemClick,onDelete}) {
         </div>
         <div className="row wrap" style={{gap:8,marginTop:12}}>
           <span style={{fontSize:12,fontWeight:500,color:'var(--slate)'}}>용도</span>
-          {USES.map(u=><button key={u.id} className={`chip ${uf.has(u.id)?'active':''}`} onClick={()=>tog(setUf,u.id)}><span className="swatch" style={{background:u.color}}/>{u.name}</button>)}
+          {USES.map(u=><button key={u.id} className={`chip ${uf.has(u.id)?'active':''}`} onClick={()=>tog(setUf,u.id)}><span className="swatch" style={{background:u.color}}/>{u.short}</button>)}
         </div>
         <div className="row wrap" style={{gap:8,marginTop:8}}>
           <span style={{fontSize:12,fontWeight:500,color:'var(--slate)'}}>공간</span>
@@ -587,8 +622,8 @@ function Search({items,onItemClick,onDelete}) {
           {(uf.size+sf.size+(q?1:0))>0&&<button style={{fontSize:12,color:'var(--link-blue)',background:'none',border:'none',cursor:'pointer'}} onClick={reset}>필터 초기화</button>}
         </div>
       </div>
-      <div style={{flex:1,overflow:'auto'}}>
-        <table className="table">
+      <div className="mobile-content mobile-scroll-x" style={{flex:1,overflow:'auto'}}>
+        <table className="table" style={{minWidth:600}}>
           <thead><tr>
             <th style={{width:36}}>
               {filtered.length>0&&<input type="checkbox" checked={sel.size===filtered.length&&filtered.length>0} onChange={e=>setSel(e.target.checked?new Set(filtered.map(i=>i.id)):new Set())}/>}
@@ -612,8 +647,8 @@ function Search({items,onItemClick,onDelete}) {
                 </tr>
               );
             })}
-            {filtered.length===0&&submitted&&<tr><td colSpan="7" style={{padding:'48px 0',textAlign:'center',color:'var(--slate)'}}>일치하는 품목이 없습니다.</td></tr>}
-            {!submitted&&<tr><td colSpan="7" style={{padding:'48px 0',textAlign:'center',color:'var(--slate)'}}>검색어를 입력하고 검색 버튼을 눌러주세요.</td></tr>}
+            {filtered.length===0&&submitted&&<tr><td colSpan={7} style={{padding:'48px 0',textAlign:'center',color:'var(--slate)'}}>일치하는 품목이 없습니다.</td></tr>}
+            {!submitted&&<tr><td colSpan={7} style={{padding:'48px 0',textAlign:'center',color:'var(--slate)'}}>검색어를 입력하고 검색 버튼을 눌러주세요.</td></tr>}
           </tbody>
         </table>
       </div>
@@ -783,14 +818,14 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
           </button>
         );})}
       </div>
-      <div style={{padding:'12px 32px',background:'var(--surface)',borderBottom:'1px solid var(--hairline)',flexShrink:0}}>
-        <div className="row wrap" style={{gap:12}}>
-          <span style={{fontSize:12,fontWeight:600,color:'var(--steel)'}}>용도 분류</span>
-          {USES.map(u=><div key={u.id} className="row" style={{gap:5}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:11,color:'var(--charcoal)'}}>{u.name}</span></div>)}
-          <span style={{marginLeft:'auto',fontSize:11,color:'var(--steel)'}}>셀 색 = 최다 용도</span>
+      <div className="mobile-pad-x" style={{padding:'12px 32px',background:'var(--surface)',borderBottom:'1px solid var(--hairline)',flexShrink:0}}>
+        <div className="row wrap" style={{gap:8}}>
+          <span style={{fontSize:12,fontWeight:600,color:'var(--steel)'}}>용도</span>
+          {USES.map(u=><div key={u.id} className="row" style={{gap:4}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:11,color:'var(--charcoal)'}}>{u.short}</span></div>)}
+          <span style={{marginLeft:'auto',fontSize:11,color:'var(--steel)',whiteSpace:'nowrap'}}>셀 색 = 최다 용도</span>
         </div>
       </div>
-      <div style={{flex:1,overflow:'auto',padding:'20px 32px',background:'var(--surface)',position:'relative'}}>
+      <div className="mobile-content mobile-scroll-x" style={{flex:1,overflow:'auto',padding:'20px 32px',background:'var(--surface)',position:'relative'}}>
         {space==='준비'&&<PrepPlan {...pp}/>}
         {(space==='서빙1'||space==='서빙2')&&<SimplePlan space={space} title={space==='서빙1'?'Serving Room 1':'Serving Room 2'} p={pp}/>}
         {(space==='토론1'||space==='토론2')&&<DiscPlan space={space} title={space==='토론1'?'Discussion Room 1':'Discussion Room 2'} p={pp}/>}
@@ -896,7 +931,7 @@ function RegisterEdit({mode,item,prefill,onCancel,onSave,onDelete}) {
           <button className="btn btn-secondary" onClick={onCancel}>취소</button>
           <button className="btn btn-primary" onClick={submit}>{isEdit?'저장':'등록'}</button>
         </div>}/>
-      <div style={{flex:1,overflow:'auto',padding:32}}>
+      <div className="mobile-content mobile-pad" style={{flex:1,overflow:'auto',padding:32}}>
         <div style={{maxWidth:860,margin:'0 auto',display:'flex',flexDirection:'column',gap:16}}>
           {!isEdit&&prefill?.space&&(
             <div className="card" style={{padding:16,background:'var(--tint-lavender)',border:'1px solid var(--brand-purple-300)'}}>
@@ -966,6 +1001,159 @@ function RegisterEdit({mode,item,prefill,onCancel,onSave,onDelete}) {
   );
 }
 
+function MiniCell({group,cell,label,x,y,w,h,vert,itemGroup,itemCell,itemColor}:{group:string,cell:string,label:string,x:number,y:number,w:number,h:number,vert?:boolean,itemGroup:string,itemCell:string,itemColor:string}) {
+  const isTarget=group===itemGroup&&cell===itemCell;
+  const bg=isTarget?itemColor:'#FFFFFF';
+  const darkColors=['var(--use-2)','var(--use-3)','var(--use-9)','var(--use-10)','var(--use-11)','var(--use-8)','var(--use-1)','var(--use-6)'];
+  const tc=isTarget?(darkColors.includes(itemColor)?'rgba(255,255,255,.9)':'var(--ink)'):'#9B9A97';
+  return (
+    <div style={{position:'absolute',left:x,top:y,width:w,height:h,background:bg,border:isTarget?'2.5px solid #1A1916':'1px solid #DEDCD7',borderRadius:4,display:'flex',alignItems:vert?'flex-end':'flex-start',justifyContent:vert?'center':'flex-start',padding:vert?5:5,boxSizing:'border-box',boxShadow:isTarget?'0 4px 12px rgba(15,15,15,.18)':'none'}}>
+      <span style={{fontSize:vert?10:label.length>2?9:10,fontWeight:isTarget?700:600,color:tc,writingMode:vert?'vertical-rl':'horizontal-tb',lineHeight:1.2}}>{label}</span>
+    </div>
+  );
+}
+
+function MiniMapPrep({itemGroup,itemCell,itemColor}:{itemGroup:string,itemCell:string,itemColor:string}) {
+  const p={itemGroup,itemCell,itemColor};
+  const c=(g:string,ce:string,x:number,y:number,w:number,h:number,label?:string,vert?:boolean)=>({...p,group:g,cell:ce,label:label??ce,x,y,w,h,vert});
+  const ORIG_W=1200,ORIG_H=730,SCALE=0.47;
+  const rw=Math.round(ORIG_W*SCALE),rh=Math.round(ORIG_H*SCALE);
+  return (
+    <div style={{borderRadius:8,border:'1px solid #ECEBE8',background:'#F7F6F3',overflow:'hidden',position:'relative',height:rh}}>
+      <div style={{transform:`scale(${SCALE})`,transformOrigin:'top left',width:ORIG_W,height:ORIG_H,position:'absolute',top:0,left:0,pointerEvents:'none'}}>
+        {/* 선반 */}
+        <div style={{position:'absolute',left:60,top:40,width:70,height:330,border:'1.5px solid #1A1916',borderRadius:4}}/>
+        <MiniCell {...c('선반','①',60,40,70,82,'①',true)}/>
+        <MiniCell {...c('선반','②',60,122,70,82,'②',true)}/>
+        <MiniCell {...c('선반','③',60,204,70,82,'③',true)}/>
+        <MiniCell {...c('선반','④',60,286,70,84,'④',true)}/>
+        {/* 실험대 위 */}
+        <div style={{position:'absolute',left:325,top:40,width:620,height:110,border:'1.5px solid #1A1916',borderRadius:4}}/>
+        <MiniCell {...c('실험대 위','①',325,40,124,110)}/>
+        <MiniCell {...c('실험대 위','②',449,40,124,110)}/>
+        <MiniCell {...c('실험대 위','③',573,40,124,110)}/>
+        <MiniCell {...c('실험대 위','④',697,40,124,110)}/>
+        <MiniCell {...c('실험대 위','⑤',821,40,124,110)}/>
+        {/* 실험대 아래/서랍 */}
+        <div style={{position:'absolute',left:170,top:195,width:775,height:150,border:'1.5px solid #1A1916',borderRadius:4}}/>
+        <MiniCell {...c('실험대 아래','①',170,195,90,150)}/>
+        <MiniCell {...c('실험대 아래','②',260,195,90,150)}/>
+        <MiniCell {...c('실험대 서랍','서랍 ①',358,195,70,50,'서①')}/>
+        <MiniCell {...c('실험대 서랍','서랍 ②',428,195,70,50,'서②')}/>
+        <MiniCell {...c('실험대 서랍','서랍 ③',358,245,70,50,'서③')}/>
+        <MiniCell {...c('실험대 서랍','서랍 ④',428,245,70,50,'서④')}/>
+        <MiniCell {...c('실험대 서랍','서랍 ⑤',358,295,70,50,'서⑤')}/>
+        <MiniCell {...c('실험대 서랍','서랍 ⑥',428,295,70,50,'서⑥')}/>
+        <MiniCell {...c('실험대 아래','③',506,195,110,150)}/>
+        <MiniCell {...c('실험대 아래','④',616,195,110,150)}/>
+        <MiniCell {...c('실험대 아래','⑤',726,195,110,150)}/>
+        <MiniCell {...c('실험대 아래','⑥',836,195,110,150)}/>
+        {/* 조리대 좌측 */}
+        <div style={{position:'absolute',left:325,top:465,width:260,height:150,border:'1.5px solid #1A1916',borderRadius:4}}/>
+        <MiniCell {...c('조리대 좌측','서랍 ①',325,465,87,40,'서①')}/>
+        <MiniCell {...c('조리대 좌측','서랍 ②',412,465,87,40,'서②')}/>
+        <MiniCell {...c('조리대 좌측','서랍 ③',499,465,87,40,'서③')}/>
+        <MiniCell {...c('조리대 좌측','④',325,505,130,110)}/>
+        <MiniCell {...c('조리대 좌측','⑤',455,505,130,110)}/>
+        {/* 조리대 우측 */}
+        <div style={{position:'absolute',left:625,top:465,width:260,height:150,border:'1.5px solid #1A1916',borderRadius:4}}/>
+        <MiniCell {...c('조리대 우측','서랍 ①',625,465,87,40,'서①')}/>
+        <MiniCell {...c('조리대 우측','서랍 ②',712,465,87,40,'서②')}/>
+        <MiniCell {...c('조리대 우측','서랍 ③',799,465,87,40,'서③')}/>
+        <MiniCell {...c('조리대 우측','④',625,505,130,110)}/>
+        <MiniCell {...c('조리대 우측','⑤',755,505,130,110)}/>
+        {/* 싱크대 아래 */}
+        <div style={{position:'absolute',left:170,top:580,width:145,height:48,border:'1.5px solid #1A1916',borderRadius:4}}/>
+        <MiniCell {...c('싱크대 아래','②',170,580,72,48)}/>
+        <MiniCell {...c('싱크대 아래','①',242,580,73,48)}/>
+        {/* 싱크대 위 */}
+        <div style={{position:'absolute',left:170,top:650,width:715,height:70,border:'1.5px solid #1A1916',borderRadius:4}}/>
+        <MiniCell {...c('싱크대 위','⑥',170,650,119,70)}/>
+        <MiniCell {...c('싱크대 위','⑤',289,650,119,70)}/>
+        <MiniCell {...c('싱크대 위','④',408,650,119,70)}/>
+        <MiniCell {...c('싱크대 위','③',527,650,119,70)}/>
+        <MiniCell {...c('싱크대 위','②',646,650,119,70)}/>
+        <MiniCell {...c('싱크대 위','①',765,650,120,70)}/>
+        {/* 저울대 아래 */}
+        <div style={{position:'absolute',left:970,top:365,width:100,height:350,border:'1.5px solid #1A1916',borderRadius:4}}/>
+        <MiniCell {...c('저울대 아래','①',970,365,100,130,'①',true)}/>
+        <MiniCell {...c('저울대 아래','②',970,495,100,130,'②',true)}/>
+        <MiniCell {...c('저울대 아래','서랍 ①',970,625,25,90,'서①',true)}/>
+        <MiniCell {...c('저울대 아래','서랍 ②',995,625,25,90,'서②',true)}/>
+        <MiniCell {...c('저울대 아래','서랍 ③',1020,625,25,90,'서③',true)}/>
+        <MiniCell {...c('저울대 아래','서랍 ④',1045,625,25,90,'서④',true)}/>
+        {/* 저울대 위 */}
+        <div style={{position:'absolute',left:1100,top:365,width:75,height:350,border:'1.5px solid #1A1916',borderRadius:4}}/>
+        <MiniCell {...c('저울대 위','①',1100,365,75,117,'①',true)}/>
+        <MiniCell {...c('저울대 위','②',1100,482,75,117,'②',true)}/>
+        <MiniCell {...c('저울대 위','③',1100,599,75,116,'③',true)}/>
+      </div>
+    </div>
+  );
+}
+
+function MiniMapSimple({space,itemGroup,itemCell,itemColor}:{space:string,itemGroup:string,itemCell:string,itemColor:string}) {
+  const p={itemGroup,itemCell,itemColor};
+  const g=ZONES[space]?.[0];
+  if(!g) return null;
+  const SCALE=0.47,rh=Math.round(320*SCALE);
+  return (
+    <div style={{borderRadius:8,border:'1px solid #ECEBE8',background:'#F7F6F3',overflow:'hidden',position:'relative',height:rh}}>
+      <div style={{transform:`scale(${SCALE})`,transformOrigin:'top left',width:760,height:320,position:'absolute',top:0,left:0,pointerEvents:'none'}}>
+        <div style={{position:'absolute',left:120,top:80,width:520,height:200,border:'1.5px solid #1A1916',borderRadius:4}}/>
+        {g.cells[0]&&<MiniCell {...p} group={g.group} cell={g.cells[0]} label={g.cells[0]} x={120} y={80} w={130} h={200}/>}
+        {g.cells[1]&&<MiniCell {...p} group={g.group} cell={g.cells[1]} label={g.cells[1]} x={250} y={80} w={390} h={60}/>}
+        {g.cells[2]&&<MiniCell {...p} group={g.group} cell={g.cells[2]} label={g.cells[2]} x={250} y={140} w={390} h={60}/>}
+        {g.cells[3]&&<MiniCell {...p} group={g.group} cell={g.cells[3]} label={g.cells[3]} x={250} y={210} w={390} h={70}/>}
+      </div>
+    </div>
+  );
+}
+
+function MiniMapDisc({space,itemGroup,itemCell,itemColor}:{space:string,itemGroup:string,itemCell:string,itemColor:string}) {
+  const p={itemGroup,itemCell,itemColor};
+  const g=ZONES[space]?.[0];
+  if(!g) return null;
+  const SCALE=0.47,rh=Math.round(320*SCALE);
+  return (
+    <div style={{borderRadius:8,border:'1px solid #ECEBE8',background:'#F7F6F3',overflow:'hidden',position:'relative',height:rh}}>
+      <div style={{transform:`scale(${SCALE})`,transformOrigin:'top left',width:600,height:320,position:'absolute',top:0,left:0,pointerEvents:'none'}}>
+        <div style={{position:'absolute',left:180,top:100,width:240,height:180,border:'1.5px solid #1A1916',borderRadius:4}}/>
+        {g.cells.map((ce,i)=><MiniCell key={ce} {...p} group={g.group} cell={ce} label={ce} x={180} y={100+i*60} w={240} h={60}/>)}
+      </div>
+    </div>
+  );
+}
+
+function MiniMapStore({itemGroup,itemCell,itemColor}:{itemGroup:string,itemCell:string,itemColor:string}) {
+  const p={itemGroup,itemCell,itemColor};
+  const SCALE=0.47,rh=Math.round(520*SCALE);
+  return (
+    <div style={{borderRadius:8,border:'1px solid #ECEBE8',background:'#F7F6F3',overflow:'hidden',position:'relative',height:rh}}>
+      <div style={{transform:`scale(${SCALE})`,transformOrigin:'top left',width:900,height:520,position:'absolute',top:0,left:0,pointerEvents:'none'}}>
+        {/* 수납장 */}
+        <div style={{position:'absolute',left:50,top:80,width:240,height:400,border:'1.5px solid #1A1916',borderRadius:4}}/>
+        {['①','②','③','④','⑤','⑥','⑦','⑧'].map((ce,i)=><MiniCell key={ce} {...p} group="수납장" cell={ce} label={ce} x={50+(i%2)*120} y={80+Math.floor(i/2)*100} w={120} h={100}/>)}
+        {/* 박스 */}
+        <div style={{position:'absolute',left:360,top:80,width:180,height:400,border:'1.5px solid #1A1916',borderRadius:4}}/>
+        {['①','②','③'].map((ce,i)=><MiniCell key={ce} {...p} group="박스" cell={ce} label={ce} x={360} y={80+i*133} w={180} h={133}/>)}
+        {/* 선반 */}
+        <div style={{position:'absolute',left:610,top:80,width:120,height:400,border:'1.5px solid #1A1916',borderRadius:4}}/>
+        {['①','②','③','④','⑤','⑥','⑦','⑧'].map((ce,i)=><MiniCell key={ce} {...p} group="선반" cell={ce} label={ce} x={610} y={80+i*50} w={120} h={50}/>)}
+      </div>
+    </div>
+  );
+}
+
+function ItemMiniMap({item,u}:{item:any,u:any}) {
+  const props={itemGroup:item.group,itemCell:item.cell,itemColor:u.color};
+  if(item.space==='준비') return <MiniMapPrep {...props}/>;
+  if(item.space==='서빙1'||item.space==='서빙2') return <MiniMapSimple space={item.space} {...props}/>;
+  if(item.space==='토론1'||item.space==='토론2') return <MiniMapDisc space={item.space} {...props}/>;
+  if(item.space==='창고') return <MiniMapStore {...props}/>;
+  return null;
+}
+
 function ItemDetail({item,onBack,onEdit,onDelete}) {
   const u=useById(item.useId);
   const isLow=item.min!=null&&item.qty<item.min;
@@ -973,17 +1161,17 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
   return (
     <div className="col" style={{height:'100%'}}>
       <Topbar title={item.name} sub={`#${item.id} · ${item.space} / ${item.group} / ${item.cell}`} action={
-        <div className="row" style={{gap:8}}>
-          <button className="btn btn-danger" onClick={()=>setDelM(true)}><IC.trash/> 삭제</button>
-          <button className="btn btn-secondary" onClick={onBack}><IC.back/> 목록</button>
-          <button className="btn btn-primary" onClick={onEdit}><IC.edit/> 수정</button>
+        <div className="row" style={{gap:6}}>
+          <button className="btn btn-danger btn-sm" onClick={()=>setDelM(true)}><IC.trash/></button>
+          <button className="btn btn-secondary btn-sm" onClick={onBack}><IC.back/></button>
+          <button className="btn btn-primary btn-sm" onClick={onEdit}><IC.edit/></button>
         </div>}/>
-      <div style={{flex:1,overflow:'auto',padding:32}}>
+      <div className="mobile-content mobile-pad" style={{flex:1,overflow:'auto',padding:32}}>
         <div style={{maxWidth:860,margin:'0 auto',display:'flex',flexDirection:'column',gap:16}}>
-          <div className="card" style={{padding:24,display:'grid',gridTemplateColumns:'1.4fr 1fr',gap:24}}>
+          <div className="card mobile-grid-1" style={{padding:24,display:'grid',gridTemplateColumns:'1.4fr 1fr',gap:24}}>
             <div>
               <span className="badge" style={{background:u.color,color:'#fff'}}>{u.name}</span>
-              <h2 style={{margin:'12px 0 6px',fontSize:28,fontWeight:600,color:'var(--ink-deep)'}}>{item.name}</h2>
+              <h2 className="mobile-h2" style={{margin:'12px 0 6px',fontSize:28,fontWeight:600,color:'var(--ink-deep)'}}>{item.name}</h2>
               <div style={{fontSize:14,color:'var(--charcoal)'}}><span style={{color:'var(--slate)'}}>위치</span> <b>{item.space} / {item.group} / {item.cell}</b></div>
               {item.note&&<div style={{marginTop:12,padding:'10px 14px',background:'var(--tint-yellow)',borderRadius:'var(--r-md)',fontSize:13}}>📌 {item.note}</div>}
             </div>
@@ -995,12 +1183,17 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
           </div>
           <div className="card" style={{padding:24}}>
             <div style={{fontSize:16,fontWeight:600,marginBottom:16}}>상세 정보</div>
-            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:20}}>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:20,marginBottom:20}}>
+              <div>
+                <div style={{fontSize:11,color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>용도</div>
+                <div className="row" style={{gap:6,marginTop:4}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:14,fontWeight:500}}>{u.name}</span></div>
+              </div>
               {[['규격',item.spec||'–'],['입고 시기',item.received||'–'],['공간',item.space],['구역',item.group],['셀',item.cell]].map(([l,v])=>(
                 <div key={l}><div style={{fontSize:11,color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>{l}</div><div style={{fontSize:14,fontWeight:500,marginTop:4}}>{v}</div></div>
               ))}
-              <div><div style={{fontSize:11,color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>용도</div><div className="row" style={{gap:6,marginTop:4}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:14,fontWeight:500}}>{u.name}</span></div></div>
             </div>
+            <div style={{borderTop:'1px solid var(--hairline)',marginBottom:14}}/>
+            <ItemMiniMap item={item} u={u}/>
           </div>
           <div className="card" style={{padding:16,background:'var(--surface)'}}>
             <div className="row wrap" style={{gap:32}}>
@@ -1140,10 +1333,18 @@ export default function App() {
       :<Search items={items} onItemClick={openItem} onDelete={removeMany}/>;
   } else if(route.name==='detail') {
     const it=getItem(route.itemId);
-            view=it
+    view=it
       ?<ItemDetail item={it} onBack={()=>route.fromSpace?nav('space',{space:route.fromSpace}):nav('search')} onEdit={()=>setRoute({name:'edit',itemId:it.id,fromSpace:route.fromSpace})} onDelete={remove}/>
       :<Search items={items} onItemClick={openItem} onDelete={removeMany}/>;
   }
+
+  const navItems=[
+    {id:'dashboard',label:'대시보드',I:IC.dash},
+    {id:'search',label:'품목 찾기',I:IC.list},
+    {id:'space',label:'공간 조회',I:IC.map},
+    {id:'register',label:'신규 등록',I:IC.plus},
+  ];
+  const curTab=route.name==='detail'?'search':route.name==='edit'?'search':route.name;
 
   return (
     <>
@@ -1154,6 +1355,17 @@ export default function App() {
           {view}
         </div>
       </div>
+      <nav className="bottom-nav">
+        {navItems.map(({id,label,I})=>{
+          const a=curTab===id;
+          return (
+            <button key={id} className={`bottom-nav-item${a?' active':''}`} onClick={()=>nav(id)}>
+              <span className="bnav-icon"><I/></span>
+              <span>{label}</span>
+            </button>
+          );
+        })}
+      </nav>
     </>
   );
 }
