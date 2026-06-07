@@ -732,8 +732,8 @@ function Cell({space,group,cell,label,x,y,w,h,vert,itemMap,selected,onToggle}) {
   const displayLabel=toPlainLabel(label);
   return (
     <div onClick={()=>onToggle(key)} style={{position:'absolute',left:x,top:y,width:w,height:h,background:fill,opacity:empty?1:.85,border:isSel?'2.5px solid var(--ink-deep)':'1px solid var(--hairline-strong)',borderRadius:4,cursor:'pointer',display:'flex',alignItems:'flex-start',justifyContent:'flex-start',padding:4,boxSizing:'border-box',boxShadow:isSel?'0 4px 12px rgba(15,15,15,.16)':'none',transform:isSel?'scale(1.02)':'scale(1)',transition:'transform 80ms',zIndex:isSel?5:1}} title={its.length>0?`${its.length}개 품목`:'비어있음'}>
-      <span style={{fontSize:10,fontWeight:600,color:empty?'var(--steel)':tc,writingMode:vert?'vertical-rl':'horizontal-tb',lineHeight:1.2}}>{displayLabel}</span>
-      {its.length>0&&<span style={{position:'absolute',...(vert?{top:4,left:'50%',transform:'translateX(-50%)'}:{top:4,right:4}),background:'rgba(255,255,255,.9)',color:'var(--charcoal)',fontSize:9,fontWeight:700,borderRadius:8,padding:'1px 4px'}}>{its.length}</span>}
+      <span style={{fontSize:12,fontWeight:600,color:empty?'var(--steel)':tc,writingMode:vert?'vertical-rl':'horizontal-tb',lineHeight:1.2}}>{displayLabel}</span>
+      {its.length>0&&<span style={{position:'absolute',...(vert?(w<40?{bottom:4,left:'50%',transform:'translateX(-50%)'}:{top:4,right:4}):{top:4,right:4}),background:'rgba(255,255,255,.9)',color:'var(--charcoal)',fontSize:9,fontWeight:700,borderRadius:8,padding:'1px 4px'}}>{its.length}</span>}
     </div>
   );
 }
@@ -1569,7 +1569,7 @@ export default function App() {
       <style>{SIDEBAR_CSS}{STYLE_SHEET}</style>
       <div className="app" style={{display:'flex'}}>
         <Sidebar cur={route.name} onNav={nav} user={user} onLogout={logout}/>
-        <div style={{flex:1,display:'flex',flexDirection:'column',minWidth:0,height:'100vh',maxHeight:'100dvh',overflow:'hidden'}}>
+        <div style={{flex:1,display:'flex',flexDirection:'column',minWidth:0,minHeight:0,overflow:'hidden'}}>
           {view}
         </div>
       </div>
