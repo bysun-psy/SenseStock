@@ -720,7 +720,7 @@ function Search({items,onItemClick,onDelete}) {
 }
 
 const CIRCLE_TO_NUM:Record<string,string>={'①':'1','②':'2','③':'3','④':'4','⑤':'5','⑥':'6','⑦':'7','⑧':'8','⑨':'9','⑩':'10'};
-function toPlainLabel(s:string):string{return s.replace(/[①-⑩]/g,c=>CIRCLE_TO_NUM[c]??c);}
+function toPlainLabel(s:string):string{return s.replace(/[①②③④⑤⑥⑦⑧⑨⑩]/g,c=>CIRCLE_TO_NUM[c]??c);}
 function Cell({space,group,cell,label,x,y,w,h,vert,itemMap,selected,onToggle}) {
   const key=`${group}||${cell}`;
   const its=(itemMap[`${space}/${group}/${cell}`]||[]);
