@@ -855,7 +855,7 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
         <div className="row" style={{gap:12}}>
           {!isMobile&&<span style={{fontSize:13,color:'var(--slate)'}}>{sel.size}개 셀 선택</span>}
           <button className="btn btn-secondary btn-sm" disabled={!sel.size} onClick={()=>setSel(new Set())} title="초기화"><IC.refresh/>{!isMobile&&<span> 초기화</span>}</button>
-          <button className="btn btn-secondary btn-sm" disabled={sel.size!==1} onClick={()=>{
+          <button className="btn btn-primary btn-sm" disabled={sel.size!==1} onClick={()=>{
             const key=[...sel][0];
             if(!key) return;
             const idx=key.indexOf('||');
@@ -1058,9 +1058,9 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
     <div className="col" style={{height:'100%'}}>
       <Topbar title={isEdit?'품목 수정':'신규 등록'} sub={isEdit&&item?`최종 수정: ${item.updatedAt} · ${item.updatedBy}`:'비품 정보를 입력하세요'} action={
         <div className="row" style={{gap:12}}>
-          {isEdit&&<button className="btn btn-danger" onClick={()=>setDelM(true)}><IC.trash/> 삭제</button>}
-          <button className="btn btn-secondary" onClick={onCancel}>취소</button>
-          <button className="btn btn-primary" onClick={submit}>{isEdit?'저장':'등록'}</button>
+          {isEdit&&<button className="btn btn-danger btn-sm" onClick={()=>setDelM(true)}><IC.trash/> 삭제</button>}
+          <button className="btn btn-secondary btn-sm" onClick={onCancel}>취소</button>
+          <button className="btn btn-primary btn-sm" onClick={submit}>{isEdit?'저장':'등록'}</button>
         </div>}/>
       <div className="mobile-content mobile-pad" style={{flex:1,overflow:'auto',padding:32,paddingBottom:100}}>
         <div style={{maxWidth:860,margin:'0 auto',display:'flex',flexDirection:'column',gap:16}}>
