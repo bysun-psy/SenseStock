@@ -1372,13 +1372,20 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
   const u=useById(item.useId);
   const isLow=item.min!=null&&item.qty<item.min;
   const [delM,setDelM]=useState(false);
+  const isMobile=useMediaQuery('(max-width:768px)');
   return (
     <div className="col" style={{height:'100%'}}>
       <Topbar title={item.name} sub={`#${item.id} · ${item.space} / ${item.group} / ${item.cell}`} action={
-        <div className="row" style={{gap:6}}>
-          <button className="btn btn-danger btn-sm" onClick={()=>setDelM(true)}><IC.trash/></button>
-          <button className="btn btn-secondary btn-sm" onClick={onBack}><IC.back/></button>
-          <button className="btn btn-primary btn-sm" onClick={onEdit}><IC.edit/></button>
+        <div className="row" style={{gap:isMobile?6:12}}>
+          <button className="btn btn-danger btn-sm" onClick={()=>setDelM(true)} style={{gap:isMobile?0:6,paddingLeft:isMobile?8:12,paddingRight:isMobile?8:12}}>
+            <IC.trash/>{!isMobile&&<span>삭제</span>}
+          </button>
+          <button className="btn btn-secondary btn-sm" onClick={onBack} style={{gap:isMobile?0:6,paddingLeft:isMobile?8:12,paddingRight:isMobile?8:12}}>
+            <IC.back/>{!isMobile&&<span>이전</span>}
+          </button>
+          <button className="btn btn-primary btn-sm" onClick={onEdit} style={{gap:isMobile?0:6,paddingLeft:isMobile?8:12,paddingRight:isMobile?8:12}}>
+            <IC.edit/>{!isMobile&&<span>수정</span>}
+          </button>
         </div>}/>
       <div className="mobile-content mobile-pad" style={{flex:1,overflow:'auto',padding:32,paddingBottom:100}}>
         <div style={{maxWidth:860,margin:'0 auto',display:'flex',flexDirection:'column',gap:16}}>
