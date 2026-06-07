@@ -334,7 +334,7 @@ function Topbar({title,sub,action}) {
         <h1 style={{margin:0,fontSize:24,fontWeight:600,color:'var(--ink-deep)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{title}</h1>
         {sub&&<div className="topbar-sub" style={{fontSize:13,color:'var(--slate)',marginTop:2}}>{sub}</div>}
       </div>
-      {action&&<div className="topbar-actions row" style={{flexShrink:0,gap:8}}>{action}</div>}
+      {action&&<div className="topbar-actions row" style={{flexShrink:0,gap:12}}>{action}</div>}
     </div>
   );
 }
@@ -605,7 +605,7 @@ function Search({items,onItemClick,onDelete}) {
   return (
     <div className="col" style={{height:'100%'}}>
       <Topbar title="품목 찾기" sub={`전체 ${items.length}개 품목`} action={sel.size>0?(
-        <div className="row" style={{gap:6}}>
+        <div className="row" style={{gap:12}}>
           <span style={{fontSize:13,color:'var(--slate)'}}>{sel.size}개 선택</span>
           <button className="btn btn-secondary btn-sm" onClick={()=>setSel(new Set())}>해제</button>
           <button className="btn btn-danger btn-sm" onClick={()=>setDelModal(true)}><IC.trash/> 삭제</button>
@@ -850,7 +850,7 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
   return (
     <div className="col" style={{height:'100%'}}>
       <Topbar title="공간 조회" sub="배치도 기반 비품 위치 확인" action={
-        <div className="row" style={{gap:8}}>
+        <div className="row" style={{gap:12}}>
           <span style={{fontSize:13,color:'var(--slate)'}}>{sel.size}개 셀 선택</span>
           <button className="btn btn-secondary btn-sm" disabled={!sel.size} onClick={()=>setSel(new Set())}><IC.refresh/> 초기화</button>
           <button className="btn btn-secondary btn-sm" disabled={sel.size!==1} onClick={()=>{
@@ -1055,7 +1055,7 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
   return (
     <div className="col" style={{height:'100%'}}>
       <Topbar title={isEdit?'품목 수정':'신규 등록'} sub={isEdit&&item?`최종 수정: ${item.updatedAt} · ${item.updatedBy}`:'비품 정보를 입력하세요'} action={
-        <div className="row" style={{gap:8}}>
+        <div className="row" style={{gap:12}}>
           {isEdit&&<button className="btn btn-danger" onClick={()=>setDelM(true)}><IC.trash/> 삭제</button>}
           <button className="btn btn-secondary" onClick={onCancel}>취소</button>
           <button className="btn btn-primary" onClick={submit}>{isEdit?'저장':'등록'}</button>
