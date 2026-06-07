@@ -504,16 +504,29 @@ function Dashboard({items,activity,onNav,onItemClick}) {
           <div className="card" style={{padding:24}}>
             <div style={{fontWeight:600,fontSize:16,marginBottom:4}}>용도별 분포</div>
             <div style={{fontSize:13,color:'var(--slate)',marginBottom:20}}>{USES.length}개 분류 · 총 {total}품목</div>
-            <div className="row" style={{gap:isMobile?16:32,alignItems:'center',flexWrap:isMobile?'wrap':'nowrap'}}>
-              <Donut data={useData} total={total} size={isMobile?120:180}/>
-              <div style={{flex:1,display:'grid',gridTemplateColumns:'1fr 1fr',gap:isMobile?'4px 12px':'6px 24px',minWidth:0}}>
-                {useData.map(u=>(
-                  <div key={u.name} className="row" style={{gap:6,padding:'3px 0'}}>
-                    <span className="swatch" style={{background:u.c}}/><span style={{flex:1,fontSize:isMobile?11:13,color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.name}</span><span style={{fontSize:isMobile?11:13,fontWeight:600}}>{u.v}</span>
-                  </div>
-                ))}
+            {isMobile?(
+              <div className="col" style={{gap:16,alignItems:'center'}}>
+                <Donut data={useData} total={total} size={140}/>
+                <div style={{width:'100%',display:'grid',gridTemplateColumns:'1fr 1fr',gap:'6px 12px'}}>
+                  {useData.map(u=>(
+                    <div key={u.name} className="row" style={{gap:6,padding:'3px 0',minWidth:0}}>
+                      <span className="swatch" style={{background:u.c,flexShrink:0}}/><span style={{flex:1,fontSize:12,color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.name}</span><span style={{fontSize:12,fontWeight:600,flexShrink:0}}>{u.v}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            ):(
+              <div className="row" style={{gap:32,alignItems:'center'}}>
+                <Donut data={useData} total={total} size={180}/>
+                <div style={{flex:1,display:'grid',gridTemplateColumns:'1fr 1fr',gap:'6px 24px'}}>
+                  {useData.map(u=>(
+                    <div key={u.name} className="row" style={{gap:8,padding:'4px 0'}}>
+                      <span className="swatch" style={{background:u.c}}/><span style={{flex:1,fontSize:13,color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.name}</span><span style={{fontSize:13,fontWeight:600}}>{u.v}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
         <div className="mobile-grid-1" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16}}>
@@ -811,12 +824,14 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
           }}><IC.plus/> 등록</button>
           <button className="btn btn-primary btn-sm" disabled={!sel.size} onClick={()=>setShowList(true)}>조회 ({selItems.length})</button>
         </div>}/>
-      <div className="row" style={{padding:'0 32px',background:'var(--canvas)',borderBottom:'1px solid var(--hairline)',gap:4,flexShrink:0}}>
+      <div style={{overflowX:'auto',WebkitOverflowScrolling:'touch',background:'var(--canvas)',borderBottom:'1px solid var(--hairline)',flexShrink:0}}>
+        <div className="row" style={{padding:'0 16px',gap:0,minWidth:'max-content'}}>
         {SPACES.map(s=>{const a=space===s;const cnt=items.filter(i=>i.space===s).length;return(
-          <button key={s} onClick={()=>setSpace(s)} style={{padding:'14px 14px 12px',border:'none',background:'transparent',color:a?'var(--ink)':'var(--slate)',fontWeight:a?600:500,fontSize:14,borderBottom:a?'2px solid var(--primary)':'2px solid transparent',cursor:'pointer',position:'relative',top:1,display:'flex',alignItems:'center',gap:8,fontFamily:'inherit'}}>
+          <button key={s} onClick={()=>setSpace(s)} style={{padding:'14px 14px 12px',border:'none',background:'transparent',color:a?'var(--ink)':'var(--slate)',fontWeight:a?600:500,fontSize:14,borderBottom:a?'2px solid var(--primary)':'2px solid transparent',cursor:'pointer',position:'relative',top:1,display:'flex',alignItems:'center',gap:8,fontFamily:'inherit',whiteSpace:'nowrap'}}>
             {s}<span style={{fontSize:11,padding:'1px 6px',borderRadius:'var(--r-full)',background:a?'var(--primary-soft)':'var(--surface)',color:a?'var(--primary-deep)':'var(--slate)',fontWeight:600}}>{cnt}</span>
           </button>
         );})}
+        </div>
       </div>
       <div className="mobile-pad-x" style={{padding:'12px 32px',background:'var(--surface)',borderBottom:'1px solid var(--hairline)',flexShrink:0}}>
         <div className="row wrap" style={{gap:8}}>
@@ -1016,11 +1031,22 @@ function MiniCell({group,cell,label,x,y,w,h,vert,itemGroup,itemCell,itemColor}:{
 function MiniMapPrep({itemGroup,itemCell,itemColor}:{itemGroup:string,itemCell:string,itemColor:string}) {
   const p={itemGroup,itemCell,itemColor};
   const c=(g:string,ce:string,x:number,y:number,w:number,h:number,label?:string,vert?:boolean)=>({...p,group:g,cell:ce,label:label??ce,x,y,w,h,vert});
-  const ORIG_W=1200,ORIG_H=730,SCALE=0.47;
-  const rw=Math.round(ORIG_W*SCALE),rh=Math.round(ORIG_H*SCALE);
+  const ORIG_W=1200,ORIG_H=730;
+  const wrapRef=useRef<HTMLDivElement>(null);
+  const [scale,setScale]=useState(0.47);
+  useEffect(()=>{
+    const el=wrapRef.current;
+    if(!el) return;
+    const update=()=>setScale(Math.min(0.67,el.clientWidth/ORIG_W));
+    update();
+    const ro=new ResizeObserver(update);
+    ro.observe(el);
+    return()=>ro.disconnect();
+  },[]);
+  const rh=Math.round(ORIG_H*scale);
   return (
-    <div style={{borderRadius:8,border:'1px solid #ECEBE8',background:'#F7F6F3',overflow:'hidden',position:'relative',height:rh}}>
-      <div style={{transform:`scale(${SCALE})`,transformOrigin:'top left',width:ORIG_W,height:ORIG_H,position:'absolute',top:0,left:0,pointerEvents:'none'}}>
+    <div ref={wrapRef} style={{borderRadius:8,border:'1px solid #ECEBE8',background:'#F7F6F3',overflow:'hidden',position:'relative',height:rh}}>
+      <div style={{transform:`scale(${scale})`,transformOrigin:'top left',width:ORIG_W,height:ORIG_H,position:'absolute',top:0,left:0,pointerEvents:'none'}}>
         {/* 선반 */}
         <div style={{position:'absolute',left:60,top:40,width:70,height:330,border:'1.5px solid #1A1916',borderRadius:4}}/>
         <MiniCell {...c('선반','①',60,40,70,82,'①',true)}/>
@@ -1096,15 +1122,32 @@ function MiniMapSimple({space,itemGroup,itemCell,itemColor}:{space:string,itemGr
   const p={itemGroup,itemCell,itemColor};
   const g=ZONES[space]?.[0];
   if(!g) return null;
-  const SCALE=0.47,rh=Math.round(320*SCALE);
+  // 서빙1/2: 조리대 — 서랍①②③(상단 가로) + ④(하단 전체)
+  const ORIG_W=500,ORIG_H=280;
+  const wrapRef=useRef<HTMLDivElement>(null);
+  const [scale,setScale]=useState(0.47);
+  useEffect(()=>{
+    const el=wrapRef.current;
+    if(!el) return;
+    const update=()=>setScale(Math.min(0.9,el.clientWidth/ORIG_W));
+    update();
+    const ro=new ResizeObserver(update);
+    ro.observe(el);
+    return()=>ro.disconnect();
+  },[]);
+  const rh=Math.round(ORIG_H*scale);
+  const drawerW=Math.floor(360/3); // 서랍 3개 균등 분할
   return (
-    <div style={{borderRadius:8,border:'1px solid #ECEBE8',background:'#F7F6F3',overflow:'hidden',position:'relative',height:rh}}>
-      <div style={{transform:`scale(${SCALE})`,transformOrigin:'top left',width:760,height:320,position:'absolute',top:0,left:0,pointerEvents:'none'}}>
-        <div style={{position:'absolute',left:120,top:80,width:520,height:200,border:'1.5px solid #1A1916',borderRadius:4}}/>
-        {g.cells[0]&&<MiniCell {...p} group={g.group} cell={g.cells[0]} label={g.cells[0]} x={120} y={80} w={130} h={200}/>}
-        {g.cells[1]&&<MiniCell {...p} group={g.group} cell={g.cells[1]} label={g.cells[1]} x={250} y={80} w={390} h={60}/>}
-        {g.cells[2]&&<MiniCell {...p} group={g.group} cell={g.cells[2]} label={g.cells[2]} x={250} y={140} w={390} h={60}/>}
-        {g.cells[3]&&<MiniCell {...p} group={g.group} cell={g.cells[3]} label={g.cells[3]} x={250} y={210} w={390} h={70}/>}
+    <div ref={wrapRef} style={{borderRadius:8,border:'1px solid #ECEBE8',background:'#F7F6F3',overflow:'hidden',position:'relative',height:rh}}>
+      <div style={{transform:`scale(${scale})`,transformOrigin:'top left',width:ORIG_W,height:ORIG_H,position:'absolute',top:0,left:0,pointerEvents:'none'}}>
+        {/* 조리대 외곽 */}
+        <div style={{position:'absolute',left:60,top:40,width:380,height:210,border:'1.5px solid #1A1916',borderRadius:4}}/>
+        {/* 서랍 ①②③ — 상단 가로 3분할 */}
+        <MiniCell {...p} group={g.group} cell={g.cells[0]} label={g.cells[0]} x={60} y={40} w={drawerW} h={60}/>
+        <MiniCell {...p} group={g.group} cell={g.cells[1]} label={g.cells[1]} x={60+drawerW} y={40} w={drawerW} h={60}/>
+        <MiniCell {...p} group={g.group} cell={g.cells[2]} label={g.cells[2]} x={60+drawerW*2} y={40} w={drawerW} h={60}/>
+        {/* ④ — 하단 전체 너비 */}
+        {g.cells[3]&&<MiniCell {...p} group={g.group} cell={g.cells[3]} label={g.cells[3]} x={60} y={100} w={380} h={150}/>}
       </div>
     </div>
   );
@@ -1114,12 +1157,24 @@ function MiniMapDisc({space,itemGroup,itemCell,itemColor}:{space:string,itemGrou
   const p={itemGroup,itemCell,itemColor};
   const g=ZONES[space]?.[0];
   if(!g) return null;
-  const SCALE=0.47,rh=Math.round(320*SCALE);
+  const ORIG_W=500,ORIG_H=280;
+  const wrapRef=useRef<HTMLDivElement>(null);
+  const [scale,setScale]=useState(0.47);
+  useEffect(()=>{
+    const el=wrapRef.current;
+    if(!el) return;
+    const update=()=>setScale(Math.min(0.9,el.clientWidth/ORIG_W));
+    update();
+    const ro=new ResizeObserver(update);
+    ro.observe(el);
+    return()=>ro.disconnect();
+  },[]);
+  const rh=Math.round(ORIG_H*scale);
   return (
-    <div style={{borderRadius:8,border:'1px solid #ECEBE8',background:'#F7F6F3',overflow:'hidden',position:'relative',height:rh}}>
-      <div style={{transform:`scale(${SCALE})`,transformOrigin:'top left',width:600,height:320,position:'absolute',top:0,left:0,pointerEvents:'none'}}>
-        <div style={{position:'absolute',left:180,top:100,width:240,height:180,border:'1.5px solid #1A1916',borderRadius:4}}/>
-        {g.cells.map((ce,i)=><MiniCell key={ce} {...p} group={g.group} cell={ce} label={ce} x={180} y={100+i*60} w={240} h={60}/>)}
+    <div ref={wrapRef} style={{borderRadius:8,border:'1px solid #ECEBE8',background:'#F7F6F3',overflow:'hidden',position:'relative',height:rh}}>
+      <div style={{transform:`scale(${scale})`,transformOrigin:'top left',width:ORIG_W,height:ORIG_H,position:'absolute',top:0,left:0,pointerEvents:'none'}}>
+        <div style={{position:'absolute',left:100,top:40,width:300,height:g.cells.length*60,border:'1.5px solid #1A1916',borderRadius:4}}/>
+        {g.cells.map((ce,i)=><MiniCell key={ce} {...p} group={g.group} cell={ce} label={ce} x={100} y={40+i*60} w={300} h={60}/>)}
       </div>
     </div>
   );
@@ -1127,10 +1182,22 @@ function MiniMapDisc({space,itemGroup,itemCell,itemColor}:{space:string,itemGrou
 
 function MiniMapStore({itemGroup,itemCell,itemColor}:{itemGroup:string,itemCell:string,itemColor:string}) {
   const p={itemGroup,itemCell,itemColor};
-  const SCALE=0.47,rh=Math.round(520*SCALE);
+  const ORIG_W=900,ORIG_H=520;
+  const wrapRef=useRef<HTMLDivElement>(null);
+  const [scale,setScale]=useState(0.47);
+  useEffect(()=>{
+    const el=wrapRef.current;
+    if(!el) return;
+    const update=()=>setScale(Math.min(0.67,el.clientWidth/ORIG_W));
+    update();
+    const ro=new ResizeObserver(update);
+    ro.observe(el);
+    return()=>ro.disconnect();
+  },[]);
+  const rh=Math.round(ORIG_H*scale);
   return (
-    <div style={{borderRadius:8,border:'1px solid #ECEBE8',background:'#F7F6F3',overflow:'hidden',position:'relative',height:rh}}>
-      <div style={{transform:`scale(${SCALE})`,transformOrigin:'top left',width:900,height:520,position:'absolute',top:0,left:0,pointerEvents:'none'}}>
+    <div ref={wrapRef} style={{borderRadius:8,border:'1px solid #ECEBE8',background:'#F7F6F3',overflow:'hidden',position:'relative',height:rh}}>
+      <div style={{transform:`scale(${scale})`,transformOrigin:'top left',width:ORIG_W,height:ORIG_H,position:'absolute',top:0,left:0,pointerEvents:'none'}}>
         {/* 수납장 */}
         <div style={{position:'absolute',left:50,top:80,width:240,height:400,border:'1.5px solid #1A1916',borderRadius:4}}/>
         {['①','②','③','④','⑤','⑥','⑦','⑧'].map((ce,i)=><MiniCell key={ce} {...p} group="수납장" cell={ce} label={ce} x={50+(i%2)*120} y={80+Math.floor(i/2)*100} w={120} h={100}/>)}
@@ -1195,13 +1262,14 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
             <div style={{borderTop:'1px solid var(--hairline)',marginBottom:14}}/>
             <ItemMiniMap item={item} u={u}/>
           </div>
-          <div className="card" style={{padding:16,background:'var(--surface)'}}>
-            <div className="row wrap" style={{gap:32}}>
+          <div className="card" style={{padding:16,background:'var(--surface)',marginBottom:0}}>
+            <div className="row wrap" style={{gap:'12px 32px'}}>
               {[['최초 등록일',item.createdAt],['최종 수정일',item.updatedAt],['최종 수정인',item.updatedBy],['품목 ID',`#${item.id}`]].map(([l,v])=>(
                 <div key={l} className="col"><span style={{fontSize:11,color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>{l}</span><span style={{fontSize:13,fontWeight:500,marginTop:2}}>{v}</span></div>
               ))}
             </div>
           </div>
+          <div style={{height:8}}/>
         </div>
       </div>
       <Modal open={delM} onClose={()=>setDelM(false)}>
