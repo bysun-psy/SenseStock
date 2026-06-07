@@ -27,6 +27,7 @@ const SIDEBAR_CSS = `
   .ss-aside.collapsed .ss-nav-item:hover .ss-tooltip { display:block; }
   .ss-toggle-btn { width:24px; height:24px; border-radius:6px; background:none; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--slate); flex-shrink:0; padding:0; }
   .bottom-nav { display:none; }
+  .desktop-hide { display:none; }
   @media (max-width:768px) {
     .ss-aside { display:none !important; }
     .bottom-nav { display:flex !important; position:fixed; bottom:0; left:0; right:0; height:60px; background:var(--canvas); border-top:1px solid var(--hairline); z-index:50; align-items:stretch; }
@@ -45,6 +46,7 @@ const SIDEBAR_CSS = `
     .mobile-grid-1 { grid-template-columns:1fr !important; }
     .mobile-grid-2 { grid-template-columns:1fr 1fr !important; }
     .mobile-hide { display:none !important; }
+    .desktop-hide { display:block !important; }
     .mobile-scroll-x { overflow-x:auto !important; -webkit-overflow-scrolling:touch; }
     .mobile-h2 { font-size:20px !important; }
     .mobile-full { width:100% !important; max-width:100% !important; }
@@ -637,12 +639,13 @@ function Search({items,onItemClick,onDelete}) {
         </div>
       </div>
       <div className="mobile-content mobile-scroll-x" style={{flex:1,overflow:'auto'}}>
-        <table className="table" style={{minWidth:600}}>
+        {/* 데스크탑 테이블 */}
+        <table className="table mobile-hide" style={{minWidth:700}}>
           <thead><tr>
             <th style={{width:36}}>
               {filtered.length>0&&<input type="checkbox" checked={sel.size===filtered.length&&filtered.length>0} onChange={e=>setSel(e.target.checked?new Set(filtered.map(i=>i.id)):new Set())}/>}
             </th>
-            <th>품목명</th><th style={{width:120}}>용도</th><th style={{width:180}}>위치</th><th style={{width:100}}>규격</th><th style={{width:120,textAlign:'right'}}>수량/최소</th><th style={{width:80}}>입고</th>
+            <th style={{width:220}}>품목명</th><th style={{width:130}}>용도</th><th style={{width:180}}>위치</th><th style={{width:110}}>규격</th><th style={{width:110,textAlign:'right'}}>수량/최소</th><th style={{width:70}}>입고</th>
           </tr></thead>
           <tbody>
             {filtered.map(it=>{
@@ -652,12 +655,12 @@ function Search({items,onItemClick,onDelete}) {
               return (
                 <tr key={it.id} className={isSel?'sel':''} onClick={e=>{if(e.target.tagName==='INPUT') return; onItemClick(it);}}>
                   <td onClick={e=>{e.stopPropagation();tog(setSel,it.id);}}><input type="checkbox" checked={isSel} onChange={()=>{}}/></td>
-                  <td><div style={{fontWeight:500}}>{q?hi(it.name,q):it.name}</div>{it.note&&<div style={{fontSize:12,color:'var(--steel)'}}>{it.note}</div>}</td>
-                  <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:13,color:'var(--charcoal)'}}>{u.short}</span></span></td>
-                  <td><span style={{fontSize:13}}><b>{it.space}</b><span style={{color:'var(--steel)'}}> / {it.group} / {it.cell}</span></span></td>
-                  <td><span style={{fontSize:13,color:'var(--slate)'}}>{it.spec||'–'}</span></td>
+                  <td style={{maxWidth:220}}><div style={{fontWeight:500,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{q?hi(it.name,q):it.name}</div>{it.note&&<div style={{fontSize:12,color:'var(--steel)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.note}</div>}</td>
+                  <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color,flexShrink:0}}/><span style={{fontSize:13,color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.short}</span></span></td>
+                  <td><span style={{fontSize:13}}><b>{it.space}</b><span style={{color:'var(--slate)'}}> / {it.group} / {it.cell}</span></span></td>
+                  <td><span style={{fontSize:13,color:'var(--slate)',whiteSpace:'nowrap'}}>{it.spec||'–'}</span></td>
                   <td style={{textAlign:'right'}}><span style={{fontWeight:600,color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:12,color:'var(--steel)'}}> / {it.min}</span>}{isLow&&<div style={{fontSize:11,color:'var(--error)',fontWeight:600}}>재고 부족</div>}</td>
-                  <td><span style={{fontSize:13,color:'var(--slate)'}}>{it.received}</span></td>
+                  <td><span style={{fontSize:13,color:'var(--slate)',whiteSpace:'nowrap'}}>{it.received}</span></td>
                 </tr>
               );
             })}
@@ -665,6 +668,38 @@ function Search({items,onItemClick,onDelete}) {
             {!submitted&&<tr><td colSpan={7} style={{padding:'48px 0',textAlign:'center',color:'var(--slate)'}}>검색어를 입력하고 검색 버튼을 눌러주세요.</td></tr>}
           </tbody>
         </table>
+        {/* 모바일 카드 리스트 */}
+        <div style={{display:'block'}} className="mobile-list desktop-hide">
+          {!submitted&&<div style={{padding:'48px 24px',textAlign:'center',color:'var(--slate)',fontSize:14}}>검색어를 입력하고 검색 버튼을 눌러주세요.</div>}
+          {submitted&&filtered.length===0&&<div style={{padding:'48px 24px',textAlign:'center',color:'var(--slate)',fontSize:14}}>일치하는 품목이 없습니다.</div>}
+          {filtered.map(it=>{
+            const u=useById(it.useId);
+            const isLow=it.min!=null&&it.qty<it.min;
+            const isSel=sel.has(it.id);
+            return (
+              <div key={it.id} onClick={()=>onItemClick(it)} style={{padding:'14px 16px',borderBottom:'1px solid var(--hairline)',background:isSel?'var(--primary-soft)':'var(--canvas)',display:'flex',alignItems:'center',gap:12,cursor:'pointer'}}>
+                <div onClick={e=>{e.stopPropagation();tog(setSel,it.id);}} style={{flexShrink:0}}>
+                  <input type="checkbox" checked={isSel} onChange={()=>{}} style={{width:16,height:16}}/>
+                </div>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontWeight:500,fontSize:14,color:'var(--ink-deep)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{q?hi(it.name,q):it.name}</div>
+                  <div className="row" style={{gap:6,marginTop:3,alignItems:'center'}}>
+                    <span className="swatch" style={{background:u.color,flexShrink:0}}/><span style={{fontSize:12,color:'var(--slate)'}}>{u.short}</span>
+                    <span style={{fontSize:12,color:'var(--steel)'}}>·</span>
+                    <span style={{fontSize:12,color:'var(--slate)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.space} / {it.group} / {it.cell}</span>
+                  </div>
+                  {it.note&&<div style={{fontSize:11,color:'var(--steel)',marginTop:2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.note}</div>}
+                </div>
+                <div style={{textAlign:'right',flexShrink:0}}>
+                  <div style={{fontWeight:600,fontSize:15,color:isLow?'var(--error)':'var(--ink-deep)'}}>{it.qty}{it.min!=null&&<span style={{fontSize:12,color:'var(--slate)',fontWeight:400}}> / {it.min}</span>}</div>
+                  {isLow&&<div style={{fontSize:10,color:'var(--error)',fontWeight:600}}>재고 부족</div>}
+                  <div style={{fontSize:11,color:'var(--steel)',marginTop:1}}>{it.received}</div>
+                </div>
+              </div>
+            );
+          })}
+          <div style={{height:24}}/>
+        </div>
       </div>
       <Modal open={delModal} onClose={()=>setDelModal(false)}>
         <div style={{padding:28}}>
@@ -693,7 +728,7 @@ function Cell({space,group,cell,label,x,y,w,h,vert,itemMap,selected,onToggle}) {
   const tc=darkColors.includes(fill)?'rgba(255,255,255,.9)':'var(--ink)';
   return (
     <div onClick={()=>onToggle(key)} style={{position:'absolute',left:x,top:y,width:w,height:h,background:fill,opacity:empty?1:.85,border:isSel?'2.5px solid var(--ink-deep)':'1px solid var(--hairline-strong)',borderRadius:4,cursor:'pointer',display:'flex',alignItems:vert?'flex-end':'flex-start',justifyContent:vert?'center':'flex-start',padding:5,boxSizing:'border-box',boxShadow:isSel?'0 4px 12px rgba(15,15,15,.16)':'none',transform:isSel?'scale(1.02)':'scale(1)',transition:'transform 80ms',zIndex:isSel?5:1}} title={its.length>0?`${its.length}개 품목`:'비어있음'}>
-      <span style={{fontSize:10,fontWeight:600,color:empty?'var(--steel)':tc,writingMode:vert?'vertical-rl':'horizontal-tb',lineHeight:1.2}}>{label}</span>
+      <span style={{fontSize:13,fontWeight:600,color:empty?'var(--steel)':tc,writingMode:vert?'vertical-rl':'horizontal-tb',lineHeight:1.2}}>{label}</span>
       {its.length>0&&<span style={{position:'absolute',...(vert?{top:4,left:'50%',transform:'translateX(-50%)'}:{top:4,right:5}),background:'rgba(255,255,255,.9)',color:'var(--charcoal)',fontSize:9,fontWeight:700,borderRadius:8,padding:'1px 5px'}}>{its.length}</span>}
     </div>
   );
@@ -998,6 +1033,7 @@ function RegisterEdit({mode,item,prefill,onCancel,onSave,onDelete}) {
               </div>
             </div>
           )}
+          <div style={{height:24}}/>
         </div>
       </div>
       <Modal open={delM} onClose={()=>setDelM(false)}>
@@ -1137,7 +1173,8 @@ function MiniMapSimple({space,itemGroup,itemCell,itemColor}:{space:string,itemGr
     return()=>ro.disconnect();
   },[]);
   const rh=Math.round(ORIG_H*scale);
-  const drawerW=Math.floor(360/3); // 서랍 3개 균등 분할
+  const drawerW=Math.floor(380/3); // 서랍 3개가 외곽(380px) 균등 분할
+  const lastDrawerW=380-drawerW*2; // 나머지 오차 마지막 셀에 흡수
   return (
     <div ref={wrapRef} style={{borderRadius:8,border:'1px solid #ECEBE8',background:'#F7F6F3',overflow:'hidden',position:'relative',height:rh}}>
       <div style={{transform:`scale(${scale})`,transformOrigin:'top left',width:ORIG_W,height:ORIG_H,position:'absolute',top:0,left:0,pointerEvents:'none'}}>
@@ -1146,7 +1183,7 @@ function MiniMapSimple({space,itemGroup,itemCell,itemColor}:{space:string,itemGr
         {/* 서랍 ①②③ — 상단 가로 3분할 */}
         <MiniCell {...p} group={g.group} cell={g.cells[0]} label={g.cells[0]} x={60} y={40} w={drawerW} h={60}/>
         <MiniCell {...p} group={g.group} cell={g.cells[1]} label={g.cells[1]} x={60+drawerW} y={40} w={drawerW} h={60}/>
-        <MiniCell {...p} group={g.group} cell={g.cells[2]} label={g.cells[2]} x={60+drawerW*2} y={40} w={drawerW} h={60}/>
+        <MiniCell {...p} group={g.group} cell={g.cells[2]} label={g.cells[2]} x={60+drawerW*2} y={40} w={lastDrawerW} h={60}/>
         {/* ④ — 하단 전체 너비 */}
         {g.cells[3]&&<MiniCell {...p} group={g.group} cell={g.cells[3]} label={g.cells[3]} x={60} y={100} w={380} h={150}/>}
       </div>
@@ -1270,7 +1307,7 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
               ))}
             </div>
           </div>
-          <div style={{height:8}}/>
+          <div style={{height:24}}/>
         </div>
       </div>
       <Modal open={delM} onClose={()=>setDelM(false)}>
@@ -1408,10 +1445,10 @@ export default function App() {
   }
 
   const navItems=[
-    {id:'dashboard',label:'대시보드',I:IC.dash},
     {id:'search',label:'품목 찾기',I:IC.list},
     {id:'space',label:'공간 조회',I:IC.map},
     {id:'register',label:'신규 등록',I:IC.plus},
+    {id:'dashboard',label:'대시보드',I:IC.dash},
   ];
   const curTab=route.name==='detail'?'search':route.name==='edit'?'search':route.name;
 
