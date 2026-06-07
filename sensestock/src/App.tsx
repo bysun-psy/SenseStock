@@ -35,7 +35,7 @@ const SIDEBAR_CSS = `
     .bottom-nav-item.active { color:var(--primary); }
     .bottom-nav-item.active .bnav-icon { color:var(--primary); }
     .bnav-icon { color:var(--slate); display:flex; }
-    .mobile-content { padding-bottom:80px !important; }
+    .mobile-content { padding-bottom:100px !important; }
     .app { height:100dvh !important; }
     .mobile-topbar { padding:14px 16px !important; }
     .mobile-topbar h1 { font-size:17px !important; }
@@ -421,10 +421,10 @@ function Login() {
 function Sidebar({cur,onNav,user,onLogout}) {
   const [collapsed,setCollapsed]=useState(false);
   const navItems=[
-    {id:'dashboard',label:'대시 보드',I:IC.dash},
     {id:'search',label:'품목 찾기',I:IC.list},
     {id:'space',label:'공간 조회',I:IC.map},
     {id:'register',label:'신규 등록',I:IC.plus},
+    {id:'dashboard',label:'대시 보드',I:IC.dash},
   ];
   return (
     <aside className={`ss-aside${collapsed?' collapsed':''}`} style={{width:240,background:'var(--surface)',borderRight:'1px solid var(--hairline)',display:'flex',flexDirection:'column',flexShrink:0}}>
@@ -669,7 +669,7 @@ function Search({items,onItemClick,onDelete}) {
           </tbody>
         </table>
         {/* 모바일 카드 리스트 */}
-        <div style={{display:'block'}} className="mobile-list desktop-hide">
+        <div className="mobile-list desktop-hide">
           {!submitted&&<div style={{padding:'48px 24px',textAlign:'center',color:'var(--slate)',fontSize:14}}>검색어를 입력하고 검색 버튼을 눌러주세요.</div>}
           {submitted&&filtered.length===0&&<div style={{padding:'48px 24px',textAlign:'center',color:'var(--slate)',fontSize:14}}>일치하는 품목이 없습니다.</div>}
           {filtered.map(it=>{
@@ -947,6 +947,73 @@ function UseSelect({value,onChange,editing}) {
     </div>
   );
 }
+function formatReceived(raw:string):string {
+  const digits=raw.replace(/\D/g,'').slice(0,6);
+  if(digits.length<=4) return digits;
+  return digits.slice(0,4)+'-'+digits.slice(4);
+}
+
+function MonthPicker({value,onChange,editing}:{value:string,onChange:(v:string)=>void,editing:boolean}) {
+  const [open,setOpen]=useState(false);
+  const [viewYear,setViewYear]=useState(()=>{
+    const y=parseInt(value?.slice(0,4));
+    return isNaN(y)?new Date().getFullYear():y;
+  });
+  const ref=useRef<HTMLDivElement>(null);
+  const selectedYear=value?.slice(0,4);
+  const selectedMonth=value?.slice(5,7);
+  useEffect(()=>{
+    const fn=(e:MouseEvent)=>{if(ref.current&&!ref.current.contains(e.target as Node))setOpen(false);};
+    document.addEventListener('mousedown',fn);
+    return()=>document.removeEventListener('mousedown',fn);
+  },[]);
+  const select=(m:number)=>{
+    onChange(`${viewYear}-${String(m).padStart(2,'0')}`);
+    setOpen(false);
+  };
+  const handleText=(e:React.ChangeEvent<HTMLInputElement>)=>{
+    const formatted=formatReceived(e.target.value);
+    onChange(formatted);
+    const y=parseInt(formatted.slice(0,4));
+    if(!isNaN(y)&&y>1900&&y<2100) setViewYear(y);
+  };
+  const months=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  return (
+    <div style={{position:'relative'}} ref={ref}>
+      <div className={`input ${editing?'is-editing':''}`} style={{display:'flex',alignItems:'center',gap:6,padding:'0 10px',cursor:'text'}}>
+        <input
+          value={value}
+          onChange={handleText}
+          placeholder="YYYY-MM"
+          maxLength={7}
+          style={{flex:1,border:'none',outline:'none',background:'transparent',font:'inherit',fontSize:14,color:'var(--ink)',padding:0}}
+        />
+        <button onClick={()=>{setOpen(o=>!o);if(value){const y=parseInt(value.slice(0,4));if(!isNaN(y))setViewYear(y);}}} style={{background:'none',border:'none',cursor:'pointer',padding:'2px 4px',color:'var(--slate)',display:'flex',alignItems:'center',flexShrink:0,fontSize:13}}>📅</button>
+      </div>
+      {open&&(
+        <div className="card" style={{position:'absolute',top:'calc(100% + 4px)',left:0,zIndex:30,padding:14,boxShadow:'var(--shadow-2)',minWidth:240}}>
+          <div className="row between" style={{marginBottom:12,alignItems:'center'}}>
+            <button onClick={()=>setViewYear(y=>y-1)} style={{background:'none',border:'none',cursor:'pointer',fontSize:16,color:'var(--charcoal)',padding:'2px 8px',borderRadius:'var(--r-sm)'}}>◀</button>
+            <span style={{fontWeight:600,fontSize:15,color:'var(--ink-deep)'}}>{viewYear}년</span>
+            <button onClick={()=>setViewYear(y=>y+1)} style={{background:'none',border:'none',cursor:'pointer',fontSize:16,color:'var(--charcoal)',padding:'2px 8px',borderRadius:'var(--r-sm)'}}>▶</button>
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:6}}>
+            {months.map((m,i)=>{
+              const mon=String(i+1).padStart(2,'0');
+              const isSel=selectedYear===String(viewYear)&&selectedMonth===mon;
+              return (
+                <button key={m} onClick={()=>select(i+1)} style={{padding:'8px 4px',borderRadius:'var(--r-md)',border:isSel?'2px solid var(--primary)':'1px solid var(--hairline)',background:isSel?'var(--primary-soft)':'var(--canvas)',color:isSel?'var(--primary-deep)':'var(--charcoal)',fontWeight:isSel?600:400,fontSize:13,cursor:'pointer',fontFamily:'inherit'}}>
+                  {m}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||'',group:pre.group||'',cell:pre.cell||'',spec:'',qty:'',min:'',received:'',note:''};}
 function RegisterEdit({mode,item,prefill,onCancel,onSave,onDelete}) {
   const isEdit=mode==='edit';
@@ -998,7 +1065,7 @@ function RegisterEdit({mode,item,prefill,onCancel,onSave,onDelete}) {
             </div>
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginTop:16}}>
               <Field label="규격"><input className={`input ${ef==='spec'?'is-editing':''}`} placeholder="예: 250 mL" value={form.spec} onChange={e=>setF('spec',e.target.value)}/></Field>
-              <Field label="입고 시기"><input className={`input ${ef==='received'?'is-editing':''}`} placeholder="2026-04" value={form.received} onChange={e=>setF('received',e.target.value)}/></Field>
+              <Field label="입고 시기"><MonthPicker value={form.received} onChange={v=>setF('received',v)} editing={ef==='received'}/></Field>
             </div>
           </div>
           <div className="card" style={{padding:24}}>
@@ -1331,7 +1398,7 @@ export default function App() {
   const [user,setUser]=useState(null);
   const [authLoading,setAuthLoading]=useState(true);
   const [accessDenied,setAccessDenied]=useState(false);
-  const [route,setRoute]=useState({name:'dashboard'});
+  const [route,setRoute]=useState({name:'search'});
   const [items,setItems]=useState(SEED);
   const [activity,setActivity]=useState(SEED_ACT);
 
