@@ -426,7 +426,6 @@ function Sidebar({cur,onNav,user,onLogout}) {
     {id:'space',label:'공간 조회',I:IC.map},
     {id:'register',label:'신규 등록',I:IC.plus},
     {id:'dashboard',label:'대시 보드',I:IC.dash},
-    {id:'profile',label:'내 계정',I:IC.user},
   ];
   return (
     <aside className={`ss-aside${collapsed?' collapsed':''}`} style={{width:240,background:'var(--surface)',borderRight:'1px solid var(--hairline)',display:'flex',flexDirection:'column',flexShrink:0}}>
@@ -897,7 +896,6 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
                 <button className="btn btn-ghost btn-icon" onClick={()=>setShowList(false)}><IC.x/></button>
               </div>
               <div style={{flex:1,overflow:'auto',paddingBottom:8}}>
-                {/* 데스크탑: 테이블 */}
                 <table className="table mobile-hide">
                   <thead><tr><th>품목명</th><th style={{width:140}}>용도</th><th style={{width:160}}>위치</th><th style={{width:120}}>규격</th><th style={{width:100,textAlign:'right'}}>수량</th></tr></thead>
                   <tbody>
@@ -917,13 +915,12 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
                     {selItems.length===0&&<tr><td colSpan={5} style={{padding:'40px 0',textAlign:'center',color:'var(--slate)'}}>선택한 셀에 품목이 없습니다.</td></tr>}
                   </tbody>
                 </table>
-                {/* 모바일: 카드형 리스트 */}
-                <div className="desktop-hide" style={{display:'flex',flexDirection:'column',gap:1}}>
+                <div className="desktop-hide" style={{display:'flex',flexDirection:'column'}}>
                   {selItems.map(it=>{
                     const u=useById(it.useId);
                     const isLow=it.min!=null&&it.qty<it.min;
                     return (
-                      <div key={it.id} onClick={()=>{setShowList(false);onItemClick(it);}} style={{padding:'12px 20px',borderBottom:'1px solid var(--hairline)',cursor:'pointer',background:'var(--canvas)'}}>
+                      <div key={it.id} onClick={()=>{setShowList(false);onItemClick(it);}} style={{padding:'12px 20px',borderBottom:'1px solid var(--hairline)',cursor:'pointer'}}>
                         <div className="row between" style={{alignItems:'flex-start',gap:8}}>
                           <div style={{flex:1,minWidth:0}}>
                             <div style={{fontWeight:600,fontSize:15,color:'var(--ink-deep)',marginBottom:4}}>{it.name}</div>
@@ -931,7 +928,6 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
                               <span className="row" style={{gap:4}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:12,color:'var(--slate)'}}>{u.short}</span></span>
                               <span style={{fontSize:12,color:'var(--steel)'}}>·</span>
                               <span style={{fontSize:12,color:'var(--slate)'}}><b style={{color:'var(--charcoal)'}}>{it.group}</b> / {it.cell}</span>
-                              {it.spec&&<><span style={{fontSize:12,color:'var(--steel)'}}>·</span><span style={{fontSize:12,color:'var(--slate)'}}>{it.spec}</span></>}
                             </div>
                           </div>
                           <div style={{textAlign:'right',flexShrink:0}}>
@@ -986,13 +982,9 @@ function formatReceived(raw:string):string {
   if(digits.length<=4) return digits;
   return digits.slice(0,4)+'-'+digits.slice(4);
 }
-
 function MonthPicker({value,onChange,editing}:{value:string,onChange:(v:string)=>void,editing:boolean}) {
   const [open,setOpen]=useState(false);
-  const [viewYear,setViewYear]=useState(()=>{
-    const y=parseInt(value?.slice(0,4));
-    return isNaN(y)?new Date().getFullYear():y;
-  });
+  const [viewYear,setViewYear]=useState(()=>{const y=parseInt(value?.slice(0,4));return isNaN(y)?new Date().getFullYear():y;});
   const ref=useRef<HTMLDivElement>(null);
   const selectedYear=value?.slice(0,4);
   const selectedMonth=value?.slice(5,7);
@@ -1001,10 +993,7 @@ function MonthPicker({value,onChange,editing}:{value:string,onChange:(v:string)=
     document.addEventListener('mousedown',fn);
     return()=>document.removeEventListener('mousedown',fn);
   },[]);
-  const select=(m:number)=>{
-    onChange(`${viewYear}-${String(m).padStart(2,'0')}`);
-    setOpen(false);
-  };
+  const select=(m:number)=>{onChange(`${viewYear}-${String(m).padStart(2,'0')}`);setOpen(false);};
   const handleText=(e:React.ChangeEvent<HTMLInputElement>)=>{
     const formatted=formatReceived(e.target.value);
     onChange(formatted);
@@ -1015,13 +1004,7 @@ function MonthPicker({value,onChange,editing}:{value:string,onChange:(v:string)=
   return (
     <div style={{position:'relative'}} ref={ref}>
       <div className={`input ${editing?'is-editing':''}`} style={{display:'flex',alignItems:'center',gap:6,padding:'0 10px',cursor:'text'}}>
-        <input
-          value={value}
-          onChange={handleText}
-          placeholder="YYYY-MM"
-          maxLength={7}
-          style={{flex:1,border:'none',outline:'none',background:'transparent',font:'inherit',fontSize:14,color:'var(--ink)',padding:0}}
-        />
+        <input value={value} onChange={handleText} placeholder="YYYY-MM" maxLength={7} style={{flex:1,border:'none',outline:'none',background:'transparent',font:'inherit',fontSize:14,color:'var(--ink)',padding:0}}/>
         <button onClick={()=>{setOpen(o=>!o);if(value){const y=parseInt(value.slice(0,4));if(!isNaN(y))setViewYear(y);}}} style={{background:'none',border:'none',cursor:'pointer',padding:'2px 4px',color:'var(--slate)',display:'flex',alignItems:'center',flexShrink:0,fontSize:13}}>📅</button>
       </div>
       {open&&(
@@ -1035,11 +1018,7 @@ function MonthPicker({value,onChange,editing}:{value:string,onChange:(v:string)=
             {months.map((m,i)=>{
               const mon=String(i+1).padStart(2,'0');
               const isSel=selectedYear===String(viewYear)&&selectedMonth===mon;
-              return (
-                <button key={m} onClick={()=>select(i+1)} style={{padding:'8px 4px',borderRadius:'var(--r-md)',border:isSel?'2px solid var(--primary)':'1px solid var(--hairline)',background:isSel?'var(--primary-soft)':'var(--canvas)',color:isSel?'var(--primary-deep)':'var(--charcoal)',fontWeight:isSel?600:400,fontSize:13,cursor:'pointer',fontFamily:'inherit'}}>
-                  {m}
-                </button>
-              );
+              return (<button key={m} onClick={()=>select(i+1)} style={{padding:'8px 4px',borderRadius:'var(--r-md)',border:isSel?'2px solid var(--primary)':'1px solid var(--hairline)',background:isSel?'var(--primary-soft)':'var(--canvas)',color:isSel?'var(--primary-deep)':'var(--charcoal)',fontWeight:isSel?600:400,fontSize:13,cursor:'pointer',fontFamily:'inherit'}}>{m}</button>);
             })}
           </div>
         </div>
@@ -1047,40 +1026,7 @@ function MonthPicker({value,onChange,editing}:{value:string,onChange:(v:string)=
     </div>
   );
 }
-
-function Profile({user,onLogout}) {
-  const initial=(user?.name||'?').charAt(0);
-  return (
-    <div className="col" style={{height:'100%'}}>
-      <Topbar title="내 계정" sub="로그인 정보 및 설정"/>
-      <div className="mobile-content mobile-pad" style={{flex:1,overflow:'auto',padding:32,paddingBottom:100}}>
-        <div style={{maxWidth:480,margin:'0 auto',display:'flex',flexDirection:'column',gap:12}}>
-          <div className="card" style={{padding:32,display:'flex',flexDirection:'column',alignItems:'center',gap:12,textAlign:'center'}}>
-            <div style={{width:72,height:72,borderRadius:'50%',background:'var(--brand-navy)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:28,fontWeight:600,flexShrink:0}}>{initial}</div>
-            <div>
-              <div style={{fontSize:20,fontWeight:600,color:'var(--ink-deep)',marginBottom:4}}>{user?.name||'사용자'}</div>
-              <div style={{fontSize:14,color:'var(--slate)'}}>{user?.email||''}</div>
-            </div>
-            <div style={{width:'100%',height:1,background:'var(--hairline)',margin:'4px 0'}}/>
-            <button className="btn btn-secondary" style={{width:'100%',height:44,color:'var(--error)',borderColor:'var(--hairline-strong)'}} onClick={onLogout}>
-              <IC.logout/> 로그아웃
-            </button>
-          </div>
-          <div className="card" style={{padding:20}}>
-            <div style={{fontSize:12,color:'var(--slate)',marginBottom:8}}>접속 권한</div>
-            <div className="row" style={{gap:8,alignItems:'center'}}>
-              <span style={{width:8,height:8,borderRadius:'50%',background:'var(--brand-green)',display:'inline-block',flexShrink:0}}/>
-              <span style={{fontSize:14,fontWeight:500,color:'var(--ink)'}}>관능평가실 구성원</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function blank(pre:any={}){return{name:'',useId:pre.useId||null,space:pre.space||'',group:pre.group||'',cell:pre.cell||'',spec:'',qty:'',min:'',received:'',note:''} as any;}
-function RegisterEdit({mode,item,prefill,onCancel,onSave,onDelete}:any) {
+function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||'',group:pre.group||'',cell:pre.cell||'',spec:'',qty:'',min:'',received:'',note:''};}function RegisterEdit({mode,item,prefill,onCancel,onSave,onDelete}) {
   const isEdit=mode==='edit';
   const [form,setForm]=useState(()=>isEdit&&item?{...item}:blank(prefill||{}));
   const [ef,setEf]=useState(null);
@@ -1181,6 +1127,37 @@ function RegisterEdit({mode,item,prefill,onCancel,onSave,onDelete}:any) {
         </div>
       </Modal>
       {saved&&<div style={{position:'fixed',bottom:28,right:28,zIndex:200,background:'var(--ink-deep)',color:'#fff',padding:'10px 18px',borderRadius:'var(--r-md)',fontSize:13,fontWeight:500,boxShadow:'var(--shadow-2)'}}>{isEdit?'저장되었습니다':'등록되었습니다'}</div>}
+    </div>
+  );
+}
+
+function Profile({user,onLogout}) {
+  const initial=(user?.name||'?').charAt(0);
+  return (
+    <div className="col" style={{height:'100%'}}>
+      <Topbar title="내 계정" sub="로그인 정보 및 설정"/>
+      <div className="mobile-content mobile-pad" style={{flex:1,overflow:'auto',padding:32,paddingBottom:100}}>
+        <div style={{maxWidth:480,margin:'0 auto',display:'flex',flexDirection:'column',gap:12}}>
+          <div className="card" style={{padding:32,display:'flex',flexDirection:'column',alignItems:'center',gap:12,textAlign:'center'}}>
+            <div style={{width:72,height:72,borderRadius:'50%',background:'var(--brand-navy)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:28,fontWeight:600,flexShrink:0}}>{initial}</div>
+            <div>
+              <div style={{fontSize:20,fontWeight:600,color:'var(--ink-deep)',marginBottom:4}}>{user?.name||'사용자'}</div>
+              <div style={{fontSize:14,color:'var(--slate)'}}>{user?.email||''}</div>
+            </div>
+            <div style={{width:'100%',height:1,background:'var(--hairline)',margin:'4px 0'}}/>
+            <button className="btn btn-secondary" style={{width:'100%',height:44,color:'var(--error)',borderColor:'var(--hairline-strong)'}} onClick={onLogout}>
+              <IC.logout/> 로그아웃
+            </button>
+          </div>
+          <div className="card" style={{padding:20}}>
+            <div style={{fontSize:12,color:'var(--slate)',marginBottom:8}}>접속 권한</div>
+            <div className="row" style={{gap:8,alignItems:'center'}}>
+              <span style={{width:8,height:8,borderRadius:'50%',background:'var(--brand-green)',display:'inline-block',flexShrink:0}}/>
+              <span style={{fontSize:14,fontWeight:500,color:'var(--ink)'}}>관능평가실 구성원</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -1406,6 +1383,7 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
       <div className="mobile-content mobile-pad" style={{flex:1,overflow:'auto',padding:32,paddingBottom:100}}>
         <div style={{maxWidth:860,margin:'0 auto',display:'flex',flexDirection:'column',gap:16}}>
           <div className="card mobile-grid-1" style={{padding:24,display:'grid',gridTemplateColumns:'1.4fr 1fr',gap:24}}>
+            <div>
               <span className="badge" style={{background:u.color,color:'#fff'}}>{u.name}</span>
               <h2 className="mobile-h2" style={{margin:'12px 0 6px',fontSize:28,fontWeight:600,color:'var(--ink-deep)'}}>{item.name}</h2>
               <div style={{fontSize:14,color:'var(--charcoal)'}}><span style={{color:'var(--slate)'}}>위치</span> <b>{item.space} / {item.group} / {item.cell}</b></div>
