@@ -1417,7 +1417,7 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
             <ItemMiniMap item={item} u={u}/>
           </div>
           <div className="card" style={{padding:16,background:'var(--surface)',marginBottom:0}}>
-            <div className="row wrap" style={{gap:'12px 16px'}}>
+            <div className="row wrap" style={{gap:isMobile ? '12px 18px' : '12px 32px'}}>
               {[['최초 등록일',item.createdAt],['최종 수정일',item.updatedAt],['최종 수정인',item.updatedBy],['품목 ID',`#${item.id}`]].map(([l,v])=>(
                 <div key={l} className="col"><span style={{fontSize:11,color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>{l}</span><span style={{fontSize:14,fontWeight:500,marginTop:2}}>{v}</span></div>
               ))}
