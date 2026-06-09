@@ -89,7 +89,7 @@ body,#root{margin:0;padding:0}
 .input::placeholder{color:var(--stone)}
 .input:focus,.select:focus,.textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(100,87,231,.16)}
 .is-editing{background:#FFFDF5!important;border-color:var(--brand-yellow)!important;box-shadow:0 0 0 3px rgba(229,183,45,.18)!important}
-.search-pill{height:44px;padding:0 14px 0 40px;border-radius:var(--r-md);border:1px solid var(--hairline);background:var(--surface);font:inherit;font-size:15px;outline:none;width:100%}
+.search-pill{height:44px;padding:0 14px 0 40px;border-radius:var(--r-md);border:1px solid var(--hairline);background:var(--surface);font:inherit;font-size:14px;outline:none;width:100%}
 .search-pill:focus{background:var(--canvas);border-color:var(--primary)}
 .field-label{display:block;font-size:12px;font-weight:600;color:var(--charcoal);margin-bottom:6px;white-space:nowrap}
 .card{background:var(--canvas);border:1px solid var(--hairline);border-radius:var(--r-lg)}
@@ -333,7 +333,7 @@ function Topbar({title,sub,action}) {
     <div className="row between mobile-topbar" style={{padding:'20px 32px',background:'var(--canvas)',borderBottom:'1px solid var(--hairline)',gap:16,flexShrink:0}}>
       <div style={{minWidth:0,flex:1}}>
         <h1 style={{margin:0,fontSize:24,fontWeight:600,color:'var(--ink-deep)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{title}</h1>
-        {sub&&<div className="topbar-sub" style={{fontSize:13,color:'var(--slate)',marginTop:2}}>{sub}</div>}
+        {sub&&<div className="topbar-sub" style={{fontSize:14,color:'var(--slate)',marginTop:2}}>{sub}</div>}
       </div>
       {action&&<div className="topbar-actions row" style={{flexShrink:0,gap:12,flexWrap:'nowrap'}}>{action}</div>}
     </div>
@@ -395,13 +395,13 @@ function Login() {
       </div>
       <div style={{position:'relative',zIndex:2,width:'100%',maxWidth:420}}>
         <div className="card" style={{padding:36,background:'var(--canvas)',color:'var(--ink)',boxShadow:'var(--shadow-3)'}}>
-          <h2 style={{margin:'0 0 8px',fontSize:22,fontWeight:600,letterSpacing:'-0.3px'}}>로그인</h2>
-          <p style={{margin:'0 0 28px',fontSize:13,color:'var(--slate)'}}>허가된 Google 계정으로만 접속할 수 있습니다.</p>
-          {err&&<div style={{background:'#FCEFEF',color:'var(--error)',border:'1px solid #EBC7C7',padding:'8px 12px',borderRadius:'var(--r-md)',fontSize:13,marginBottom:16}}>{err}</div>}
+          <h2 style={{margin:'0 0 8px',fontSize:24,fontWeight:600,letterSpacing:'-0.3px'}}>로그인</h2>
+          <p style={{margin:'0 0 28px',fontSize:14,color:'var(--slate)'}}>허가된 Google 계정으로만 접속할 수 있습니다.</p>
+          {err&&<div style={{background:'#FCEFEF',color:'var(--error)',border:'1px solid #EBC7C7',padding:'8px 12px',borderRadius:'var(--r-md)',fontSize:14,marginBottom:16}}>{err}</div>}
           <button
             onClick={handleGoogleLogin}
             disabled={loading}
-            style={{width:'100%',height:48,borderRadius:'var(--r-md)',border:'1px solid var(--hairline-strong)',background:'var(--canvas)',color:'var(--ink)',fontSize:15,fontWeight:500,cursor:loading?'not-allowed':'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:12,fontFamily:'inherit'}}
+            style={{width:'100%',height:48,borderRadius:'var(--r-md)',border:'1px solid var(--hairline-strong)',background:'var(--canvas)',color:'var(--ink)',fontSize:16,fontWeight:500,cursor:loading?'not-allowed':'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:12,fontFamily:'inherit'}}
           >
             <svg width="20" height="20" viewBox="0 0 48 48">
               <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.8 2.5 30.2 0 24 0 14.7 0 6.7 5.4 2.8 13.3l7.8 6C12.4 13 17.8 9.5 24 9.5z"/>
@@ -432,7 +432,7 @@ function Sidebar({cur,onNav,user,onLogout}) {
     <aside className={`ss-aside${collapsed?' collapsed':''}`} style={{width:240,background:'var(--surface)',borderRight:'1px solid var(--hairline)',display:'flex',flexDirection:'column',flexShrink:0}}>
       <div className="row between" style={{padding:'18px 14px 18px 16px',borderBottom:'1px solid var(--hairline-soft)',minHeight:62,flexShrink:0}}>
         <div className="row" style={{gap:10,overflow:'hidden'}}>
-          <span className="ss-logo-name" style={{fontSize:18,fontWeight:600,color:'var(--ink-deep)'}}>SenseStock</span>
+          <span className="ss-logo-name" style={{fontSize:20,fontWeight:600,color:'var(--ink-deep)'}}>SenseStock</span>
         </div>
         <button className="ss-toggle-btn" onClick={()=>setCollapsed(c=>!c)}>
           <SidebarToggleIcon open={!collapsed}/>
@@ -451,11 +451,11 @@ function Sidebar({cur,onNav,user,onLogout}) {
         })}
       </nav>
       <div className="row" style={{borderTop:'1px solid var(--hairline-soft)',padding:'12px 6px',gap:10,flexShrink:0}}>
-        <div className="ss-avatar" style={{width:32,height:32,borderRadius:'50%',background:'var(--tint-lavender)',color:'var(--brand-purple-800)',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:600,fontSize:13,flexShrink:0}}>
+        <div className="ss-avatar" style={{width:32,height:32,borderRadius:'50%',background:'var(--tint-lavender)',color:'var(--brand-purple-800)',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:600,fontSize:14,flexShrink:0}}>
           {user?.name?.[0]||'U'}
         </div>
         <div className="ss-user-info col flex1">
-          <span style={{fontSize:13,fontWeight:600,color:'var(--charcoal)'}}>{user?.name}</span>
+          <span style={{fontSize:14,fontWeight:600,color:'var(--charcoal)'}}>{user?.name}</span>
           <span style={{fontSize:11,color:'var(--steel)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{user?.email}</span>
         </div>
         <button className="ss-logout-btn btn btn-ghost btn-icon" onClick={onLogout} style={{color:'var(--slate)',flexShrink:0}}><IC.logout/></button>
@@ -499,8 +499,8 @@ function Dashboard({items,activity,onNav,onItemClick}) {
       <div className={`mobile-content mobile-pad`} style={{flex:1,overflow:'auto',padding:32,paddingBottom:100}}>
         <div className="mobile-grid-1" style={{display:'grid',gridTemplateColumns:'1fr 2.5fr',gap:16,marginBottom:16}}>
           <div className="card" style={{padding:24,display:'flex',flexDirection:'column',justifyContent:'center'}}>
-            <div style={{fontSize:13,color:'var(--slate)'}}>총 등록 품목</div>
-            <div style={{fontSize:48,fontWeight:600,color:'var(--ink-deep)',letterSpacing:'-1px',marginTop:8}}>{total}</div>
+            <div style={{fontSize:12,color:'var(--slate)'}}>총 등록 품목</div>
+            <div style={{fontSize:45,fontWeight:600,color:'var(--ink-deep)',letterSpacing:'-1px',marginTop:8}}>{total}</div>
             <div className="row" style={{gap:6,marginTop:12}}>
               <span style={{padding:'2px 8px',borderRadius:'var(--r-full)',background:'var(--tint-lavender)',color:'var(--brand-purple-800)',fontSize:11,fontWeight:600}}>+12</span>
               <span style={{fontSize:12,color:'var(--steel)'}}>이번 달</span>
@@ -508,7 +508,7 @@ function Dashboard({items,activity,onNav,onItemClick}) {
           </div>
           <div className="card" style={{padding:24}}>
             <div style={{fontWeight:600,fontSize:16,marginBottom:4}}>용도별 분포</div>
-            <div style={{fontSize:13,color:'var(--slate)',marginBottom:20}}>{USES.length}개 분류 · 총 {total}품목</div>
+            <div style={{fontSize:14,color:'var(--slate)',marginBottom:20}}>{USES.length}개 분류 · 총 {total}품목</div>
             {isMobile?(
               <div className="col" style={{gap:16,alignItems:'center'}}>
                 <Donut data={useData} total={total} size={140}/>
@@ -526,7 +526,7 @@ function Dashboard({items,activity,onNav,onItemClick}) {
                 <div style={{flex:1,display:'grid',gridTemplateColumns:'1fr 1fr',gap:'6px 24px'}}>
                   {useData.map(u=>(
                     <div key={u.name} className="row" style={{gap:8,padding:'4px 0'}}>
-                      <span className="swatch" style={{background:u.c}}/><span style={{flex:1,fontSize:13,color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.name}</span><span style={{fontSize:13,fontWeight:600}}>{u.v}</span>
+                      <span className="swatch" style={{background:u.c}}/><span style={{flex:1,fontSize:14,color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.name}</span><span style={{fontSize:14,fontWeight:600}}>{u.v}</span>
                     </div>
                   ))}
                 </div>
@@ -537,13 +537,13 @@ function Dashboard({items,activity,onNav,onItemClick}) {
         <div className="mobile-grid-1" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16}}>
           <div className="card" style={{padding:24}}>
             <div style={{fontWeight:600,fontSize:16,marginBottom:4}}>공간별 분포</div>
-            <div style={{fontSize:13,color:'var(--slate)',marginBottom:20}}>{SPACES.length}개 공간</div>
+            <div style={{fontSize:14,color:'var(--slate)',marginBottom:20}}>{SPACES.length}개 공간</div>
             <div className="row" style={{gap:isMobile?12:24,alignItems:'center',flexWrap:isMobile?'wrap':'nowrap'}}>
               <Donut data={spData} total={total} size={isMobile?100:160}/>
               <div className="col" style={{flex:1,gap:6,minWidth:0}}>
                 {spData.map(s=>(
                   <button key={s.name} onClick={()=>onNav('space',{space:s.name})} className="row" style={{gap:8,padding:'9px 12px',borderRadius:'var(--r-md)',border:'1px solid var(--hairline)',background:'var(--canvas)',cursor:'pointer',fontFamily:'inherit',minWidth:0}}>
-                    <span className="swatch" style={{background:s.c}}/><span style={{flex:1,fontSize:13,fontWeight:500,color:'var(--charcoal)'}}>{s.name}</span><span style={{fontSize:13,fontWeight:600}}>{s.v}</span><IC.chev/>
+                    <span className="swatch" style={{background:s.c}}/><span style={{flex:1,fontSize:14,fontWeight:500,color:'var(--charcoal)'}}>{s.name}</span><span style={{fontSize:14,fontWeight:600}}>{s.v}</span><IC.chev/>
                   </button>
                 ))}
               </div>
@@ -556,9 +556,9 @@ function Dashboard({items,activity,onNav,onItemClick}) {
                 const d=aDot[a.action]||aDot.create;
                 return (
                   <div key={a.id} className="row" style={{gap:12,padding:'12px 0',borderBottom:i<activity.length-1?'1px solid var(--hairline-soft)':'none',alignItems:'flex-start'}}>
-                    <div style={{width:24,height:24,borderRadius:'50%',background:d.bg,color:d.fg,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:700,flexShrink:0,marginTop:1}}>{d.l}</div>
+                    <div style={{width:24,height:24,borderRadius:'50%',background:d.bg,color:d.fg,display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,fontWeight:700,flexShrink:0,marginTop:1}}>{d.l}</div>
                     <div style={{minWidth:0}}>
-                      <div style={{fontSize:13,color:'var(--charcoal)',overflow:'hidden'}}><b>{a.user}</b>님이 <b>{a.name}</b>{a.action==='create'?'을 등록':a.action==='update'?'을 수정':'을 삭제'}했습니다.</div>
+                      <div style={{fontSize:14,color:'var(--charcoal)',overflow:'hidden'}}><b>{a.user}</b>님이 <b>{a.name}</b>{a.action==='create'?'을 등록':a.action==='update'?'을 수정':'을 삭제'}했습니다.</div>
                       <div style={{fontSize:12,color:'var(--steel)',marginTop:2}}>{a.time}</div>
                     </div>
                   </div>
@@ -607,7 +607,7 @@ function Search({items,onItemClick,onDelete}) {
     <div className="col" style={{height:'100%'}}>
       <Topbar title="품목 찾기" sub={`전체 ${items.length}개 품목`} action={sel.size>0?(
         <div className="row" style={{gap:12}}>
-          <span style={{fontSize:13,color:'var(--slate)'}}>{sel.size}개 선택</span>
+          <span style={{fontSize:14,color:'var(--slate)'}}>{sel.size}개 선택</span>
           <button className="btn btn-secondary btn-sm" onClick={()=>setSel(new Set())}>해제</button>
           <button className="btn btn-danger btn-sm" onClick={()=>setDelModal(true)}><IC.trash/> 삭제</button>
         </div>):null}/>
@@ -658,11 +658,11 @@ function Search({items,onItemClick,onDelete}) {
                 <tr key={it.id} className={isSel?'sel':''} onClick={e=>{if(e.target.tagName==='INPUT') return; onItemClick(it);}}>
                   <td onClick={e=>{e.stopPropagation();tog(setSel,it.id);}}><input type="checkbox" checked={isSel} onChange={()=>{}}/></td>
                   <td style={{maxWidth:220}}><div style={{fontWeight:500,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{q?hi(it.name,q):it.name}</div>{it.note&&<div style={{fontSize:12,color:'var(--steel)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.note}</div>}</td>
-                  <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color,flexShrink:0}}/><span style={{fontSize:13,color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.short}</span></span></td>
-                  <td><span style={{fontSize:13}}><b>{it.space}</b><span style={{color:'var(--slate)'}}> / {it.group} / {it.cell}</span></span></td>
-                  <td><span style={{fontSize:13,color:'var(--slate)',whiteSpace:'nowrap'}}>{it.spec||'–'}</span></td>
+                  <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color,flexShrink:0}}/><span style={{fontSize:14,color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.short}</span></span></td>
+                  <td><span style={{fontSize:14}}><b>{it.space}</b><span style={{color:'var(--slate)'}}> / {it.group} / {it.cell}</span></span></td>
+                  <td><span style={{fontSize:14,color:'var(--slate)',whiteSpace:'nowrap'}}>{it.spec||'–'}</span></td>
                   <td style={{textAlign:'right'}}><span style={{fontWeight:600,color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:12,color:'var(--steel)'}}> / {it.min}</span>}{isLow&&<div style={{fontSize:11,color:'var(--error)',fontWeight:600}}>재고 부족</div>}</td>
-                  <td><span style={{fontSize:13,color:'var(--slate)',whiteSpace:'nowrap'}}>{it.received}</span></td>
+                  <td><span style={{fontSize:14,color:'var(--slate)',whiteSpace:'nowrap'}}>{it.received}</span></td>
                 </tr>
               );
             })}
@@ -707,7 +707,7 @@ function Search({items,onItemClick,onDelete}) {
         <div style={{padding:28}}>
           <div className="row" style={{gap:12,marginBottom:16}}>
             <div style={{width:40,height:40,borderRadius:'50%',background:'var(--tint-rose)',color:'var(--brand-pink-deep)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><IC.alert/></div>
-            <div><div style={{fontSize:16,fontWeight:600}}>{sel.size}개 품목을 삭제할까요?</div><div style={{fontSize:13,color:'var(--slate)',marginTop:2}}>이 작업은 되돌릴 수 없습니다.</div></div>
+            <div><div style={{fontSize:16,fontWeight:600}}>{sel.size}개 품목을 삭제할까요?</div><div style={{fontSize:14,color:'var(--slate)',marginTop:2}}>이 작업은 되돌릴 수 없습니다.</div></div>
           </div>
           <div className="row between" style={{marginTop:20}}>
             <button className="btn btn-danger" onClick={()=>{onDelete([...sel]);setDelModal(false);setSel(new Set());}}><IC.trash/> 삭제</button>
@@ -802,7 +802,7 @@ function SimplePlan({space,title,p}) {
   if(!g) return null;
   return (
     <div style={{position:'relative',width:760,height:320,background:'var(--canvas)',border:'1px solid var(--hairline)',borderRadius:'var(--r-lg)',margin:'0 auto'}}>
-      <div style={{position:'absolute',left:32,top:20,fontSize:20,fontWeight:600,color:'var(--ink-deep)'}}>{title}</div>
+      <div style={{position:'absolute',left:32,top:20,fontSize:22,fontWeight:600,color:'var(--ink-deep)'}}>{title}</div>
       <FBox title={g.group} x={120} y={100} w={520} h={180}>
         {g.cells.slice(0,3).map((ce,i)=><Cell key={ce} {...p} group={g.group} cell={ce} label={ce} x={120+i*174} y={100} w={174} h={50}/>)}
         {g.cells[3]&&<Cell {...p} group={g.group} cell={g.cells[3]} label={g.cells[3]} x={120} y={150} w={520} h={130}/>}
@@ -815,7 +815,7 @@ function DiscPlan({space,title,p}) {
   if(!g) return null;
   return (
     <div style={{position:'relative',width:600,height:320,background:'var(--canvas)',border:'1px solid var(--hairline)',borderRadius:'var(--r-lg)',margin:'0 auto'}}>
-      <div style={{position:'absolute',left:32,top:20,fontSize:20,fontWeight:600,color:'var(--ink-deep)'}}>{title}</div>
+      <div style={{position:'absolute',left:32,top:20,fontSize:22,fontWeight:600,color:'var(--ink-deep)'}}>{title}</div>
       <FBox x={180} y={100} w={240} h={180}>
         {g.cells.map((ce,i)=><Cell key={ce} {...p} group={g.group} cell={ce} label={ce} x={180} y={100+i*60} w={240} h={60}/>)}
       </FBox>
@@ -826,7 +826,7 @@ function StorePlan(p) {
   const c=(g,ce,x,y,w,h)=>({...p,group:g,cell:ce,label:ce,x,y,w,h});
   return (
     <div style={{position:'relative',width:900,height:520,background:'var(--canvas)',border:'1px solid var(--hairline)',borderRadius:'var(--r-lg)',margin:'0 auto'}}>
-      <div style={{position:'absolute',left:32,top:20,fontSize:20,fontWeight:600,color:'var(--ink-deep)'}}>창고</div>
+      <div style={{position:'absolute',left:32,top:20,fontSize:22,fontWeight:600,color:'var(--ink-deep)'}}>창고</div>
       <FBox title="수납장" x={50} y={80} w={240} h={400}>
         {['①','②','③','④','⑤','⑥','⑦','⑧'].map((ce,i)=><Cell key={ce} {...c('수납장',ce,50+(i%2)*120,80+Math.floor(i/2)*100,120,100)}/>)}
       </FBox>
@@ -853,7 +853,7 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
     <div className="col" style={{height:'100%'}}>
       <Topbar title="공간 조회" sub="배치도 기반 비품 위치 확인" action={
         <div className="row" style={{gap:12}}>
-          {!isMobile&&<span style={{fontSize:13,color:'var(--slate)'}}>{sel.size}개 셀 선택</span>}
+          {!isMobile&&<span style={{fontSize:14,color:'var(--slate)'}}>{sel.size}개 셀 선택</span>}
           <button className="btn btn-secondary btn-sm" disabled={!sel.size} onClick={()=>setSel(new Set())} title="초기화" style={isMobile?{width:30,padding:0}:{}}><IC.refresh/>{!isMobile&&<span> 초기화</span>}</button>
           <button className="btn btn-primary btn-sm" disabled={sel.size!==1} onClick={()=>{
             const key=[...sel][0];
@@ -892,7 +892,7 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
             <div onClick={e=>e.stopPropagation()} className="card" style={{width:'100%',maxHeight:'65%',borderRadius:'var(--r-lg) var(--r-lg) 0 0',background:'var(--canvas)',boxShadow:'var(--shadow-4)',display:'flex',flexDirection:'column'}}>
               <div className="row between" style={{padding:'16px 24px',borderBottom:'1px solid var(--hairline)',flexShrink:0}}>
                 <div className="row" style={{gap:10}}>
-                  <span style={{fontSize:18,fontWeight:600}}>{space} · {sel.size}개 셀</span>
+                  <span style={{fontSize:20,fontWeight:600}}>{space} · {sel.size}개 셀</span>
                   <span className="badge" style={{background:'var(--primary-soft)',color:'var(--primary-deep)'}}>{selItems.length}개 품목</span>
                 </div>
                 <button className="btn btn-ghost btn-icon" onClick={()=>setShowList(false)}><IC.x/></button>
@@ -909,7 +909,7 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
                           <td><div style={{fontWeight:500}}>{it.name}</div>{it.note&&<div style={{fontSize:12,color:'var(--steel)'}}>{it.note}</div>}</td>
                           <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color}}/>{u.short}</span></td>
                           <td><b>{it.group}</b> / {it.cell}</td>
-                          <td style={{fontSize:13,color:'var(--slate)'}}>{it.spec||'–'}</td>
+                          <td style={{fontSize:14,color:'var(--slate)'}}>{it.spec||'–'}</td>
                           <td style={{textAlign:'right'}}><span style={{fontWeight:600,color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:12,color:'var(--slate)'}}> / {it.min}</span>}</td>
                         </tr>
                       );
@@ -925,7 +925,7 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
                       <div key={it.id} onClick={()=>{setShowList(false);onItemClick(it);}} style={{padding:'12px 20px',borderBottom:'1px solid var(--hairline)',cursor:'pointer'}}>
                         <div className="row between" style={{alignItems:'flex-start',gap:8}}>
                           <div style={{flex:1,minWidth:0}}>
-                            <div style={{fontWeight:600,fontSize:15,color:'var(--ink-deep)',marginBottom:4}}>{it.name}</div>
+                            <div style={{fontWeight:600,fontSize:16,color:'var(--ink-deep)',marginBottom:4}}>{it.name}</div>
                             <div className="row" style={{gap:6,flexWrap:'wrap'}}>
                               <span className="row" style={{gap:4}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:12,color:'var(--slate)'}}>{u.short}</span></span>
                               <span style={{fontSize:12,color:'var(--steel)'}}>·</span>
@@ -1007,20 +1007,20 @@ function MonthPicker({value,onChange,editing}:{value:string,onChange:(v:string)=
     <div style={{position:'relative',minWidth:0}} ref={ref}>
       <div className={`input ${editing?'is-editing':''}`} style={{display:'flex',alignItems:'center',gap:4,padding:'0 8px',cursor:'text',minWidth:0,width:'100%',overflow:'hidden'}}>
         <input value={value} onChange={handleText} placeholder="YYYY-MM" maxLength={7} size={1} style={{flex:1,minWidth:0,border:'none',outline:'none',background:'transparent',font:'inherit',fontSize:14,color:'var(--ink)',padding:0}}/>
-        <button onClick={()=>{setOpen(o=>!o);if(value){const y=parseInt(value.slice(0,4));if(!isNaN(y))setViewYear(y);}}} style={{background:'none',border:'none',cursor:'pointer',padding:'2px 2px',color:'var(--slate)',display:'flex',alignItems:'center',flexShrink:0,fontSize:13}}>📅</button>
+        <button onClick={()=>{setOpen(o=>!o);if(value){const y=parseInt(value.slice(0,4));if(!isNaN(y))setViewYear(y);}}} style={{background:'none',border:'none',cursor:'pointer',padding:'2px 2px',color:'var(--slate)',display:'flex',alignItems:'center',flexShrink:0,fontSize:12}}>📅</button>
       </div>
       {open&&(
         <div className="card" style={{position:'absolute',top:'calc(100% + 4px)',left:0,right:0,zIndex:30,padding:14,boxShadow:'var(--shadow-2)'}}>
           <div className="row between" style={{marginBottom:12,alignItems:'center'}}>
             <button onClick={()=>setViewYear(y=>y-1)} style={{background:'none',border:'none',cursor:'pointer',fontSize:16,color:'var(--charcoal)',padding:'2px 8px',borderRadius:'var(--r-sm)'}}>◀</button>
-            <span style={{fontWeight:600,fontSize:15,color:'var(--ink-deep)'}}>{viewYear}년</span>
+            <span style={{fontWeight:600,fontSize:16,color:'var(--ink-deep)'}}>{viewYear}년</span>
             <button onClick={()=>setViewYear(y=>y+1)} style={{background:'none',border:'none',cursor:'pointer',fontSize:16,color:'var(--charcoal)',padding:'2px 8px',borderRadius:'var(--r-sm)'}}>▶</button>
           </div>
           <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:6}}>
             {months.map((m,i)=>{
               const mon=String(i+1).padStart(2,'0');
               const isSel=selectedYear===String(viewYear)&&selectedMonth===mon;
-              return (<button key={m} onClick={()=>select(i+1)} style={{padding:'8px 4px',borderRadius:'var(--r-md)',border:isSel?'2px solid var(--primary)':'1px solid var(--hairline)',background:isSel?'var(--primary-soft)':'var(--canvas)',color:isSel?'var(--primary-deep)':'var(--charcoal)',fontWeight:isSel?600:400,fontSize:13,cursor:'pointer',fontFamily:'inherit'}}>{m}</button>);
+              return (<button key={m} onClick={()=>select(i+1)} style={{padding:'8px 4px',borderRadius:'var(--r-md)',border:isSel?'2px solid var(--primary)':'1px solid var(--hairline)',background:isSel?'var(--primary-soft)':'var(--canvas)',color:isSel?'var(--primary-deep)':'var(--charcoal)',fontWeight:isSel?600:400,fontSize:12,cursor:'pointer',fontFamily:'inherit'}}>{m}</button>);
             })}
           </div>
         </div>
@@ -1067,7 +1067,7 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
           {!isEdit&&prefill?.space&&(
             <div className="card" style={{padding:16,background:'var(--tint-lavender)',border:'1px solid var(--brand-purple-300)'}}>
               <div className="row" style={{gap:10}}><span style={{width:22,height:22,borderRadius:'50%',background:'var(--primary)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:700,flexShrink:0}}>!</span>
-              <span style={{fontSize:13,color:'var(--brand-purple-800)'}}>공간 조회에서 <b>{prefill.space} / {prefill.group} / {prefill.cell}</b>의 신규 등록으로 이동했습니다. 위치 정보가 자동 입력되었습니다.</span></div>
+              <span style={{fontSize:14,color:'var(--brand-purple-800)'}}>공간 조회에서 <b>{prefill.space} / {prefill.group} / {prefill.cell}</b>의 신규 등록으로 이동했습니다. 위치 정보가 자동 입력되었습니다.</span></div>
             </div>
           )}
           <div className="card" style={{padding:24}}>
@@ -1108,7 +1108,7 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
               <div style={{fontSize:12,fontWeight:600,color:'var(--steel)',marginBottom:8}}>시스템 정보</div>
               <div className="row wrap" style={{gap:32}}>
                 {[['최초 등록일',item.createdAt],['최종 수정일',item.updatedAt],['최종 수정인',item.updatedBy],['품목 ID',`#${item.id}`]].map(([l,v])=>(
-                  <div key={l} className="col"><span style={{fontSize:11,color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>{l}</span><span style={{fontSize:13,fontWeight:500,marginTop:2}}>{v}</span></div>
+                  <div key={l} className="col"><span style={{fontSize:11,color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>{l}</span><span style={{fontSize:14,fontWeight:500,marginTop:2}}>{v}</span></div>
                 ))}
               </div>
             </div>
@@ -1120,7 +1120,7 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
         <div style={{padding:28}}>
           <div className="row" style={{gap:12,marginBottom:16}}>
             <div style={{width:40,height:40,borderRadius:'50%',background:'var(--tint-rose)',color:'var(--brand-pink-deep)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><IC.alert/></div>
-            <div><div style={{fontSize:16,fontWeight:600}}>이 품목을 삭제할까요?</div><div style={{fontSize:13,color:'var(--slate)',marginTop:2}}>{form.name}</div></div>
+            <div><div style={{fontSize:16,fontWeight:600}}>이 품목을 삭제할까요?</div><div style={{fontSize:14,color:'var(--slate)',marginTop:2}}>{form.name}</div></div>
           </div>
           <div className="row between">
             <button className="btn btn-danger" onClick={()=>{if(onDelete&&item)onDelete(item.id);setDelM(false);}}><IC.trash/> 삭제</button>
@@ -1128,7 +1128,7 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
           </div>
         </div>
       </Modal>
-      {saved&&<div style={{position:'fixed',bottom:28,right:28,zIndex:200,background:'var(--ink-deep)',color:'#fff',padding:'10px 18px',borderRadius:'var(--r-md)',fontSize:13,fontWeight:500,boxShadow:'var(--shadow-2)'}}>{isEdit?'저장되었습니다':'등록되었습니다'}</div>}
+      {saved&&<div style={{position:'fixed',bottom:28,right:28,zIndex:200,background:'var(--ink-deep)',color:'#fff',padding:'10px 18px',borderRadius:'var(--r-md)',fontSize:12,fontWeight:500,boxShadow:'var(--shadow-2)'}}>{isEdit?'저장되었습니다':'등록되었습니다'}</div>}
     </div>
   );
 }
@@ -1396,11 +1396,11 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
               <span className="badge" style={{background:u.color,color:'#fff'}}>{u.name}</span>
               <h2 className="mobile-h2" style={{margin:'12px 0 6px',fontSize:28,fontWeight:600,color:'var(--ink-deep)'}}>{item.name}</h2>
               <div style={{fontSize:14,color:'var(--charcoal)'}}><span style={{color:'var(--slate)'}}>위치</span> <b>{item.space} / {item.group} / {item.cell}</b></div>
-              {item.note&&<div style={{marginTop:12,padding:'10px 14px',background:'var(--tint-yellow)',borderRadius:'var(--r-md)',fontSize:13}}>📌 {item.note}</div>}
+              {item.note&&<div style={{marginTop:12,padding:'10px 14px',background:'var(--tint-yellow)',borderRadius:'var(--r-md)',fontSize:14}}>📌 {item.note}</div>}
             </div>
             <div style={{background:isLow?'var(--tint-rose)':'var(--tint-mint)',borderRadius:'var(--r-lg)',padding:'18px 20px',display:'flex',flexDirection:'column',justifyContent:'center'}}>
               <div style={{fontSize:12,fontWeight:600,color:isLow?'var(--brand-pink-deep)':'var(--brand-green)'}}>{isLow?'재고 부족':'재고 양호'}</div>
-              <div style={{fontSize:38,fontWeight:600,color:'var(--ink-deep)',marginTop:4}}>{item.qty}{item.min!=null&&<span style={{fontSize:18,color:'var(--slate)',fontWeight:500}}> / {item.min}</span>}</div>
+              <div style={{fontSize:36,fontWeight:600,color:'var(--ink-deep)',marginTop:4,display:'flex',alignItems:'baseline',gap:4}}>{item.qty}{item.min!=null&&<span style={{fontSize:18,color:'var(--slate)',fontWeight:500}}> / {item.min}</span>}</div>
               <div style={{fontSize:12,color:'var(--slate)',marginTop:4}}>{item.min!=null?'현재 / 최소':'현재 수량'}</div>
             </div>
           </div>
@@ -1421,7 +1421,7 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
           <div className="card" style={{padding:16,background:'var(--surface)',marginBottom:0}}>
             <div className="row wrap" style={{gap:'12px 32px'}}>
               {[['최초 등록일',item.createdAt],['최종 수정일',item.updatedAt],['최종 수정인',item.updatedBy],['품목 ID',`#${item.id}`]].map(([l,v])=>(
-                <div key={l} className="col"><span style={{fontSize:11,color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>{l}</span><span style={{fontSize:13,fontWeight:500,marginTop:2}}>{v}</span></div>
+                <div key={l} className="col"><span style={{fontSize:11,color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>{l}</span><span style={{fontSize:14,fontWeight:500,marginTop:2}}>{v}</span></div>
               ))}
             </div>
           </div>
@@ -1432,7 +1432,7 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
         <div style={{padding:28}}>
           <div className="row" style={{gap:12,marginBottom:16}}>
             <div style={{width:40,height:40,borderRadius:'50%',background:'var(--tint-rose)',color:'var(--brand-pink-deep)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><IC.alert/></div>
-            <div><div style={{fontSize:16,fontWeight:600}}>이 품목을 삭제할까요?</div><div style={{fontSize:13,color:'var(--slate)',marginTop:2}}>{item.name}</div></div>
+            <div><div style={{fontSize:16,fontWeight:600}}>이 품목을 삭제할까요?</div><div style={{fontSize:14,color:'var(--slate)',marginTop:2}}>{item.name}</div></div>
           </div>
           <div className="row between">
             <button className="btn btn-danger" onClick={()=>{onDelete(item.id);setDelM(false);}}><IC.trash/> 삭제</button>
@@ -1522,7 +1522,7 @@ export default function App() {
           <div className="card" style={{padding:36,maxWidth:400,textAlign:'center',color:'var(--ink)'}}>
             <div style={{fontSize:32,marginBottom:16}}>🚫</div>
             <div style={{fontSize:18,fontWeight:600,marginBottom:8}}>접근 권한 없음</div>
-            <p style={{fontSize:13,color:'var(--slate)',marginBottom:24}}>이 이메일은 접근이 허용되지 않습니다.<br/>관리자에게 권한을 요청하세요.</p>
+            <p style={{fontSize:14,color:'var(--slate)',marginBottom:24}}>이 이메일은 접근이 허용되지 않습니다.<br/>관리자에게 권한을 요청하세요.</p>
             <button className="btn btn-secondary" onClick={()=>setAccessDenied(false)}>다른 계정으로 로그인</button>
           </div>
         </div>
