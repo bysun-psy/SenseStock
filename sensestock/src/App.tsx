@@ -876,7 +876,7 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
       <div className="mobile-pad-x" style={{padding:'12px 32px',background:'var(--surface)',borderBottom:'1px solid var(--hairline)',flexShrink:0}}>
         <div className="row wrap" style={{gap:8}}>
           <span style={{fontSize:12,fontWeight:600,color:'var(--steel)'}}>용도</span>
-          {USES.map(u=><div key={u.id} className="row" style={{gap:4}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:11,color:'var(--charcoal)'}}>{u.short}</span></div>)}
+          {USES.map(u=><div key={u.id} className="row" style={{gap:4}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:12,color:'var(--charcoal)'}}>{u.short}</span></div>)}
           <span style={{marginLeft:'auto',fontSize:11,color:'var(--steel)',whiteSpace:'nowrap'}}>셀 색 = 최다 용도</span>
         </div>
       </div>
