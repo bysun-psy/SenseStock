@@ -32,13 +32,13 @@ const SIDEBAR_CSS = `
     .ss-aside { display:none !important; }
     .bottom-nav { display:flex !important; position:fixed; bottom:0; left:0; right:0; height:60px; background:var(--canvas); border-top:1px solid var(--hairline); z-index:50; align-items:stretch; }
     .bottom-nav-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; border:none; background:transparent; cursor:pointer; font-family:inherit; font-size:12px; font-weight:500; color:var(--slate); padding:0; }
-    .bottom-nav-item.active { color:var(--primary); }
+    .bottom-nav-item.active { color:var(--primary); font-weight: 600; }
     .bottom-nav-item.active .bnav-icon { color:var(--primary); }
     .bnav-icon { color:var(--slate); display:flex; }
     .mobile-content { padding-bottom:100px !important; }
     .app { height:100dvh !important; }
     .mobile-topbar { padding:14px 16px !important; }
-    .mobile-topbar h1 { font-size:20px !important; white-space:nowrap; overflow:visible !important; text-overflow:clip !important; }
+    .mobile-topbar h1 { font-size:22px !important; white-space:nowrap; overflow:visible !important; text-overflow:clip !important; }
     .mobile-topbar .topbar-sub { display:none; }
     .mobile-topbar .topbar-actions { gap:6px !important; flex-shrink:1 !important; min-width:0; }
     .mobile-topbar .topbar-actions .btn { flex-shrink:0; }
@@ -690,12 +690,12 @@ function Search({items,onItemClick,onDelete}) {
                     <span style={{fontSize:12,color:'var(--steel)'}}>·</span>
                     <span style={{fontSize:12,color:'var(--slate)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.space} / {it.group} / {it.cell}</span>
                   </div>
-                  {it.note&&<div style={{fontSize:11,color:'var(--steel)',marginTop:2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.note}</div>}
+                  {it.note&&<div style={{fontSize:12,color:'var(--steel)',marginTop:2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.note}</div>}
                 </div>
                 <div style={{textAlign:'right',flexShrink:0}}>
                   <div style={{fontWeight:600,fontSize:15,color:isLow?'var(--error)':'var(--ink-deep)'}}>{it.qty}{it.min!=null&&<span style={{fontSize:12,color:'var(--slate)',fontWeight:400}}> / {it.min}</span>}</div>
-                  {isLow&&<div style={{fontSize:10,color:'var(--error)',fontWeight:600}}>재고 부족</div>}
-                  <div style={{fontSize:11,color:'var(--steel)',marginTop:1}}>{it.received}</div>
+                  {isLow&&<div style={{fontSize:11,color:'var(--error)',fontWeight:600}}>재고 부족</div>}
+                  <div style={{fontSize:12,color:'var(--steel)',marginTop:1}}>{it.received}</div>
                 </div>
               </div>
             );
