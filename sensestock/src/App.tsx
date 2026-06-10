@@ -23,22 +23,20 @@ const SIDEBAR_CSS = `
   .ss-aside.collapsed .ss-avatar { margin:0 auto; }
   .ss-logo-name,.ss-nav-label,.ss-user-info,.ss-logout-btn { opacity:1; transition:opacity 0.15s; overflow:hidden; white-space:nowrap; }
   .ss-nav-item { position:relative; min-height:36px; }
-  .ss-tooltip { display:none; position:absolute; left:calc(100% + 8px); top:50%; transform:translateY(-50%); background:#2D2D2D; color:#fff; font-size:12px; font-weight:500; padding:4px 8px; border-radius:6px; white-space:nowrap; pointer-events:none; z-index:100; }
-  .ss-aside.collapsed .ss-nav-item:hover .ss-tooltip { display:block; }
   .ss-toggle-btn { width:24px; height:24px; border-radius:6px; background:none; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--slate); flex-shrink:0; padding:0; }
   .bottom-nav { display:none; }
   .desktop-hide { display:none; }
   @media (max-width:768px) {
     .ss-aside { display:none !important; }
     .bottom-nav { display:flex !important; position:fixed; bottom:0; left:0; right:0; height:60px; background:var(--canvas); border-top:1px solid var(--hairline); z-index:50; align-items:stretch; }
-    .bottom-nav-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; border:none; background:transparent; cursor:pointer; font-family:inherit; font-size:10px; font-weight:500; color:var(--slate); padding:0; }
-    .bottom-nav-item.active { color:var(--primary); }
+    .bottom-nav-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; border:none; background:transparent; cursor:pointer; font-family:inherit; font-size:12px; font-weight:500; color:var(--slate); padding:0; }
+    .bottom-nav-item.active { color:var(--primary); font-weight:600; }
     .bottom-nav-item.active .bnav-icon { color:var(--primary); }
     .bnav-icon { color:var(--slate); display:flex; }
     .mobile-content { padding-bottom:100px !important; }
-    .app { height:100dvh !important; }
+    .app { height:100dvh !important; padding-bottom:60px !important; }
     .mobile-topbar { padding:14px 16px !important; }
-    .mobile-topbar h1 { font-size:17px !important; white-space:nowrap; overflow:visible !important; text-overflow:clip !important; }
+    .mobile-topbar h1 { font-size:22px !important; white-space:nowrap; overflow:visible !important; text-overflow:clip !important; }
     .mobile-topbar .topbar-sub { display:none; }
     .mobile-topbar .topbar-actions { gap:6px !important; flex-shrink:1 !important; min-width:0; }
     .mobile-topbar .topbar-actions .btn { flex-shrink:0; }
@@ -71,34 +69,42 @@ const STYLE_SHEET = `
   --use-6:#E69A1F; --use-7:#F4D31E; --use-8:#2BAA50; --use-9:#2B7FD3; --use-10:#1A2E5C; --use-11:#A1318C;
   --r-sm:6px; --r-md:8px; --r-lg:12px; --r-full:9999px;
   --shadow-2:0 4px 12px rgba(15,15,15,.08); --shadow-3:0 24px 48px -8px rgba(15,15,15,.20); --shadow-4:0 16px 48px -8px rgba(15,15,15,.16);
+  --fs-body:14px; --fs-sm:12px; --fs-label:12px; --fs-btn:14px; --fs-nav:14px; --fs-input:14px; --fs-section:16px; --fs-topbar:22px; --fs-table:13px;
+  --h-btn:36px; --h-btn-sm:30px; --h-btn-ghost:32px; --h-topbar:72px;
+}
+@media (min-width:769px) {
+  :root {
+    --fs-body:16px; --fs-sm:14px; --fs-label:13px; --fs-btn:15px; --fs-nav:15px; --fs-input:15px; --fs-section:18px; --fs-topbar:24px; --fs-table:14px;
+    --h-btn:40px; --h-btn-sm:34px; --h-btn-ghost:36px; --h-topbar:88px;
+  }
 }
 *{box-sizing:border-box}
 body,#root{margin:0;padding:0}
-.app{font-family:'Pretendard','Inter',-apple-system,system-ui,sans-serif;color:var(--ink);background:var(--surface);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased;height:100vh;height:100dvh;overflow:hidden}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:36px;padding:0 14px;border-radius:var(--r-md);font-size:14px;font-weight:500;border:1px solid transparent;cursor:pointer;white-space:nowrap;font-family:inherit;transition:background 120ms}
+.app{font-family:'Pretendard','Inter',-apple-system,system-ui,sans-serif;color:var(--ink);background:var(--surface);font-size:var(--fs-body);line-height:1.55;-webkit-font-smoothing:antialiased;height:100vh;height:100dvh;overflow:hidden}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:var(--h-btn);padding:0 14px;border-radius:var(--r-md);font-size:var(--fs-btn);font-weight:500;border:1px solid transparent;cursor:pointer;white-space:nowrap;font-family:inherit;transition:background 120ms}
 .btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-pressed)}
 .btn-primary:disabled{background:var(--hairline-strong);color:var(--steel);cursor:not-allowed}
 .btn-secondary{background:var(--canvas);color:var(--ink);border-color:var(--hairline-strong)}.btn-secondary:hover{background:var(--surface)}
 .btn-secondary:disabled{color:var(--stone);cursor:not-allowed}
-.btn-ghost{background:transparent;color:var(--ink);padding:0 10px;height:32px;border:none}.btn-ghost:hover{background:var(--surface)}
+.btn-ghost{background:transparent;color:var(--ink);padding:0 10px;height:var(--h-btn-ghost);border:none}.btn-ghost:hover{background:var(--surface)}
 .btn-danger{background:var(--canvas);color:var(--error);border-color:#EBC7C7}.btn-danger:hover{background:#FCEFEF}
-.btn-sm{height:30px;padding:0 10px;font-size:13px}
-.btn-icon{width:32px;height:32px;padding:0}
-.input,.select,.textarea{width:100%;height:40px;padding:0 12px;border-radius:var(--r-md);border:1px solid var(--hairline-strong);background:var(--canvas);color:var(--ink);font:inherit;font-size:14px;outline:none;transition:border-color 120ms}
+.btn-sm{height:var(--h-btn-sm);padding:0 10px;font-size:var(--fs-btn)}
+.btn-icon{width:var(--h-btn-ghost);height:var(--h-btn-ghost);padding:0}
+.input,.select,.textarea{width:100%;height:40px;padding:0 12px;border-radius:var(--r-md);border:1px solid var(--hairline-strong);background:var(--canvas);color:var(--ink);font:inherit;font-size:var(--fs-input);outline:none;transition:border-color 120ms}
 .textarea{height:auto;padding:10px 12px;resize:vertical;min-height:80px}
 .input::placeholder{color:var(--stone)}
 .input:focus,.select:focus,.textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(100,87,231,.16)}
 .is-editing{background:#FFFDF5!important;border-color:var(--brand-yellow)!important;box-shadow:0 0 0 3px rgba(229,183,45,.18)!important}
-.search-pill{height:44px;padding:0 14px 0 40px;border-radius:var(--r-md);border:1px solid var(--hairline);background:var(--surface);font:inherit;font-size:14px;outline:none;width:100%}
+.search-pill{height:44px;padding:0 14px 0 40px;border-radius:var(--r-md);border:1px solid var(--hairline);background:var(--surface);font:inherit;font-size:var(--fs-input);outline:none;width:100%}
 .search-pill:focus{background:var(--canvas);border-color:var(--primary)}
-.field-label{display:block;font-size:12px;font-weight:600;color:var(--charcoal);margin-bottom:6px;white-space:nowrap}
+.field-label{display:block;font-size:var(--fs-label);font-weight:500;color:var(--charcoal);margin-bottom:6px;white-space:nowrap}
 .card{background:var(--canvas);border:1px solid var(--hairline);border-radius:var(--r-lg)}
-.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:var(--r-full);font-size:12px;font-weight:600;white-space:nowrap}
-.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:var(--r-full);background:var(--canvas);border:1px solid var(--hairline);font-size:12px;font-weight:500;cursor:pointer;transition:background 120ms;white-space:nowrap;font-family:inherit}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:var(--r-full);font-size:var(--fs-label);font-weight:600;white-space:nowrap}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:var(--r-full);background:var(--canvas);border:1px solid var(--hairline);font-size:var(--fs-label);font-weight:500;cursor:pointer;transition:background 120ms;white-space:nowrap;font-family:inherit}
 .chip:hover{background:var(--surface)}
 .chip.active{background:var(--ink-deep);color:#fff;border-color:var(--ink-deep)}
 .table{width:100%;border-collapse:separate;border-spacing:0}
-.table thead th{text-align:left;padding:12px 16px;font-size:12px;font-weight:600;color:var(--slate);border-bottom:1px solid var(--hairline);background:var(--surface-soft);position:sticky;top:0;z-index:1}
+.table thead th{text-align:left;padding:12px 16px;font-size:var(--fs-label);font-weight:500;color:var(--slate);border-bottom:1px solid var(--hairline);background:var(--surface-soft);position:sticky;top:0;z-index:1}
 .table tbody td{padding:12px 16px;border-bottom:1px solid var(--hairline-soft);vertical-align:middle}
 .table tbody tr{cursor:pointer}
 .table tbody tr:hover td{background:var(--surface-soft)}
@@ -330,10 +336,10 @@ function Modal({open,onClose,children,width=440}) {
 }
 function Topbar({title,sub,action}) {
   return (
-    <div className="row between mobile-topbar" style={{padding:'20px 32px',background:'var(--canvas)',borderBottom:'1px solid var(--hairline)',gap:16,flexShrink:0}}>
+    <div className="row between mobile-topbar" style={{height:'var(--h-topbar)',padding:'0 32px',background:'var(--canvas)',borderBottom:'1px solid var(--hairline)',gap:16,flexShrink:0}}>
       <div style={{minWidth:0,flex:1}}>
-        <h1 style={{margin:0,fontSize:24,fontWeight:600,color:'var(--ink-deep)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{title}</h1>
-        {sub&&<div className="topbar-sub" style={{fontSize:14,color:'var(--slate)',marginTop:2}}>{sub}</div>}
+        <h1 style={{margin:0,fontSize:'var(--fs-topbar)',fontWeight:600,color:'var(--ink-deep)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{title}</h1>
+        {sub&&<div className="topbar-sub" style={{fontSize:'var(--fs-sm)',color:'var(--slate)',marginTop:2}}>{sub}</div>}
       </div>
       {action&&<div className="topbar-actions row" style={{flexShrink:0,gap:12,flexWrap:'nowrap'}}>{action}</div>}
     </div>
@@ -344,7 +350,7 @@ function Field({label,required,err,children}) {
     <div style={{minWidth:0}}>
       <label className="field-label">{label}{required&&<span style={{color:'var(--brand-pink-deep)'}}> *</span>}</label>
       {children}
-      {err&&<div style={{fontSize:12,color:'var(--error)',marginTop:4}}>{err}</div>}
+      {err&&<div style={{fontSize:'var(--fs-label)',color:'var(--error)',marginTop:4}}>{err}</div>}
     </div>
   );
 }
@@ -388,7 +394,7 @@ function Login() {
         <div style={{marginBottom:20}}>
           <span style={{fontSize:'clamp(36px,5vw,56px)',fontWeight:600,lineHeight:1.1,letterSpacing:'-1px',background:'linear-gradient(90deg,var(--brand-yellow),var(--brand-orange))',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>SenseStock</span>
         </div>
-        <p style={{color:'var(--on-dark-muted)',fontSize:16,lineHeight:1.6}}>
+        <p style={{color:'var(--on-dark-muted)',fontSize:'var(--fs-section)',lineHeight:1.6}}>
           누군가의 기억 대신, 팀이 함께 보는 위치·재고 정보.<br/>
           SenseStock은 관능평가실 비품을 모두가 독립적으로 찾을 수 있게 합니다.
         </p>
@@ -396,12 +402,12 @@ function Login() {
       <div style={{position:'relative',zIndex:2,width:'100%',maxWidth:420}}>
         <div className="card" style={{padding:36,background:'var(--canvas)',color:'var(--ink)',boxShadow:'var(--shadow-3)'}}>
           <h2 style={{margin:'0 0 8px',fontSize:24,fontWeight:600,letterSpacing:'-0.3px'}}>로그인</h2>
-          <p style={{margin:'0 0 28px',fontSize:14,color:'var(--slate)'}}>허가된 Google 계정으로만 접속할 수 있습니다.</p>
-          {err&&<div style={{background:'#FCEFEF',color:'var(--error)',border:'1px solid #EBC7C7',padding:'8px 12px',borderRadius:'var(--r-md)',fontSize:14,marginBottom:16}}>{err}</div>}
+          <p style={{margin:'0 0 28px',fontSize:'var(--fs-body)',color:'var(--slate)'}}>허가된 Google 계정으로만 접속할 수 있습니다.</p>
+          {err&&<div style={{background:'#FCEFEF',color:'var(--error)',border:'1px solid #EBC7C7',padding:'8px 12px',borderRadius:'var(--r-md)',fontSize:'var(--fs-body)',marginBottom:16}}>{err}</div>}
           <button
             onClick={handleGoogleLogin}
             disabled={loading}
-            style={{width:'100%',height:48,borderRadius:'var(--r-md)',border:'1px solid var(--hairline-strong)',background:'var(--canvas)',color:'var(--ink)',fontSize:16,fontWeight:500,cursor:loading?'not-allowed':'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:12,fontFamily:'inherit'}}
+            style={{width:'100%',height:48,borderRadius:'var(--r-md)',border:'1px solid var(--hairline-strong)',background:'var(--canvas)',color:'var(--ink)',fontSize:'var(--fs-section)',fontWeight:500,cursor:loading?'not-allowed':'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:12,fontFamily:'inherit'}}
           >
             <svg width="20" height="20" viewBox="0 0 48 48">
               <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.8 2.5 30.2 0 24 0 14.7 0 6.7 5.4 2.8 13.3l7.8 6C12.4 13 17.8 9.5 24 9.5z"/>
@@ -411,7 +417,7 @@ function Login() {
             </svg>
             {loading?'로그인 중...':'Google 계정으로 로그인'}
           </button>
-          <div style={{marginTop:20,fontSize:12,color:'var(--steel)',textAlign:'center'}}>
+          <div style={{marginTop:20,fontSize:'var(--fs-sm)',color:'var(--steel)',textAlign:'center'}}>
             외부 회원가입은 제공하지 않습니다.<br/>접속 권한은 관리자에게 요청하세요.
           </div>
         </div>
@@ -422,6 +428,7 @@ function Login() {
 
 function Sidebar({cur,onNav,user,onLogout}) {
   const [collapsed,setCollapsed]=useState(false);
+  const [tooltip,setTooltip]=useState<{label:string,y:number}|null>(null);
   const navItems=[
     {id:'search',label:'품목 찾기',I:IC.list},
     {id:'space',label:'공간 조회',I:IC.map},
@@ -429,38 +436,51 @@ function Sidebar({cur,onNav,user,onLogout}) {
     {id:'dashboard',label:'대시 보드',I:IC.dash},
   ];
   return (
-    <aside className={`ss-aside${collapsed?' collapsed':''}`} style={{width:240,background:'var(--surface)',borderRight:'1px solid var(--hairline)',display:'flex',flexDirection:'column',flexShrink:0}}>
-      <div className="row between" style={{padding:'18px 14px 18px 16px',borderBottom:'1px solid var(--hairline-soft)',minHeight:62,flexShrink:0}}>
-        <div className="row" style={{gap:10,overflow:'hidden'}}>
-          <span className="ss-logo-name" style={{fontSize:20,fontWeight:600,color:'var(--ink-deep)'}}>SenseStock</span>
+    <>
+      <aside className={`ss-aside${collapsed?' collapsed':''}`} style={{width:240,background:'var(--surface)',borderRight:'1px solid var(--hairline)',display:'flex',flexDirection:'column',flexShrink:0}}>
+        <div className="row between" style={{height:'var(--h-topbar)',padding:'0 14px 0 16px',borderBottom:'1px solid var(--hairline-soft)',flexShrink:0}}>
+          <div className="row" style={{gap:10,overflow:'hidden'}}>
+            <span className="ss-logo-name" style={{fontSize:22,fontWeight:600,color:'var(--ink-deep)'}}>SenseStock</span>
+          </div>
+          <button className="ss-toggle-btn" onClick={()=>setCollapsed(c=>!c)}>
+            <SidebarToggleIcon open={!collapsed}/>
+          </button>
         </div>
-        <button className="ss-toggle-btn" onClick={()=>setCollapsed(c=>!c)}>
-          <SidebarToggleIcon open={!collapsed}/>
-        </button>
-      </div>
-      <nav style={{padding:'8px 6px',display:'flex',flexDirection:'column',gap:2,flex:1,overflow:'auto'}}>
-        {navItems.map(({id,label,I})=>{
-          const a=cur===id||(id==='search'&&cur==='detail');
-          return (
-            <button key={id} onClick={()=>onNav(id)} className="ss-nav-item row" style={{gap:10,padding:'8px',borderRadius:'var(--r-md)',background:a?'var(--primary-soft)':'transparent',color:a?'var(--primary-deep)':'var(--charcoal)',fontWeight:a?600:500,fontSize:14,border:'none',cursor:'pointer',textAlign:'left',fontFamily:'inherit',width:'100%'}}>
-              <span style={{color:a?'var(--primary)':'var(--slate)',display:'flex',width:20,justifyContent:'center',flexShrink:0}}><I/></span>
-              <span className="ss-nav-label">{label}</span>
-              <span className="ss-tooltip">{label}</span>
-            </button>
-          );
-        })}
-      </nav>
-      <div className="row" style={{borderTop:'1px solid var(--hairline-soft)',padding:'12px 6px',gap:10,flexShrink:0}}>
-        <div className="ss-avatar" style={{width:32,height:32,borderRadius:'50%',background:'var(--tint-lavender)',color:'var(--brand-purple-800)',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:600,fontSize:14,flexShrink:0}}>
-          {user?.name?.[0]||'U'}
+        <nav style={{padding:'8px 6px',display:'flex',flexDirection:'column',gap:2,flex:1,overflow:'auto'}}>
+          {navItems.map(({id,label,I})=>{
+            const a=cur===id||(id==='search'&&cur==='detail');
+            return (
+              <button
+                key={id}
+                onClick={()=>onNav(id)}
+                className="ss-nav-item row"
+                onMouseEnter={e=>{if(collapsed){const r=e.currentTarget.getBoundingClientRect();setTooltip({label,y:r.top+r.height/2});}}}
+                onMouseLeave={()=>setTooltip(null)}
+                style={{gap:10,padding:'8px',borderRadius:'var(--r-md)',background:a?'var(--primary-soft)':'transparent',color:a?'var(--primary-deep)':'var(--charcoal)',fontWeight:a?600:500,fontSize:'var(--fs-nav)',border:'none',cursor:'pointer',textAlign:'left',fontFamily:'inherit',width:'100%'}}
+              >
+                <span style={{color:a?'var(--primary)':'var(--slate)',display:'flex',width:20,justifyContent:'center',flexShrink:0}}><I/></span>
+                <span className="ss-nav-label">{label}</span>
+              </button>
+            );
+          })}
+        </nav>
+        <div className="row" style={{borderTop:'1px solid var(--hairline-soft)',padding:'12px 6px',gap:10,flexShrink:0}}>
+          <div className="ss-avatar" style={{width:32,height:32,borderRadius:'50%',background:'var(--tint-lavender)',color:'var(--brand-purple-800)',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:600,fontSize:'var(--fs-label)',flexShrink:0}}>
+            {user?.name?.[0]||'U'}
+          </div>
+          <div className="ss-user-info col flex1">
+            <span style={{fontSize:'var(--fs-nav)',fontWeight:600,color:'var(--charcoal)'}}>{user?.name}</span>
+            <span style={{fontSize:'var(--fs-label)',color:'var(--steel)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{user?.email}</span>
+          </div>
+          <button className="ss-logout-btn btn btn-ghost btn-icon" onClick={onLogout} style={{color:'var(--slate)',flexShrink:0}}><IC.logout/></button>
         </div>
-        <div className="ss-user-info col flex1">
-          <span style={{fontSize:14,fontWeight:600,color:'var(--charcoal)'}}>{user?.name}</span>
-          <span style={{fontSize:11,color:'var(--steel)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{user?.email}</span>
+      </aside>
+      {collapsed&&tooltip&&(
+        <div style={{position:'fixed',left:60,top:tooltip.y,transform:'translateY(-50%)',background:'#2D2D2D',color:'#fff',fontSize:'var(--fs-sm)',fontWeight:500,lineHeight:1.4,padding:'4px 8px',borderRadius:6,whiteSpace:'nowrap',pointerEvents:'none',zIndex:200}}>
+          {tooltip.label}
         </div>
-        <button className="ss-logout-btn btn btn-ghost btn-icon" onClick={onLogout} style={{color:'var(--slate)',flexShrink:0}}><IC.logout/></button>
-      </div>
-    </aside>
+      )}
+    </>
   );
 }
 
@@ -480,7 +500,7 @@ function Donut({data,total,size=160}) {
       </svg>
       <div style={{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center'}}>
         <span style={{fontSize:24,fontWeight:600,color:'var(--ink-deep)'}}>{total}</span>
-        <span style={{fontSize:11,color:'var(--steel)'}}>총 품목</span>
+        <span style={{fontSize:'var(--fs-label)',color:'var(--steel)'}}>총 품목</span>
       </div>
     </div>
   );
@@ -499,23 +519,23 @@ function Dashboard({items,activity,onNav,onItemClick}) {
       <div className={`mobile-content mobile-pad`} style={{flex:1,overflow:'auto',padding:32,paddingBottom:100}}>
         <div className="mobile-grid-1" style={{display:'grid',gridTemplateColumns:'1fr 2.5fr',gap:16,marginBottom:16}}>
           <div className="card" style={{padding:24,display:'flex',flexDirection:'column',justifyContent:'center'}}>
-            <div style={{fontSize:12,color:'var(--slate)'}}>총 등록 품목</div>
+            <div style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}>총 등록 품목</div>
             <div style={{fontSize:45,fontWeight:600,color:'var(--ink-deep)',letterSpacing:'-1px',marginTop:8}}>{total}</div>
             <div className="row" style={{gap:6,marginTop:12}}>
-              <span style={{padding:'2px 8px',borderRadius:'var(--r-full)',background:'var(--tint-lavender)',color:'var(--brand-purple-800)',fontSize:11,fontWeight:600}}>+12</span>
-              <span style={{fontSize:12,color:'var(--steel)'}}>이번 달</span>
+              <span style={{padding:'2px 8px',borderRadius:'var(--r-full)',background:'var(--tint-lavender)',color:'var(--brand-purple-800)',fontSize:'var(--fs-label)',fontWeight:600}}>+12</span>
+              <span style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}>이번 달</span>
             </div>
           </div>
           <div className="card" style={{padding:24}}>
-            <div style={{fontWeight:600,fontSize:16,marginBottom:4}}>용도별 분포</div>
-            <div style={{fontSize:14,color:'var(--slate)',marginBottom:20}}>{USES.length}개 분류 · 총 {total}품목</div>
+            <div style={{fontWeight:600,fontSize:'var(--fs-section)',marginBottom:4}}>용도별 분포</div>
+            <div style={{fontSize:'var(--fs-body)',color:'var(--slate)',marginBottom:20}}>{USES.length}개 분류 · 총 {total}품목</div>
             {isMobile?(
               <div className="col" style={{gap:16,alignItems:'center'}}>
                 <Donut data={useData} total={total} size={140}/>
                 <div style={{width:'100%',display:'grid',gridTemplateColumns:'1fr 1fr',gap:'6px 12px'}}>
                   {useData.map(u=>(
                     <div key={u.name} className="row" style={{gap:6,padding:'3px 0',minWidth:0}}>
-                      <span className="swatch" style={{background:u.c,flexShrink:0}}/><span style={{flex:1,fontSize:12,color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.name}</span><span style={{fontSize:12,fontWeight:600,flexShrink:0}}>{u.v}</span>
+                      <span className="swatch" style={{background:u.c,flexShrink:0}}/><span style={{flex:1,fontSize:'var(--fs-sm)',color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.name}</span><span style={{fontSize:'var(--fs-sm)',fontWeight:600,flexShrink:0}}>{u.v}</span>
                     </div>
                   ))}
                 </div>
@@ -526,7 +546,7 @@ function Dashboard({items,activity,onNav,onItemClick}) {
                 <div style={{flex:1,display:'grid',gridTemplateColumns:'1fr 1fr',gap:'6px 24px'}}>
                   {useData.map(u=>(
                     <div key={u.name} className="row" style={{gap:8,padding:'4px 0'}}>
-                      <span className="swatch" style={{background:u.c}}/><span style={{flex:1,fontSize:14,color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.name}</span><span style={{fontSize:14,fontWeight:600}}>{u.v}</span>
+                      <span className="swatch" style={{background:u.c}}/><span style={{flex:1,fontSize:'var(--fs-body)',color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.name}</span><span style={{fontSize:'var(--fs-body)',fontWeight:600}}>{u.v}</span>
                     </div>
                   ))}
                 </div>
@@ -536,30 +556,30 @@ function Dashboard({items,activity,onNav,onItemClick}) {
         </div>
         <div className="mobile-grid-1" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16}}>
           <div className="card" style={{padding:24}}>
-            <div style={{fontWeight:600,fontSize:16,marginBottom:4}}>공간별 분포</div>
-            <div style={{fontSize:14,color:'var(--slate)',marginBottom:20}}>{SPACES.length}개 공간</div>
+            <div style={{fontWeight:600,fontSize:'var(--fs-section)',marginBottom:4}}>공간별 분포</div>
+            <div style={{fontSize:'var(--fs-body)',color:'var(--slate)',marginBottom:20}}>{SPACES.length}개 공간</div>
             <div className="row" style={{gap:isMobile?12:24,alignItems:'center',flexWrap:isMobile?'wrap':'nowrap'}}>
               <Donut data={spData} total={total} size={isMobile?100:160}/>
               <div className="col" style={{flex:1,gap:6,minWidth:0}}>
                 {spData.map(s=>(
                   <button key={s.name} onClick={()=>onNav('space',{space:s.name})} className="row" style={{gap:8,padding:'9px 12px',borderRadius:'var(--r-md)',border:'1px solid var(--hairline)',background:'var(--canvas)',cursor:'pointer',fontFamily:'inherit',minWidth:0}}>
-                    <span className="swatch" style={{background:s.c}}/><span style={{flex:1,fontSize:14,fontWeight:500,color:'var(--charcoal)'}}>{s.name}</span><span style={{fontSize:14,fontWeight:600}}>{s.v}</span><IC.chev/>
+                    <span className="swatch" style={{background:s.c}}/><span style={{flex:1,fontSize:'var(--fs-body)',fontWeight:500,color:'var(--charcoal)'}}>{s.name}</span><span style={{fontSize:'var(--fs-body)',fontWeight:600}}>{s.v}</span><IC.chev/>
                   </button>
                 ))}
               </div>
             </div>
           </div>
           <div className="card" style={{padding:24}}>
-            <div style={{fontWeight:600,fontSize:16,marginBottom:16}}>최근 활동</div>
+            <div style={{fontWeight:600,fontSize:'var(--fs-section)',marginBottom:16}}>최근 활동</div>
             <div className="col">
               {activity.map((a,i)=>{
                 const d=aDot[a.action]||aDot.create;
                 return (
                   <div key={a.id} className="row" style={{gap:12,padding:'12px 0',borderBottom:i<activity.length-1?'1px solid var(--hairline-soft)':'none',alignItems:'flex-start'}}>
-                    <div style={{width:24,height:24,borderRadius:'50%',background:d.bg,color:d.fg,display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,fontWeight:700,flexShrink:0,marginTop:1}}>{d.l}</div>
+                    <div style={{width:24,height:24,borderRadius:'50%',background:d.bg,color:d.fg,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'var(--fs-body)',fontWeight:700,flexShrink:0,marginTop:1}}>{d.l}</div>
                     <div style={{minWidth:0}}>
-                      <div style={{fontSize:14,color:'var(--charcoal)',overflow:'hidden'}}><b>{a.user}</b>님이 <b>{a.name}</b>{a.action==='create'?'을 등록':a.action==='update'?'을 수정':'을 삭제'}했습니다.</div>
-                      <div style={{fontSize:12,color:'var(--steel)',marginTop:2}}>{a.time}</div>
+                      <div style={{fontSize:'var(--fs-body)',color:'var(--charcoal)',overflow:'hidden'}}><b>{a.user}</b>님이 <b>{a.name}</b>{a.action==='create'?'을 등록':a.action==='update'?'을 수정':'을 삭제'}했습니다.</div>
+                      <div style={{fontSize:'var(--fs-sm)',color:'var(--steel)',marginTop:2}}>{a.time}</div>
                     </div>
                   </div>
                 );
@@ -607,7 +627,7 @@ function Search({items,onItemClick,onDelete}) {
     <div className="col" style={{height:'100%'}}>
       <Topbar title="품목 찾기" sub={`전체 ${items.length}개 품목`} action={sel.size>0?(
         <div className="row" style={{gap:12}}>
-          <span style={{fontSize:14,color:'var(--slate)'}}>{sel.size}개 선택</span>
+          <span style={{fontSize:'var(--fs-body)',color:'var(--slate)'}}>{sel.size}개 선택</span>
           <button className="btn btn-secondary btn-sm" onClick={()=>setSel(new Set())}>해제</button>
           <button className="btn btn-danger btn-sm" onClick={()=>setDelModal(true)}><IC.trash/> 삭제</button>
         </div>):null}/>
@@ -615,15 +635,15 @@ function Search({items,onItemClick,onDelete}) {
         <div style={{position:'relative',maxWidth:640}}>
           <span style={{position:'absolute',left:12,top:'50%',transform:'translateY(-50%)',color:'var(--slate)',display:'flex'}}><IC.search/></span>
           <input className="search-pill" placeholder="품목명으로 검색…" value={q} onChange={e=>{setQ(e.target.value);setSubmitted(false);setSuggOpen(true);}} onFocus={()=>setSuggOpen(true)} onBlur={()=>setTimeout(()=>setSuggOpen(false),150)} onKeyDown={e=>e.key==='Enter'&&submit()}/>
-          <button className="btn btn-primary btn-sm" onClick={submit} style={{position:'absolute',right:6,top:'50%',transform:'translateY(-50%)',height:32}}>찾기</button>
+          <button className="btn btn-primary btn-sm" onClick={submit} style={{position:'absolute',right:6,top:'50%',transform:'translateY(-50%)',height:'var(--h-btn-sm)'}}>찾기</button>
           {suggOpen&&sugg.length>0&&(
             <div className="card" style={{position:'absolute',top:'calc(100% + 6px)',left:0,right:0,padding:6,zIndex:10,boxShadow:'var(--shadow-2)'}}>
-              <div style={{fontSize:12,fontWeight:600,color:'var(--steel)',padding:'4px 10px'}}>추천</div>
+              <div style={{fontSize:'var(--fs-sm)',fontWeight:600,color:'var(--steel)',padding:'4px 10px'}}>추천</div>
               {sugg.map(s=>{
                 const u=useById(s.useId);
                 return (
                   <button key={s.id} onMouseDown={()=>{setQ(s.name);submit();}} className="row" style={{gap:8,width:'100%',padding:'8px 10px',background:'transparent',border:'none',borderRadius:'var(--r-sm)',cursor:'pointer',fontFamily:'inherit',textAlign:'left'}} onMouseEnter={e=>e.currentTarget.style.background='var(--surface)'} onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
-                    <span className="swatch" style={{background:u.color,flexShrink:0}}/><span style={{fontSize:14,color:'var(--charcoal)',flex:1,textAlign:'left'}}>{hi(s.name,q)}</span><span style={{fontSize:12,color:'var(--slate)',flexShrink:0}}>{s.space}·{s.group}</span>
+                    <span className="swatch" style={{background:u.color,flexShrink:0}}/><span style={{fontSize:'var(--fs-table)',color:'var(--charcoal)',flex:1,textAlign:'left'}}>{hi(s.name,q)}</span><span style={{fontSize:'var(--fs-sm)',color:'var(--slate)',flexShrink:0}}>{s.space}·{s.group}</span>
                   </button>
                 );
               })}
@@ -631,13 +651,13 @@ function Search({items,onItemClick,onDelete}) {
           )}
         </div>
         <div className="row wrap" style={{gap:8,marginTop:12}}>
-          <span style={{fontSize:12,fontWeight:500,color:'var(--slate)'}}>용도</span>
+          <span style={{fontSize:'var(--fs-sm)',fontWeight:500,color:'var(--slate)'}}>용도</span>
           {USES.map(u=><button key={u.id} className={`chip ${uf.has(u.id)?'active':''}`} onClick={()=>tog(setUf,u.id)}><span className="swatch" style={{background:u.color}}/>{u.short}</button>)}
         </div>
         <div className="row wrap" style={{gap:8,marginTop:8}}>
-          <span style={{fontSize:12,fontWeight:500,color:'var(--slate)'}}>공간</span>
+          <span style={{fontSize:'var(--fs-sm)',fontWeight:500,color:'var(--slate)'}}>공간</span>
           {SPACES.map(s=><button key={s} className={`chip ${sf.has(s)?'active':''}`} onClick={()=>tog(setSf,s)}>{s}</button>)}
-          {(uf.size+sf.size+(q?1:0))>0&&<button style={{fontSize:12,color:'var(--link-blue)',background:'none',border:'none',cursor:'pointer'}} onClick={reset}>필터 초기화</button>}
+          {(uf.size+sf.size+(q?1:0))>0&&<button style={{fontSize:'var(--fs-sm)',color:'var(--link-blue)',background:'none',border:'none',cursor:'pointer'}} onClick={reset}>필터 초기화</button>}
         </div>
       </div>
       <div className="mobile-content mobile-scroll-x" style={{flex:1,overflow:'auto'}}>
@@ -657,12 +677,12 @@ function Search({items,onItemClick,onDelete}) {
               return (
                 <tr key={it.id} className={isSel?'sel':''} onClick={e=>{if(e.target.tagName==='INPUT') return; onItemClick(it);}}>
                   <td onClick={e=>{e.stopPropagation();tog(setSel,it.id);}}><input type="checkbox" checked={isSel} onChange={()=>{}}/></td>
-                  <td style={{maxWidth:220}}><div style={{fontWeight:500,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{q?hi(it.name,q):it.name}</div>{it.note&&<div style={{fontSize:12,color:'var(--steel)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.note}</div>}</td>
-                  <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color,flexShrink:0}}/><span style={{fontSize:14,color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.short}</span></span></td>
-                  <td><span style={{fontSize:14}}><b>{it.space}</b><span style={{color:'var(--slate)'}}> / {it.group} / {it.cell}</span></span></td>
-                  <td><span style={{fontSize:14,color:'var(--slate)',whiteSpace:'nowrap'}}>{it.spec||'–'}</span></td>
-                  <td style={{textAlign:'right'}}><span style={{fontWeight:600,color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:12,color:'var(--steel)'}}> / {it.min}</span>}{isLow&&<div style={{fontSize:11,color:'var(--error)',fontWeight:600}}>재고 부족</div>}</td>
-                  <td><span style={{fontSize:14,color:'var(--slate)',whiteSpace:'nowrap'}}>{it.received}</span></td>
+                  <td style={{maxWidth:220}}><div style={{fontWeight:500,fontSize:'var(--fs-table)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{q?hi(it.name,q):it.name}</div>{it.note&&<div style={{fontSize:'var(--fs-sm)',color:'var(--steel)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.note}</div>}</td>
+                  <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color,flexShrink:0}}/><span style={{fontSize:'var(--fs-table)',color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.short}</span></span></td>
+                  <td><span style={{fontSize:'var(--fs-table)'}}><b>{it.space}</b><span style={{color:'var(--slate)'}}> / {it.group} / {it.cell}</span></span></td>
+                  <td><span style={{fontSize:'var(--fs-table)',color:'var(--slate)',whiteSpace:'nowrap'}}>{it.spec||'–'}</span></td>
+                  <td style={{textAlign:'right'}}><span style={{fontWeight:600,fontSize:'var(--fs-table)',color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}> / {it.min}</span>}{isLow&&<div style={{fontSize:'var(--fs-label)',color:'var(--error)',fontWeight:600}}>재고 부족</div>}</td>
+                  <td><span style={{fontSize:'var(--fs-table)',color:'var(--slate)',whiteSpace:'nowrap'}}>{it.received}</span></td>
                 </tr>
               );
             })}
@@ -672,8 +692,8 @@ function Search({items,onItemClick,onDelete}) {
         </table>
         {/* 모바일 카드 리스트 */}
         <div className="mobile-list desktop-hide">
-          {!submitted&&<div style={{padding:'48px 24px',textAlign:'center',color:'var(--slate)',fontSize:14}}>검색어를 입력하고 검색 버튼을 눌러주세요.</div>}
-          {submitted&&filtered.length===0&&<div style={{padding:'48px 24px',textAlign:'center',color:'var(--slate)',fontSize:14}}>일치하는 품목이 없습니다.</div>}
+          {!submitted&&<div style={{padding:'48px 24px',textAlign:'center',color:'var(--slate)',fontSize:'var(--fs-body)'}}>검색어를 입력하고 검색 버튼을 눌러주세요.</div>}
+          {submitted&&filtered.length===0&&<div style={{padding:'48px 24px',textAlign:'center',color:'var(--slate)',fontSize:'var(--fs-body)'}}>일치하는 품목이 없습니다.</div>}
           {filtered.map(it=>{
             const u=useById(it.useId);
             const isLow=it.min!=null&&it.qty<it.min;
@@ -684,18 +704,18 @@ function Search({items,onItemClick,onDelete}) {
                   <input type="checkbox" checked={isSel} onChange={()=>{}} style={{width:16,height:16}}/>
                 </div>
                 <div style={{flex:1,minWidth:0}}>
-                  <div style={{fontWeight:500,fontSize:14,color:'var(--ink-deep)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{q?hi(it.name,q):it.name}</div>
+                  <div style={{fontWeight:500,fontSize:'var(--fs-body)',color:'var(--ink-deep)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{q?hi(it.name,q):it.name}</div>
                   <div className="row" style={{gap:6,marginTop:3,alignItems:'center'}}>
-                    <span className="swatch" style={{background:u.color,flexShrink:0}}/><span style={{fontSize:12,color:'var(--slate)'}}>{u.short}</span>
-                    <span style={{fontSize:12,color:'var(--steel)'}}>·</span>
-                    <span style={{fontSize:12,color:'var(--slate)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.space} / {it.group} / {it.cell}</span>
+                    <span className="swatch" style={{background:u.color,flexShrink:0}}/><span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}>{u.short}</span>
+                    <span style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}>·</span>
+                    <span style={{fontSize:'var(--fs-sm)',color:'var(--slate)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.space} / {it.group} / {it.cell}</span>
                   </div>
-                  {it.note&&<div style={{fontSize:11,color:'var(--steel)',marginTop:2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.note}</div>}
+                  {it.note&&<div style={{fontSize:'var(--fs-label)',color:'var(--steel)',marginTop:2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.note}</div>}
                 </div>
                 <div style={{textAlign:'right',flexShrink:0}}>
-                  <div style={{fontWeight:600,fontSize:15,color:isLow?'var(--error)':'var(--ink-deep)'}}>{it.qty}{it.min!=null&&<span style={{fontSize:12,color:'var(--slate)',fontWeight:400}}> / {it.min}</span>}</div>
-                  {isLow&&<div style={{fontSize:10,color:'var(--error)',fontWeight:600}}>재고 부족</div>}
-                  <div style={{fontSize:11,color:'var(--steel)',marginTop:1}}>{it.received}</div>
+                  <div style={{fontWeight:600,fontSize:15,color:isLow?'var(--error)':'var(--ink-deep)'}}>{it.qty}{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--slate)',fontWeight:400}}> / {it.min}</span>}</div>
+                  {isLow&&<div style={{fontSize:'var(--fs-label)',color:'var(--error)',fontWeight:600}}>재고 부족</div>}
+                  <div style={{fontSize:'var(--fs-sm)',color:'var(--steel)',marginTop:1}}>{it.received}</div>
                 </div>
               </div>
             );
@@ -707,11 +727,11 @@ function Search({items,onItemClick,onDelete}) {
         <div style={{padding:28}}>
           <div className="row" style={{gap:12,marginBottom:16}}>
             <div style={{width:40,height:40,borderRadius:'50%',background:'var(--tint-rose)',color:'var(--brand-pink-deep)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><IC.alert/></div>
-            <div><div style={{fontSize:16,fontWeight:600}}>{sel.size}개 품목을 삭제할까요?</div><div style={{fontSize:14,color:'var(--slate)',marginTop:2}}>이 작업은 되돌릴 수 없습니다.</div></div>
+            <div><div style={{fontSize:'var(--fs-section)',fontWeight:600}}>{sel.size}개 품목을 삭제할까요?</div><div style={{fontSize:'var(--fs-body)',color:'var(--slate)',marginTop:2}}>이 작업은 되돌릴 수 없습니다.</div></div>
           </div>
           <div className="row between" style={{marginTop:20}}>
             <button className="btn btn-danger" onClick={()=>{onDelete([...sel]);setDelModal(false);setSel(new Set());}}><IC.trash/> 삭제</button>
-            <button className="btn btn-secondary" onClick={()=>setDelModal(false)}>취소</button>
+            <button className="btn btn-secondary" onClick={()=>setDelModal(false)}><IC.x/>취소</button>
           </div>
         </div>
       </Modal>
@@ -731,8 +751,7 @@ function Cell({space,group,cell,label,x,y,w,h,vert,itemMap,selected,onToggle}) {
   const displayLabel=label;
   return (
     <div onClick={()=>onToggle(key)} style={{position:'absolute',left:x,top:y,width:w,height:h,background:fill,opacity:empty?1:.85,border:isSel?'2.5px solid var(--ink-deep)':'1px solid var(--hairline-strong)',borderRadius:4,cursor:'pointer',display:'flex',alignItems:'flex-start',justifyContent:'flex-start',padding:4,boxSizing:'border-box',boxShadow:isSel?'0 4px 12px rgba(15,15,15,.16)':'none',transform:isSel?'scale(1.02)':'scale(1)',transition:'transform 80ms',zIndex:isSel?5:1}} title={its.length>0?`${its.length}개 품목`:'비어있음'}>
-      <span style={{fontSize:12,fontWeight:600,color:empty?'var(--steel)':tc,writingMode:vert?'vertical-rl':'horizontal-tb',lineHeight:1.2}}>{displayLabel}</span>
-      {its.length>0&&<span style={{position:'absolute',...(vert?(w<40?{bottom:4,left:'50%',transform:'translateX(-50%)'}:{top:4,right:4}):{top:4,right:4}),background:'rgba(255,255,255,.9)',color:'var(--charcoal)',fontSize:9,fontWeight:700,borderRadius:8,padding:'1px 4px'}}>{its.length}</span>}
+      <span style={{fontSize:'var(--fs-sm)',fontWeight:600,color:empty?'var(--steel)':tc,writingMode:'horizontal-tb',lineHeight:1.2}}>{displayLabel}</span>
     </div>
   );
 }
@@ -746,7 +765,7 @@ function FBox({title,x,y,w,h,tp='top',children}) {
   return (
     <>
       <div style={{position:'absolute',left:x,top:y,width:w,height:h,border:'1.5px solid var(--ink-deep)',borderRadius:4,pointerEvents:'none'}}/>
-      {title&&<div style={{position:'absolute',...pos,fontSize:11,fontWeight:700,color:'var(--ink-deep)',whiteSpace:'nowrap'}}>{title}</div>}
+      {title&&<div style={{position:'absolute',...pos,fontSize:'var(--fs-sm)',fontWeight:700,color:'var(--ink-deep)',whiteSpace:'nowrap'}}>{title}</div>}
       {children}
     </>
   );
@@ -851,7 +870,7 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
     <div className="col" style={{height:'100%'}}>
       <Topbar title="공간 조회" sub="배치도 기반 비품 위치 확인" action={
         <div className="row" style={{gap:12}}>
-          {!isMobile&&<span style={{fontSize:14,color:'var(--slate)'}}>{sel.size}개 셀 선택</span>}
+          {!isMobile&&<span style={{fontSize:'var(--fs-body)',color:'var(--slate)'}}>{sel.size}개 셀 선택</span>}
           <button className="btn btn-secondary btn-sm" disabled={!sel.size} onClick={()=>setSel(new Set())} title="초기화" style={isMobile?{width:30,padding:0}:{}}><IC.refresh/>{!isMobile&&<span> 초기화</span>}</button>
           <button className="btn btn-primary btn-sm" disabled={sel.size!==1} onClick={()=>{
             const key=[...sel][0];
@@ -867,17 +886,17 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
       <div style={{overflowX:'auto',overflowY:'hidden',WebkitOverflowScrolling:'touch',background:'var(--canvas)',borderBottom:'1px solid var(--hairline)',flexShrink:0}}>
         <div className="row" style={{padding:'0 16px',gap:0,minWidth:'max-content'}}>
         {SPACES.map(s=>{const a=space===s;const cnt=items.filter(i=>i.space===s).length;return(
-          <button key={s} onClick={()=>setSpace(s)} style={{padding:'14px 14px 12px',border:'none',background:'transparent',color:a?'var(--ink)':'var(--slate)',fontWeight:a?600:500,fontSize:14,borderBottom:a?'2px solid var(--primary)':'2px solid transparent',cursor:'pointer',position:'relative',top:1,display:'flex',alignItems:'center',gap:8,fontFamily:'inherit',whiteSpace:'nowrap'}}>
-            {s}<span style={{fontSize:11,padding:'1px 6px',borderRadius:'var(--r-full)',background:a?'var(--primary-soft)':'var(--surface)',color:a?'var(--primary-deep)':'var(--slate)',fontWeight:600}}>{cnt}</span>
+          <button key={s} onClick={()=>setSpace(s)} style={{padding:'14px 14px 12px',border:'none',background:'transparent',color:a?'var(--ink)':'var(--slate)',fontWeight:a?600:500,fontSize:'var(--fs-body)',borderBottom:a?'2px solid var(--primary)':'2px solid transparent',cursor:'pointer',position:'relative',top:1,display:'flex',alignItems:'center',gap:8,fontFamily:'inherit',whiteSpace:'nowrap'}}>
+            {s}<span style={{fontSize:'var(--fs-sm)',padding:'1px 6px',borderRadius:'var(--r-full)',background:a?'var(--primary-soft)':'var(--surface)',color:a?'var(--primary-deep)':'var(--slate)',fontWeight:600}}>{cnt}</span>
           </button>
         );})}
         </div>
       </div>
       <div className="mobile-pad-x" style={{padding:'12px 32px',background:'var(--surface)',borderBottom:'1px solid var(--hairline)',flexShrink:0}}>
         <div className="row wrap" style={{gap:8}}>
-          <span style={{fontSize:12,fontWeight:600,color:'var(--steel)'}}>용도</span>
-          {USES.map(u=><div key={u.id} className="row" style={{gap:4}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:12,color:'var(--charcoal)'}}>{u.short}</span></div>)}
-          <span style={{marginLeft:'auto',fontSize:11,color:'var(--steel)',whiteSpace:'nowrap'}}>셀 색 = 최다 용도</span>
+          <span style={{fontSize:'var(--fs-sm)',fontWeight:600,color:'var(--steel)'}}>용도</span>
+          {USES.map(u=><div key={u.id} className="row" style={{gap:4}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:'var(--fs-sm)',color:'var(--charcoal)'}}>{u.short}</span></div>)}
+          <span style={{marginLeft:'auto',fontSize:'var(--fs-label)',color:'var(--steel)',whiteSpace:'nowrap'}}>셀 색 = 최다 용도</span>
         </div>
       </div>
       <div className="mobile-content mobile-scroll-x" style={{flex:1,overflow:'auto',padding:'20px 32px',paddingBottom:100,background:'var(--surface)',position:'relative'}}>
@@ -886,8 +905,8 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
         {(space==='토론1'||space==='토론2')&&<DiscPlan space={space} title={space==='토론1'?'Discussion Room 1':'Discussion Room 2'} p={pp}/>}
         {space==='창고'&&<StorePlan {...pp}/>}
         {showList&&(
-          <div onClick={()=>setShowList(false)} style={{position:'fixed',inset:0,bottom:60,background:'rgba(15,15,15,.3)',zIndex:30,display:'flex',alignItems:'flex-end'}}>
-            <div onClick={e=>e.stopPropagation()} className="card" style={{width:'100%',maxHeight:'65%',borderRadius:'var(--r-lg) var(--r-lg) 0 0',background:'var(--canvas)',boxShadow:'var(--shadow-4)',display:'flex',flexDirection:'column'}}>
+          <div onClick={()=>setShowList(false)} style={{position:'fixed',inset:0,background:'rgba(15,15,15,.3)',zIndex:60,display:'flex',alignItems:'flex-end',justifyContent:'center',padding:isMobile?0:'0 0 24px 0'}}>
+            <div onClick={e=>e.stopPropagation()} className="card" style={{width:'100%',maxWidth:isMobile?'100%':'calc(100% - 528px)',marginLeft:isMobile?0:'264px',maxHeight:isMobile?'65%':'calc(65% - 48px)',borderRadius:isMobile?'var(--r-lg) var(--r-lg) 0 0':'var(--r-lg)',background:'var(--canvas)',boxShadow:isMobile?'var(--shadow-4)':'0 -4px 24px rgba(15,15,15,.18)',border:isMobile?'none':'1px solid var(--hairline-strong)',display:'flex',flexDirection:'column'}}>
               <div className="row between" style={{padding:'16px 24px',borderBottom:'1px solid var(--hairline)',flexShrink:0}}>
                 <div className="row" style={{gap:10}}>
                   <span style={{fontSize:20,fontWeight:600}}>{space} · {sel.size}개 셀</span>
@@ -897,18 +916,18 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
               </div>
               <div style={{flex:1,overflow:'auto',paddingBottom:8}}>
                 <table className="table mobile-hide">
-                  <thead><tr><th>품목명</th><th style={{width:140}}>용도</th><th style={{width:160}}>위치</th><th style={{width:120}}>규격</th><th style={{width:100,textAlign:'right'}}>수량</th></tr></thead>
+                  <thead><tr><th style={{width:200}}>품목명</th><th style={{width:120}}>용도</th><th style={{width:140}}>위치</th><th style={{width:160}}>규격</th><th style={{width:60}}>수량</th></tr></thead>
                   <tbody>
                     {selItems.map(it=>{
                       const u=useById(it.useId);
                       const isLow=it.min!=null&&it.qty<it.min;
                       return (
                         <tr key={it.id} onClick={()=>{setShowList(false);onItemClick(it);}}>
-                          <td><div style={{fontWeight:500}}>{it.name}</div>{it.note&&<div style={{fontSize:12,color:'var(--steel)'}}>{it.note}</div>}</td>
-                          <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color}}/>{u.short}</span></td>
-                          <td><b>{it.group}</b> / {it.cell}</td>
-                          <td style={{fontSize:14,color:'var(--slate)'}}>{it.spec||'–'}</td>
-                          <td style={{textAlign:'right'}}><span style={{fontWeight:600,color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:12,color:'var(--slate)'}}> / {it.min}</span>}</td>
+                          <td><div style={{fontWeight:500,fontSize:'var(--fs-table)'}}>{it.name}</div>{it.note&&<div style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}>{it.note}</div>}</td>
+                          <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:'var(--fs-table)'}}>{u.short}</span></span></td>
+                          <td style={{fontSize:'var(--fs-table)'}}><b>{it.group}</b> / {it.cell}</td>
+                          <td style={{fontSize:'var(--fs-table)',color:'var(--slate)'}}>{it.spec||'–'}</td>
+                          <td><span style={{fontWeight:600,fontSize:'var(--fs-table)',color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}> / {it.min}</span>}</td>
                         </tr>
                       );
                     })}
@@ -923,23 +942,23 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
                       <div key={it.id} onClick={()=>{setShowList(false);onItemClick(it);}} style={{padding:'12px 20px',borderBottom:'1px solid var(--hairline)',cursor:'pointer'}}>
                         <div className="row between" style={{alignItems:'flex-start',gap:8}}>
                           <div style={{flex:1,minWidth:0}}>
-                            <div style={{fontWeight:600,fontSize:16,color:'var(--ink-deep)',marginBottom:4}}>{it.name}</div>
+                            <div style={{fontWeight:600,fontSize:'var(--fs-section)',color:'var(--ink-deep)',marginBottom:4}}>{it.name}</div>
                             <div className="row" style={{gap:6,flexWrap:'wrap'}}>
-                              <span className="row" style={{gap:4}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:12,color:'var(--slate)'}}>{u.short}</span></span>
-                              <span style={{fontSize:12,color:'var(--steel)'}}>·</span>
-                              <span style={{fontSize:12,color:'var(--slate)'}}><b style={{color:'var(--charcoal)'}}>{it.group}</b> / {it.cell}</span>
+                              <span className="row" style={{gap:4}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}>{u.short}</span></span>
+                              <span style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}>·</span>
+                              <span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}><b style={{color:'var(--charcoal)'}}>{it.group}</b> / {it.cell}</span>
                             </div>
                           </div>
                           <div style={{textAlign:'right',flexShrink:0}}>
-                            <span style={{fontWeight:700,fontSize:16,color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>
-                            {it.min!=null&&<span style={{fontSize:12,color:'var(--slate)'}}> / {it.min}</span>}
-                            {isLow&&<div style={{fontSize:11,color:'var(--error)',fontWeight:500}}>재고 부족</div>}
+                            <span style={{fontWeight:700,fontSize:'var(--fs-section)',color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>
+                            {it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}> / {it.min}</span>}
+                            {isLow&&<div style={{fontSize:'var(--fs-label)',color:'var(--error)',fontWeight:500}}>재고 부족</div>}
                           </div>
                         </div>
                       </div>
                     );
                   })}
-                  {selItems.length===0&&<div style={{padding:'40px 0',textAlign:'center',color:'var(--slate)',fontSize:14}}>선택한 셀에 품목이 없습니다.</div>}
+                  {selItems.length===0&&<div style={{padding:'40px 0',textAlign:'center',color:'var(--slate)',fontSize:'var(--fs-body)'}}>선택한 셀에 품목이 없습니다.</div>}
                 </div>
               </div>
             </div>
@@ -969,7 +988,7 @@ function UseSelect({value,onChange,editing}) {
         <div className="card" style={{position:'absolute',top:'calc(100% + 4px)',left:0,right:0,padding:6,zIndex:30,boxShadow:'var(--shadow-2)',maxHeight:280,overflow:'auto'}}>
           {USES.map(o=>(
             <button key={o.id} onClick={()=>{onChange(o.id);setOpen(false);}} className="row" style={{gap:8,width:'100%',padding:'8px 10px',background:value===o.id?'var(--surface)':'transparent',border:'none',borderRadius:'var(--r-sm)',cursor:'pointer',fontFamily:'inherit'}} onMouseEnter={e=>e.currentTarget.style.background='var(--surface)'} onMouseLeave={e=>{if(value!==o.id)e.currentTarget.style.background='transparent';}}>
-              <span className="swatch" style={{background:o.color}}/><span style={{fontSize:14}}>{o.name}</span>
+              <span className="swatch" style={{background:o.color}}/><span style={{fontSize:'var(--fs-body)'}}>{o.name}</span>
             </button>
           ))}
         </div>
@@ -1004,21 +1023,21 @@ function MonthPicker({value,onChange,editing}:{value:string,onChange:(v:string)=
   return (
     <div style={{position:'relative',minWidth:0}} ref={ref}>
       <div className={`input ${editing?'is-editing':''}`} style={{display:'flex',alignItems:'center',gap:4,padding:'0 8px',cursor:'text',minWidth:0,width:'100%',overflow:'hidden'}}>
-        <input value={value} onChange={handleText} placeholder="YYYY-MM" maxLength={7} size={1} style={{flex:1,minWidth:0,border:'none',outline:'none',background:'transparent',font:'inherit',fontSize:14,color:'var(--ink)',padding:0}}/>
-        <button onClick={()=>{setOpen(o=>!o);if(value){const y=parseInt(value.slice(0,4));if(!isNaN(y))setViewYear(y);}}} style={{background:'none',border:'none',cursor:'pointer',padding:'2px 2px',color:'var(--slate)',display:'flex',alignItems:'center',flexShrink:0,fontSize:12}}>📅</button>
+        <input value={value} onChange={handleText} placeholder="YYYY-MM" maxLength={7} size={1} style={{flex:1,minWidth:0,border:'none',outline:'none',background:'transparent',font:'inherit',fontSize:'var(--fs-body)',color:'var(--ink)',padding:0}}/>
+        <button onClick={()=>{setOpen(o=>!o);if(value){const y=parseInt(value.slice(0,4));if(!isNaN(y))setViewYear(y);}}} style={{background:'none',border:'none',cursor:'pointer',padding:'2px 2px',color:'var(--slate)',display:'flex',alignItems:'center',flexShrink:0,fontSize:'var(--fs-sm)'}}>📅</button>
       </div>
       {open&&(
         <div className="card" style={{position:'absolute',top:'calc(100% + 4px)',left:0,right:0,zIndex:30,padding:14,boxShadow:'var(--shadow-2)'}}>
           <div className="row between" style={{marginBottom:12,alignItems:'center'}}>
-            <button onClick={()=>setViewYear(y=>y-1)} style={{background:'none',border:'none',cursor:'pointer',fontSize:16,color:'var(--charcoal)',padding:'2px 8px',borderRadius:'var(--r-sm)'}}>◀</button>
-            <span style={{fontWeight:600,fontSize:16,color:'var(--ink-deep)'}}>{viewYear}년</span>
-            <button onClick={()=>setViewYear(y=>y+1)} style={{background:'none',border:'none',cursor:'pointer',fontSize:16,color:'var(--charcoal)',padding:'2px 8px',borderRadius:'var(--r-sm)'}}>▶</button>
+            <button onClick={()=>setViewYear(y=>y-1)} style={{background:'none',border:'none',cursor:'pointer',fontSize:'var(--fs-section)',color:'var(--charcoal)',padding:'2px 8px',borderRadius:'var(--r-sm)'}}>◀</button>
+            <span style={{fontWeight:600,fontSize:'var(--fs-section)',color:'var(--ink-deep)'}}>{viewYear}년</span>
+            <button onClick={()=>setViewYear(y=>y+1)} style={{background:'none',border:'none',cursor:'pointer',fontSize:'var(--fs-section)',color:'var(--charcoal)',padding:'2px 8px',borderRadius:'var(--r-sm)'}}>▶</button>
           </div>
           <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:6}}>
             {months.map((m,i)=>{
               const mon=String(i+1).padStart(2,'0');
               const isSel=selectedYear===String(viewYear)&&selectedMonth===mon;
-              return (<button key={m} onClick={()=>select(i+1)} style={{padding:'8px 4px',borderRadius:'var(--r-md)',border:isSel?'2px solid var(--primary)':'1px solid var(--hairline)',background:isSel?'var(--primary-soft)':'var(--canvas)',color:isSel?'var(--primary-deep)':'var(--charcoal)',fontWeight:isSel?600:400,fontSize:12,cursor:'pointer',fontFamily:'inherit'}}>{m}</button>);
+              return (<button key={m} onClick={()=>select(i+1)} style={{padding:'8px 4px',borderRadius:'var(--r-md)',border:isSel?'2px solid var(--primary)':'1px solid var(--hairline)',background:isSel?'var(--primary-soft)':'var(--canvas)',color:isSel?'var(--primary-deep)':'var(--charcoal)',fontWeight:isSel?600:400,fontSize:'var(--fs-sm)',cursor:'pointer',fontFamily:'inherit'}}>{m}</button>);
             })}
           </div>
         </div>
@@ -1064,12 +1083,12 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
         <div style={{maxWidth:860,margin:'0 auto',display:'flex',flexDirection:'column',gap:16}}>
           {!isEdit&&prefill?.space&&(
             <div className="card" style={{padding:16,background:'var(--tint-lavender)',border:'1px solid var(--brand-purple-300)'}}>
-              <div className="row" style={{gap:10}}><span style={{width:22,height:22,borderRadius:'50%',background:'var(--primary)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:700,flexShrink:0}}>!</span>
-              <span style={{fontSize:14,color:'var(--brand-purple-800)'}}>공간 조회에서 <b>{prefill.space} / {prefill.group} / {prefill.cell}</b>의 신규 등록으로 이동했습니다. 위치 정보가 자동 입력되었습니다.</span></div>
+              <div className="row" style={{gap:10}}><span style={{width:22,height:22,borderRadius:'50%',background:'var(--primary)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'var(--fs-sm)',fontWeight:700,flexShrink:0}}>!</span>
+              <span style={{fontSize:'var(--fs-body)',color:'var(--brand-purple-800)'}}>공간 조회에서 <b>{prefill.space} / {prefill.group} / {prefill.cell}</b>의 신규 등록으로 이동했습니다. 위치 정보가 자동 입력되었습니다.</span></div>
             </div>
           )}
           <div className="card" style={{padding:24}}>
-            <div style={{fontSize:16,fontWeight:600,marginBottom:16}}>기본 정보</div>
+            <div style={{fontSize:'var(--fs-section)',fontWeight:600,marginBottom:16}}>기본 정보</div>
             <div style={{display:'grid',gridTemplateColumns:'1.4fr 1fr',gap:16}}>
               <Field label="품목명" required err={errs.name}><input className={`input ${ef==='name'?'is-editing':''}`} placeholder="예: 정량 피펫" value={form.name} onChange={e=>setF('name',e.target.value)}/></Field>
               <Field label="용도 분류" required err={errs.useId}><UseSelect value={form.useId} onChange={v=>setF('useId',v)} editing={ef==='useId'}/></Field>
@@ -1080,7 +1099,7 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
             </div>
           </div>
           <div className="card" style={{padding:24}}>
-            <div style={{fontSize:16,fontWeight:600,marginBottom:16}}>위치</div>
+            <div style={{fontSize:'var(--fs-section)',fontWeight:600,marginBottom:16}}>위치</div>
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:16}}>
               <Field label="공간" required err={errs.space}><select className={`select ${ef==='space'?'is-editing':''}`} value={form.space} onChange={e=>setF('space',e.target.value)}><option value="">선택…</option>{SPACES.map(s=><option key={s} value={s}>{s}</option>)}</select></Field>
               <Field label="구역" required err={errs.group}><select className={`select ${ef==='group'?'is-editing':''}`} value={form.group} onChange={e=>setF('group',e.target.value)} disabled={!form.space}><option value="">{form.space?'선택…':'공간을 먼저 선택'}</option>{groups.map(g=><option key={g} value={g}>{g}</option>)}</select></Field>
@@ -1089,7 +1108,7 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
           </div>
           <div className="card" style={{padding:24}}>
             <div className="row between" style={{marginBottom:16}}>
-              <div style={{fontSize:16,fontWeight:600}}>수량 정보</div>
+              <div style={{fontSize:'var(--fs-section)',fontWeight:600}}>수량 정보</div>
               {rq&&<span className="badge" style={{background:'var(--tint-peach)',color:'var(--brand-orange-deep)'}}>수량 필수</span>}
             </div>
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16}}>
@@ -1098,15 +1117,15 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
             </div>
           </div>
           <div className="card" style={{padding:24}}>
-            <div style={{fontSize:16,fontWeight:600,marginBottom:12}}>비고</div>
+            <div style={{fontSize:'var(--fs-section)',fontWeight:600,marginBottom:12}}>비고</div>
             <textarea className={`textarea ${ef==='note'?'is-editing':''}`} placeholder="추가 메모" value={form.note} onChange={e=>setF('note',e.target.value)} rows={3}/>
           </div>
           {isEdit&&item&&(
             <div className="card" style={{padding:16,background:'var(--surface)'}}>
-              <div style={{fontSize:12,fontWeight:600,color:'var(--steel)',marginBottom:8}}>시스템 정보</div>
+              <div style={{fontSize:'var(--fs-sm)',fontWeight:600,color:'var(--steel)',marginBottom:8}}>시스템 정보</div>
               <div className="row wrap" style={{gap:32}}>
                 {[['최초 등록일',item.createdAt],['최종 수정일',item.updatedAt],['최종 수정인',item.updatedBy],['품목 ID',`#${item.id}`]].map(([l,v])=>(
-                  <div key={l} className="col"><span style={{fontSize:11,color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>{l}</span><span style={{fontSize:14,fontWeight:500,marginTop:2}}>{v}</span></div>
+                  <div key={l} className="col"><span style={{fontSize:'var(--fs-sm)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>{l}</span><span style={{fontSize:'var(--fs-body)',fontWeight:500,marginTop:2}}>{v}</span></div>
                 ))}
               </div>
             </div>
@@ -1118,15 +1137,15 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
         <div style={{padding:28}}>
           <div className="row" style={{gap:12,marginBottom:16}}>
             <div style={{width:40,height:40,borderRadius:'50%',background:'var(--tint-rose)',color:'var(--brand-pink-deep)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><IC.alert/></div>
-            <div><div style={{fontSize:16,fontWeight:600}}>이 품목을 삭제할까요?</div><div style={{fontSize:14,color:'var(--slate)',marginTop:2}}>{form.name}</div></div>
+            <div><div style={{fontSize:'var(--fs-section)',fontWeight:600}}>이 품목을 삭제할까요?</div><div style={{fontSize:'var(--fs-body)',color:'var(--slate)',marginTop:2}}>{form.name}</div></div>
           </div>
           <div className="row between">
             <button className="btn btn-danger" onClick={()=>{if(onDelete&&item)onDelete(item.id);setDelM(false);}}><IC.trash/> 삭제</button>
-            <button className="btn btn-secondary" onClick={()=>setDelM(false)}>취소</button>
+            <button className="btn btn-secondary" onClick={()=>setDelM(false)}><IC.x/>취소</button>
           </div>
         </div>
       </Modal>
-      {saved&&<div style={{position:'fixed',bottom:28,right:28,zIndex:200,background:'var(--ink-deep)',color:'#fff',padding:'10px 18px',borderRadius:'var(--r-md)',fontSize:12,fontWeight:500,boxShadow:'var(--shadow-2)'}}>{isEdit?'저장되었습니다':'등록되었습니다'}</div>}
+      {saved&&<div style={{position:'fixed',bottom:28,right:28,zIndex:200,background:'var(--ink-deep)',color:'#fff',padding:'10px 18px',borderRadius:'var(--r-md)',fontSize:'var(--fs-sm)',fontWeight:500,boxShadow:'var(--shadow-2)'}}>{isEdit?'저장되었습니다':'등록되었습니다'}</div>}
     </div>
   );
 }
@@ -1142,7 +1161,7 @@ function Profile({user,onLogout}) {
             <div style={{width:72,height:72,borderRadius:'50%',background:'var(--brand-navy)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:28,fontWeight:600,flexShrink:0}}>{initial}</div>
             <div>
               <div style={{fontSize:20,fontWeight:600,color:'var(--ink-deep)',marginBottom:4}}>{user?.name||'사용자'}</div>
-              <div style={{fontSize:14,color:'var(--slate)'}}>{user?.email||''}</div>
+              <div style={{fontSize:'var(--fs-body)',color:'var(--slate)'}}>{user?.email||''}</div>
             </div>
             <div style={{width:'100%',height:1,background:'var(--hairline)',margin:'4px 0'}}/>
             <button className="btn btn-secondary" style={{width:'100%',height:44,color:'var(--error)',borderColor:'var(--hairline-strong)'}} onClick={onLogout}>
@@ -1150,10 +1169,10 @@ function Profile({user,onLogout}) {
             </button>
           </div>
           <div className="card" style={{padding:20}}>
-            <div style={{fontSize:12,color:'var(--slate)',marginBottom:8}}>접속 권한</div>
+            <div style={{fontSize:'var(--fs-sm)',color:'var(--slate)',marginBottom:8}}>접속 권한</div>
             <div className="row" style={{gap:8,alignItems:'center'}}>
               <span style={{width:8,height:8,borderRadius:'50%',background:'var(--brand-green)',display:'inline-block',flexShrink:0}}/>
-              <span style={{fontSize:14,fontWeight:500,color:'var(--ink)'}}>관능평가실 구성원</span>
+              <span style={{fontSize:'var(--fs-body)',fontWeight:500,color:'var(--ink)'}}>관능평가실 구성원</span>
             </div>
           </div>
         </div>
@@ -1169,7 +1188,7 @@ function MiniCell({group,cell,label,x,y,w,h,vert,itemGroup,itemCell,itemColor}:{
   const tc=isTarget?(darkColors.includes(itemColor)?'rgba(255,255,255,.9)':'var(--ink)'):'#9B9A97';
   return (
     <div style={{position:'absolute',left:x,top:y,width:w,height:h,background:bg,border:isTarget?'2.5px solid #1A1916':'1px solid #DEDCD7',borderRadius:4,display:'flex',alignItems:vert?'flex-end':'flex-start',justifyContent:vert?'center':'flex-start',padding:vert?5:5,boxSizing:'border-box',boxShadow:isTarget?'0 4px 12px rgba(15,15,15,.18)':'none'}}>
-      <span style={{fontSize:10,fontWeight:isTarget?700:600,color:tc,writingMode:vert?'vertical-rl':'horizontal-tb',lineHeight:1.2}}>{label}</span>
+      <span style={{fontSize:18,fontWeight:isTarget?700:600,color:tc,writingMode:vert?'vertical-rl':'horizontal-tb',lineHeight:1.2}}>{isTarget ? label : null}</span>
     </div>
   );
 }
@@ -1375,51 +1394,67 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
   const isMobile=useMediaQuery('(max-width:768px)');
   return (
     <div className="col" style={{height:'100%'}}>
-      <Topbar title={item.name} sub={`#${item.id} · ${item.space} / ${item.group} / ${item.cell}`} action={
-        <div className="row" style={{gap:isMobile?6:12}}>
-          <button className="btn btn-danger btn-sm" onClick={()=>setDelM(true)} style={{gap:isMobile?0:6,paddingLeft:isMobile?8:12,paddingRight:isMobile?8:12}}>
-            <IC.trash/>{!isMobile&&<span>삭제</span>}
+      <Topbar title="품목 상세" sub={`${item.name} · #${item.id} · ${item.space} / ${item.group} / ${item.cell}`} action={
+        <div className="row" style={{gap:12}}>
+          <button className="btn btn-danger btn-sm" onClick={()=>setDelM(true)}>
+            <IC.trash/><span>삭제</span>
           </button>
-          <button className="btn btn-secondary btn-sm" onClick={onBack} style={{gap:isMobile?0:6,paddingLeft:isMobile?8:12,paddingRight:isMobile?8:12}}>
-            <IC.back/>{!isMobile&&<span>이전</span>}
+          <button className="btn btn-secondary btn-sm" onClick={onBack}>
+            <IC.back/><span>이전</span>
           </button>
-          <button className="btn btn-primary btn-sm" onClick={onEdit} style={{gap:isMobile?0:6,paddingLeft:isMobile?8:12,paddingRight:isMobile?8:12}}>
-            <IC.edit/>{!isMobile&&<span>수정</span>}
+          <button className="btn btn-primary btn-sm" onClick={onEdit}>
+            <IC.edit/><span>수정</span>
           </button>
         </div>}/>
       <div className="mobile-content mobile-pad" style={{flex:1,overflow:'auto',padding:32,paddingBottom:100}}>
         <div style={{maxWidth:860,margin:'0 auto',display:'flex',flexDirection:'column',gap:16}}>
-          <div className="card mobile-grid-1" style={{padding:24,display:'grid',gridTemplateColumns:'1.4fr 1fr',gap:24}}>
-            <div>
-              <span className="badge" style={{background:u.color,color:'#fff'}}>{u.name}</span>
-              <h2 className="mobile-h2" style={{margin:'12px 0 6px',fontSize:28,fontWeight:600,color:'var(--ink-deep)'}}>{item.name}</h2>
-              <div style={{fontSize:14,color:'var(--charcoal)'}}><span style={{color:'var(--slate)'}}>위치</span> <b>{item.space} / {item.group} / {item.cell}</b></div>
-              {item.note&&<div style={{marginTop:12,padding:'10px 14px',background:'var(--tint-yellow)',borderRadius:'var(--r-md)',fontSize:14}}>📌 {item.note}</div>}
-            </div>
-            <div style={{background:isLow?'var(--tint-rose)':'var(--tint-mint)',borderRadius:'var(--r-lg)',padding:'18px 20px',display:'flex',flexDirection:'column',justifyContent:'center'}}>
-              <div style={{fontSize:12,fontWeight:600,color:isLow?'var(--brand-pink-deep)':'var(--brand-green)'}}>{isLow?'재고 부족':'재고 양호'}</div>
-              <div style={{fontSize:36,fontWeight:600,color:'var(--ink-deep)',marginTop:4,display:'flex',alignItems:'baseline',gap:4}}>{item.qty}{item.min!=null&&<span style={{fontSize:18,color:'var(--slate)',fontWeight:500}}> / {item.min}</span>}</div>
-              <div style={{fontSize:12,color:'var(--slate)',marginTop:4}}>{item.min!=null?'현재 / 최소':'현재 수량'}</div>
-            </div>
-          </div>
+          {/* 카드 1: 품목명 + 미니맵 */}
           <div className="card" style={{padding:24}}>
-            <div style={{fontSize:16,fontWeight:600,marginBottom:16}}>상세 정보</div>
-            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:20,marginBottom:20}}>
-              <div>
-                <div style={{fontSize:11,color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>용도</div>
-                <div className="row" style={{gap:6,marginTop:4}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:14,fontWeight:500}}>{u.name}</span></div>
-              </div>
-              {[['규격',item.spec||'–'],['입고 시기',item.received||'–'],['공간',item.space],['구역',item.group],['셀',item.cell]].map(([l,v])=>(
-                <div key={l}><div style={{fontSize:11,color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>{l}</div><div style={{fontSize:14,fontWeight:500,marginTop:4}}>{v}</div></div>
-              ))}
+            <span className="badge" style={{background:u.color,color:'#fff'}}>{u.name}</span>
+            <h2 className="mobile-h2" style={{margin:'12px 0 6px',fontSize:28,fontWeight:600,color:'var(--ink-deep)'}}>{item.name}</h2>
+            <div style={{fontSize:'var(--fs-body)',color:'var(--charcoal)'}}><span style={{color:'var(--slate)'}}>위치</span> <b>{item.space} / {item.group} / {item.cell}</b></div>
+            <div style={{marginTop:12,borderTop:'1px solid var(--hairline)',paddingTop:14}}>
+              <ItemMiniMap item={item} u={u}/>
             </div>
-            <div style={{borderTop:'1px solid var(--hairline)',marginBottom:14}}/>
-            <ItemMiniMap item={item} u={u}/>
           </div>
+          {/* 카드 2: 상세 정보 (규격·입고·수량·재고상태) + 비고 */}
+          <div className="card" style={{padding:24}}>
+            <div style={{fontSize:'var(--fs-section)',fontWeight:600,marginBottom:16}}>상세 정보</div>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:20}}>
+              {[['규격',item.spec||'–'],['입고 시기',item.received||'–']].map(([l,v])=>(
+                <div key={l}>
+                  <div style={{fontSize:'var(--fs-label)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>{l}</div>
+                  <div style={{fontSize:'var(--fs-body)',fontWeight:500,marginTop:4}}>{v}</div>
+                </div>
+              ))}
+              <div>
+                <div style={{fontSize:'var(--fs-label)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>현재 수량</div>
+                <div style={{fontSize:'var(--fs-body)',fontWeight:600,marginTop:4,color:isLow?'var(--error)':'var(--ink)'}}>
+                  {item.qty}{item.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--steel)',fontWeight:400}}> / {item.min} 최소</span>}
+                </div>
+              </div>
+              <div>
+                <div style={{fontSize:'var(--fs-label)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>재고 상태</div>
+                <div style={{fontSize:'var(--fs-body)',fontWeight:600,marginTop:4,color:isLow?'var(--error)':'var(--brand-green)'}}>{isLow?'재고 부족':'재고 양호'}</div>
+              </div>
+            </div>
+            {item.note&&(
+              <>
+                <div style={{borderTop:'1px solid var(--hairline)',margin:'16px 0'}}/>
+                <div style={{padding:'10px 14px',background:'var(--tint-yellow)',borderRadius:'var(--r-md)',fontSize:'var(--fs-body)',display:'flex',alignItems:'flex-start',gap:8}}>
+                  <span style={{flexShrink:0}}>📌</span>{item.note}
+                </div>
+              </>
+            )}
+          </div>
+          {/* 카드 3: 시스템 정보 (품목 ID 제외) */}
           <div className="card" style={{padding:16,background:'var(--surface)',marginBottom:0}}>
-            <div className="row wrap" style={{gap:'12px 32px'}}>
-              {[['최초 등록일',item.createdAt],['최종 수정일',item.updatedAt],['최종 수정인',item.updatedBy],['품목 ID',`#${item.id}`]].map(([l,v])=>(
-                <div key={l} className="col"><span style={{fontSize:11,color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>{l}</span><span style={{fontSize:14,fontWeight:500,marginTop:2}}>{v}</span></div>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:12}}>
+              {[['최초 등록일',item.createdAt],['최종 수정일',item.updatedAt],['최종 수정인',item.updatedBy]].map(([l,v])=>(
+                <div key={l} className="col">
+                  <span style={{fontSize:'var(--fs-label)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4,whiteSpace:'nowrap'}}>{l}</span>
+                  <span style={{fontSize:'var(--fs-body)',fontWeight:500,marginTop:2,whiteSpace:'nowrap'}}>{v}</span>
+                </div>
               ))}
             </div>
           </div>
@@ -1430,11 +1465,11 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
         <div style={{padding:28}}>
           <div className="row" style={{gap:12,marginBottom:16}}>
             <div style={{width:40,height:40,borderRadius:'50%',background:'var(--tint-rose)',color:'var(--brand-pink-deep)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><IC.alert/></div>
-            <div><div style={{fontSize:16,fontWeight:600}}>이 품목을 삭제할까요?</div><div style={{fontSize:14,color:'var(--slate)',marginTop:2}}>{item.name}</div></div>
+            <div><div style={{fontSize:'var(--fs-section)',fontWeight:600}}>이 품목을 삭제할까요?</div><div style={{fontSize:'var(--fs-body)',color:'var(--slate)',marginTop:2}}>{item.name}</div></div>
           </div>
           <div className="row between">
             <button className="btn btn-danger" onClick={()=>{onDelete(item.id);setDelM(false);}}><IC.trash/> 삭제</button>
-            <button className="btn btn-secondary" onClick={()=>setDelM(false)}>취소</button>
+            <button className="btn btn-secondary" onClick={()=>setDelM(false)}><IC.x/>취소</button>
           </div>
         </div>
       </Modal>
@@ -1506,7 +1541,7 @@ export default function App() {
       <>
         <style>{SIDEBAR_CSS}{STYLE_SHEET}</style>
         <div className="app" style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',height:'100dvh',background:'var(--brand-navy)'}}>
-          <div style={{color:'#fff',fontSize:16,opacity:0.7}}>로딩 중...</div>
+          <div style={{color:'#fff',fontSize:'var(--fs-section)',opacity:0.7}}>로딩 중...</div>
         </div>
       </>
     );
@@ -1520,7 +1555,7 @@ export default function App() {
           <div className="card" style={{padding:36,maxWidth:400,textAlign:'center',color:'var(--ink)'}}>
             <div style={{fontSize:32,marginBottom:16}}>🚫</div>
             <div style={{fontSize:18,fontWeight:600,marginBottom:8}}>접근 권한 없음</div>
-            <p style={{fontSize:14,color:'var(--slate)',marginBottom:24}}>이 이메일은 접근이 허용되지 않습니다.<br/>관리자에게 권한을 요청하세요.</p>
+            <p style={{fontSize:'var(--fs-body)',color:'var(--slate)',marginBottom:24}}>이 이메일은 접근이 허용되지 않습니다.<br/>관리자에게 권한을 요청하세요.</p>
             <button className="btn btn-secondary" onClick={()=>setAccessDenied(false)}>다른 계정으로 로그인</button>
           </div>
         </div>
