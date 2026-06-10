@@ -731,7 +731,7 @@ function Cell({space,group,cell,label,x,y,w,h,vert,itemMap,selected,onToggle}) {
   const displayLabel=label;
   return (
     <div onClick={()=>onToggle(key)} style={{position:'absolute',left:x,top:y,width:w,height:h,background:fill,opacity:empty?1:.85,border:isSel?'2.5px solid var(--ink-deep)':'1px solid var(--hairline-strong)',borderRadius:4,cursor:'pointer',display:'flex',alignItems:'flex-start',justifyContent:'flex-start',padding:4,boxSizing:'border-box',boxShadow:isSel?'0 4px 12px rgba(15,15,15,.16)':'none',transform:isSel?'scale(1.02)':'scale(1)',transition:'transform 80ms',zIndex:isSel?5:1}} title={its.length>0?`${its.length}개 품목`:'비어있음'}>
-      <span style={{fontSize:12,fontWeight:600,color:empty?'var(--steel)':tc,writingMode:vert?'vertical-rl':'horizontal-tb',lineHeight:1.2}}>{displayLabel}</span>
+      <span style={{fontSize:12,fontWeight:600,color:empty?'var(--steel)':tc,writingMode:'horizontal-tb',lineHeight:1.2}}>{displayLabel}</span>
     </div>
   );
 }
