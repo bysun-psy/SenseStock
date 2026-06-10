@@ -396,7 +396,7 @@ function Login() {
         </div>
         <p style={{color:'var(--on-dark-muted)',fontSize:'var(--fs-section)',lineHeight:1.6}}>
           누군가의 기억 대신, 팀이 함께 보는 위치·재고 정보.<br/>
-          SenseStock은 관능평가실 비품을 모두가 독립적으로 찾을 수 있게 합니다.
+          SenseStock은 관능평가실 물품을 모두가 편리하게 찾을 수 있도록 합니다.
         </p>
       </div>
       <div style={{position:'relative',zIndex:2,width:'100%',maxWidth:420}}>
