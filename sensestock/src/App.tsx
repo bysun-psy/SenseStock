@@ -905,7 +905,7 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
         {(space==='토론1'||space==='토론2')&&<DiscPlan space={space} title={space==='토론1'?'Discussion Room 1':'Discussion Room 2'} p={pp}/>}
         {space==='창고'&&<StorePlan {...pp}/>}
         {showList&&(
-          <div onClick={()=>setShowList(false)} style={{position:'fixed',inset:0,bottom:60,background:'rgba(15,15,15,.3)',zIndex:30,display:'flex',alignItems:'flex-end',padding:isMobile?0:'0 16px 16px'}}>
+          <div onClick={()=>setShowList(false)} style={{position:'fixed',inset:0,bottom:0,background:'rgba(15,15,15,.3)',zIndex:30,display:'flex',alignItems:'flex-end',padding:isMobile?'0 0 60px':'0 16px 16px'}}>
             <div onClick={e=>e.stopPropagation()} className="card" style={{width:'100%',maxHeight:isMobile?'65%':'calc(65% - 32px)',borderRadius:isMobile?'var(--r-lg) var(--r-lg) 0 0':'var(--r-lg)',background:'var(--canvas)',boxShadow:isMobile?'var(--shadow-4)':'0 -4px 24px rgba(15,15,15,.18)',border:isMobile?'none':'1px solid var(--hairline-strong)',display:'flex',flexDirection:'column'}}>
               <div className="row between" style={{padding:'16px 24px',borderBottom:'1px solid var(--hairline)',flexShrink:0}}>
                 <div className="row" style={{gap:10}}>
@@ -916,7 +916,7 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
               </div>
               <div style={{flex:1,overflow:'auto',paddingBottom:8}}>
                 <table className="table mobile-hide">
-                  <thead><tr><th>품목명</th><th style={{width:140}}>용도</th><th style={{width:160}}>위치</th><th style={{width:120}}>규격</th><th style={{width:100,textAlign:'right'}}>수량</th></tr></thead>
+                  <thead><tr><th style={{width:200}}>품목명</th><th style={{width:140}}>용도</th><th style={{width:160}}>위치</th><th style={{width:200}}>규격</th><th style={{width:80,textAlign:'right'}}>수량</th></tr></thead>
                   <tbody>
                     {selItems.map(it=>{
                       const u=useById(it.useId);
