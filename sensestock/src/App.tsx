@@ -69,12 +69,12 @@ const STYLE_SHEET = `
   --use-6:#E69A1F; --use-7:#F4D31E; --use-8:#2BAA50; --use-9:#2B7FD3; --use-10:#1A2E5C; --use-11:#A1318C;
   --r-sm:6px; --r-md:8px; --r-lg:12px; --r-full:9999px;
   --shadow-2:0 4px 12px rgba(15,15,15,.08); --shadow-3:0 24px 48px -8px rgba(15,15,15,.20); --shadow-4:0 16px 48px -8px rgba(15,15,15,.16);
-  --fs-body:14px; --fs-sm:12px; --fs-label:12px; --fs-btn:14px; --fs-nav:14px; --fs-input:14px; --fs-section:16px; --fs-topbar:24px;
+  --fs-body:14px; --fs-sm:12px; --fs-label:12px; --fs-btn:14px; --fs-nav:14px; --fs-input:14px; --fs-section:16px; --fs-topbar:22px;
   --h-btn:36px; --h-btn-sm:30px; --h-btn-ghost:32px; --h-topbar:72px;
 }
 @media (min-width:769px) {
   :root {
-    --fs-body:16px; --fs-sm:14px; --fs-label:13px; --fs-btn:15px; --fs-nav:15px; --fs-input:15px; --fs-section:18px; --fs-topbar:22px;
+    --fs-body:16px; --fs-sm:14px; --fs-label:13px; --fs-btn:15px; --fs-nav:15px; --fs-input:15px; --fs-section:18px; --fs-topbar:24px;
     --h-btn:40px; --h-btn-sm:34px; --h-btn-ghost:36px; --h-topbar:88px;
   }
 }
@@ -440,7 +440,7 @@ function Sidebar({cur,onNav,user,onLogout}) {
       <aside className={`ss-aside${collapsed?' collapsed':''}`} style={{width:240,background:'var(--surface)',borderRight:'1px solid var(--hairline)',display:'flex',flexDirection:'column',flexShrink:0}}>
         <div className="row between" style={{height:'var(--h-topbar)',padding:'0 14px 0 16px',borderBottom:'1px solid var(--hairline-soft)',flexShrink:0}}>
           <div className="row" style={{gap:10,overflow:'hidden'}}>
-            <span className="ss-logo-name" style={{fontSize:20,fontWeight:600,color:'var(--ink-deep)'}}>SenseStock</span>
+            <span className="ss-logo-name" style={{fontSize:22,fontWeight:600,color:'var(--ink-deep)'}}>SenseStock</span>
           </div>
           <button className="ss-toggle-btn" onClick={()=>setCollapsed(c=>!c)}>
             <SidebarToggleIcon open={!collapsed}/>
