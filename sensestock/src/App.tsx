@@ -916,7 +916,7 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
               </div>
               <div style={{flex:1,overflow:'auto',paddingBottom:8}}>
                 <table className="table mobile-hide">
-                  <thead><tr><th style={{width:200}}>품목명</th><th style={{width:120}}>용도</th><th style={{width:140}}>위치</th><th style={{width:160}}>규격</th><th style={{width:60,textAlign:'right'}}>수량</th></tr></thead>
+                  <thead><tr><th style={{width:200}}>품목명</th><th style={{width:120}}>용도</th><th style={{width:140}}>위치</th><th style={{width:160}}>규격</th><th style={{width:60}}>수량</th></tr></thead>
                   <tbody>
                     {selItems.map(it=>{
                       const u=useById(it.useId);
@@ -927,7 +927,7 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
                           <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color}}/>{u.short}</span></td>
                           <td><b>{it.group}</b> / {it.cell}</td>
                           <td style={{fontSize:'var(--fs-body)',color:'var(--slate)'}}>{it.spec||'–'}</td>
-                          <td style={{textAlign:'right'}}><span style={{fontWeight:600,color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}> / {it.min}</span>}</td>
+                          <td><span style={{fontWeight:600,color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}> / {it.min}</span>}</td>
                         </tr>
                       );
                     })}
