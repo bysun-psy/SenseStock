@@ -105,7 +105,7 @@ body,#root{margin:0;padding:0}
 .chip.active{background:var(--ink-deep);color:#fff;border-color:var(--ink-deep)}
 .table{width:100%;border-collapse:separate;border-spacing:0}
 .table thead th{text-align:left;padding:12px 16px;font-size:var(--fs-label);font-weight:500;color:var(--slate);border-bottom:1px solid var(--hairline);background:var(--surface-soft);position:sticky;top:0;z-index:1}
-.table tbody td{padding:9px 16px;border-bottom:1px solid var(--hairline-soft);vertical-align:middle;font-size:14px}
+.table tbody td{padding:9px 16px;border-bottom:1px solid var(--hairline-soft);vertical-align:middle}
 .table tbody tr{cursor:pointer}
 .table tbody tr:hover td{background:var(--surface-soft)}
 .table tbody tr.sel td{background:var(--primary-soft)}
@@ -678,11 +678,11 @@ function Search({items,onItemClick,onDelete}) {
                 <tr key={it.id} className={isSel?'sel':''} onClick={e=>{if(e.target.tagName==='INPUT') return; onItemClick(it);}}>
                   <td onClick={e=>{e.stopPropagation();tog(setSel,it.id);}}><input type="checkbox" checked={isSel} onChange={()=>{}}/></td>
                   <td style={{maxWidth:220}}><div style={{fontWeight:500,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{q?hi(it.name,q):it.name}</div>{it.note&&<div style={{fontSize:'var(--fs-sm)',color:'var(--steel)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.note}</div>}</td>
-                  <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color,flexShrink:0}}/><span style={{fontSize:'var(--fs-body)',color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.short}</span></span></td>
-                  <td><span style={{fontSize:'var(--fs-body)'}}><b>{it.space}</b><span style={{color:'var(--slate)'}}> / {it.group} / {it.cell}</span></span></td>
-                  <td><span style={{fontSize:'var(--fs-body)',color:'var(--slate)',whiteSpace:'nowrap'}}>{it.spec||'–'}</span></td>
+                  <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color,flexShrink:0}}/><span style={{color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.short}</span></span></td>
+                  <td><span <b>{it.space}</b><span style={{color:'var(--slate)'}}> / {it.group} / {it.cell}</span></span></td>
+                  <td><span style={{color:'var(--slate)',whiteSpace:'nowrap'}}>{it.spec||'–'}</span></td>
                   <td style={{textAlign:'right'}}><span style={{fontWeight:600,color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}> / {it.min}</span>}{isLow&&<div style={{fontSize:'var(--fs-label)',color:'var(--error)',fontWeight:600}}>재고 부족</div>}</td>
-                  <td><span style={{fontSize:'var(--fs-body)',color:'var(--slate)',whiteSpace:'nowrap'}}>{it.received}</span></td>
+                  <td><span style={{color:'var(--slate)',whiteSpace:'nowrap'}}>{it.received}</span></td>
                 </tr>
               );
             })}
