@@ -915,7 +915,7 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
                 <button className="btn btn-ghost btn-icon" onClick={()=>setShowList(false)}><IC.x/></button>
               </div>
               <div style={{flex:1,overflow:'auto',paddingBottom:8}}>
-                <table className="table mobile-hide">
+                <table className="table mobile-hide" style={{maxWidth:800,margin:'0 auto'}}>
                   <thead><tr><th style={{width:200}}>품목명</th><th style={{width:120}}>용도</th><th style={{width:140}}>위치</th><th style={{width:160}}>규격</th><th style={{width:60,textAlign:'right'}}>수량</th></tr></thead>
                   <tbody>
                     {selItems.map(it=>{
