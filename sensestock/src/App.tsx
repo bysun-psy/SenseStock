@@ -33,7 +33,7 @@ const SIDEBAR_CSS = `
     .bottom-nav-item.active { color:var(--primary); font-weight:600; }
     .bottom-nav-item.active .bnav-icon { color:var(--primary); }
     .bnav-icon { color:var(--slate); display:flex; }
-    .mobile-content { padding-bottom:100px !important; }
+    .mobile-content { padding-bottom:120px !important; }
     .app { height:100dvh !important; }
     .mobile-topbar { padding:14px 16px !important; }
     .mobile-topbar h1 { font-size:22px !important; white-space:nowrap; overflow:visible !important; text-overflow:clip !important; }
