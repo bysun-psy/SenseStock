@@ -780,7 +780,7 @@ function PrepPlan(p) {
       <FBox title="실험대 위" x={325} y={40} w={620} h={110} tp="right">
         {['1','2','3','4','5'].map((ce,i)=><Cell key={ce} {...c('실험대 위',ce,325+i*124,40,124,110,ce)}/>)}
       </FBox>
-      <FBox title="실험대 아래/서랍" x={170} y={195} w={775} h={150} tp="right">
+      <FBox title="실험대 아래" x={170} y={195} w={775} h={150} tp="right">
         <Cell {...c('실험대 아래','1',170,195,90,150,'1')}/>
         <Cell {...c('실험대 아래','2',260,195,90,150,'2')}/>
         {['서랍 1','서랍 2','서랍 3','서랍 4','서랍 5','서랍 6'].map((ce,i)=><Cell key={ce} {...c('실험대 서랍',ce,358+(i%2)*70,195+Math.floor(i/2)*50,70,50,ce)}/>)}
@@ -1225,7 +1225,7 @@ function MiniMapPrep({itemGroup,itemCell,itemColor}:{itemGroup:string,itemCell:s
         <MiniCell {...c('실험대 위','3',573,40,124,110)}/>
         <MiniCell {...c('실험대 위','4',697,40,124,110)}/>
         <MiniCell {...c('실험대 위','5',821,40,124,110)}/>
-        {/* 실험대 아래/서랍 */}
+        {/* 실험대 아래 */}
         <div style={{position:'absolute',left:170,top:195,width:775,height:150,border:'1.5px solid #1A1916',borderRadius:4}}/>
         <MiniCell {...c('실험대 아래','1',170,195,90,150)}/>
         <MiniCell {...c('실험대 아래','2',260,195,90,150)}/>
