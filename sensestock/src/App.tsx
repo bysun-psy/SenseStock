@@ -70,12 +70,12 @@ const STYLE_SHEET = `
   --r-sm:6px; --r-md:8px; --r-lg:12px; --r-full:9999px;
   --shadow-2:0 4px 12px rgba(15,15,15,.08); --shadow-3:0 24px 48px -8px rgba(15,15,15,.20); --shadow-4:0 16px 48px -8px rgba(15,15,15,.16);
   --fs-body:14px; --fs-sm:12px; --fs-label:12px; --fs-btn:14px; --fs-nav:14px; --fs-input:14px; --fs-section:16px; --fs-topbar:24px;
-  --h-btn:36px; --h-btn-sm:30px; --h-btn-ghost:32px;
+  --h-btn:36px; --h-btn-sm:30px; --h-btn-ghost:32px; --h-topbar:72px;
 }
 @media (min-width:769px) {
   :root {
     --fs-body:16px; --fs-sm:14px; --fs-label:13px; --fs-btn:15px; --fs-nav:15px; --fs-input:15px; --fs-section:18px; --fs-topbar:28px;
-    --h-btn:40px; --h-btn-sm:34px; --h-btn-ghost:36px;
+    --h-btn:40px; --h-btn-sm:34px; --h-btn-ghost:36px; --h-topbar:88px;
   }
 }
 *{box-sizing:border-box}
@@ -336,7 +336,7 @@ function Modal({open,onClose,children,width=440}) {
 }
 function Topbar({title,sub,action}) {
   return (
-    <div className="row between mobile-topbar" style={{padding:'20px 32px',background:'var(--canvas)',borderBottom:'1px solid var(--hairline)',gap:16,flexShrink:0}}>
+    <div className="row between mobile-topbar" style={{height:'var(--h-topbar)',padding:'0 32px',background:'var(--canvas)',borderBottom:'1px solid var(--hairline)',gap:16,flexShrink:0}}>
       <div style={{minWidth:0,flex:1}}>
         <h1 style={{margin:0,fontSize:'var(--fs-topbar)',fontWeight:600,color:'var(--ink-deep)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{title}</h1>
         {sub&&<div className="topbar-sub" style={{fontSize:'var(--fs-sm)',color:'var(--slate)',marginTop:2}}>{sub}</div>}
@@ -438,7 +438,7 @@ function Sidebar({cur,onNav,user,onLogout}) {
   return (
     <>
       <aside className={`ss-aside${collapsed?' collapsed':''}`} style={{width:240,background:'var(--surface)',borderRight:'1px solid var(--hairline)',display:'flex',flexDirection:'column',flexShrink:0}}>
-        <div className="row between" style={{padding:'18px 14px 18px 16px',borderBottom:'1px solid var(--hairline-soft)',minHeight:62,flexShrink:0}}>
+        <div className="row between" style={{height:'var(--h-topbar)',padding:'0 14px 0 16px',borderBottom:'1px solid var(--hairline-soft)',flexShrink:0}}>
           <div className="row" style={{gap:10,overflow:'hidden'}}>
             <span className="ss-logo-name" style={{fontSize:20,fontWeight:600,color:'var(--ink-deep)'}}>SenseStock</span>
           </div>
@@ -1394,7 +1394,7 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
   const isMobile=useMediaQuery('(max-width:768px)');
   return (
     <div className="col" style={{height:'100%'}}>
-      <Topbar title={item.name} sub={`#${item.id} · ${item.space} / ${item.group} / ${item.cell}`} action={
+      <Topbar title="품목 상세" sub={`${item.name} · #${item.id} · ${item.space} / ${item.group} / ${item.cell}`} action={
         <div className="row" style={{gap:isMobile?6:12}}>
           <button className="btn btn-danger btn-sm" onClick={()=>setDelM(true)} style={{gap:isMobile?0:6,paddingLeft:isMobile?8:12,paddingRight:isMobile?8:12}}>
             <IC.trash/>{!isMobile&&<span>삭제</span>}
