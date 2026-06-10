@@ -14,7 +14,7 @@ function useMediaQuery(query:string):boolean {
 }
 
 const SIDEBAR_CSS = `
-  .ss-aside.collapsed { overflow: visible !important; }
+  .ss-aside { transition: width 0.22s ease; overflow: hidden; }
   .ss-aside.collapsed { width: 52px !important; }
   .ss-aside.collapsed .ss-logo-name,
   .ss-aside.collapsed .ss-nav-label,
@@ -23,8 +23,6 @@ const SIDEBAR_CSS = `
   .ss-aside.collapsed .ss-avatar { margin:0 auto; }
   .ss-logo-name,.ss-nav-label,.ss-user-info,.ss-logout-btn { opacity:1; transition:opacity 0.15s; overflow:hidden; white-space:nowrap; }
   .ss-nav-item { position:relative; min-height:36px; }
-  .ss-tooltip { display:none; position:absolute; left:calc(100% + 8px); top:50%; transform:translateY(-50%); background:#2D2D2D; color:#fff; font-size:12px; font-weight:500; line-height:1.4; padding:4px 8px; border-radius:6px; white-space:nowrap; pointer-events:none; z-index:100; }
-  .ss-aside.collapsed .ss-nav-item:hover .ss-tooltip { display:block; }
   .ss-toggle-btn { width:24px; height:24px; border-radius:6px; background:none; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--slate); flex-shrink:0; padding:0; }
   .bottom-nav { display:none; }
   .desktop-hide { display:none; }
@@ -32,13 +30,13 @@ const SIDEBAR_CSS = `
     .ss-aside { display:none !important; }
     .bottom-nav { display:flex !important; position:fixed; bottom:0; left:0; right:0; height:60px; background:var(--canvas); border-top:1px solid var(--hairline); z-index:50; align-items:stretch; }
     .bottom-nav-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; border:none; background:transparent; cursor:pointer; font-family:inherit; font-size:12px; font-weight:500; color:var(--slate); padding:0; }
-    .bottom-nav-item.active { color:var(--primary); font-weight: 600; }
+    .bottom-nav-item.active { color:var(--primary); }
     .bottom-nav-item.active .bnav-icon { color:var(--primary); }
     .bnav-icon { color:var(--slate); display:flex; }
     .mobile-content { padding-bottom:100px !important; }
     .app { height:100dvh !important; }
     .mobile-topbar { padding:14px 16px !important; }
-    .mobile-topbar h1 { font-size:22px !important; white-space:nowrap; overflow:visible !important; text-overflow:clip !important; }
+    .mobile-topbar h1 { font-size:20px !important; white-space:nowrap; overflow:visible !important; text-overflow:clip !important; }
     .mobile-topbar .topbar-sub { display:none; }
     .mobile-topbar .topbar-actions { gap:6px !important; flex-shrink:1 !important; min-width:0; }
     .mobile-topbar .topbar-actions .btn { flex-shrink:0; }
@@ -422,6 +420,7 @@ function Login() {
 
 function Sidebar({cur,onNav,user,onLogout}) {
   const [collapsed,setCollapsed]=useState(false);
+  const [tooltip,setTooltip]=useState<{label:string,y:number}|null>(null);
   const navItems=[
     {id:'search',label:'품목 찾기',I:IC.list},
     {id:'space',label:'공간 조회',I:IC.map},
@@ -429,38 +428,51 @@ function Sidebar({cur,onNav,user,onLogout}) {
     {id:'dashboard',label:'대시 보드',I:IC.dash},
   ];
   return (
-    <aside className={`ss-aside${collapsed?' collapsed':''}`} style={{width:240,background:'var(--surface)',borderRight:'1px solid var(--hairline)',display:'flex',flexDirection:'column',flexShrink:0}}>
-      <div className="row between" style={{padding:'18px 14px 18px 16px',borderBottom:'1px solid var(--hairline-soft)',minHeight:62,flexShrink:0}}>
-        <div className="row" style={{gap:10,overflow:'hidden'}}>
-          <span className="ss-logo-name" style={{fontSize:20,fontWeight:600,color:'var(--ink-deep)'}}>SenseStock</span>
+    <>
+      <aside className={`ss-aside${collapsed?' collapsed':''}`} style={{width:240,background:'var(--surface)',borderRight:'1px solid var(--hairline)',display:'flex',flexDirection:'column',flexShrink:0}}>
+        <div className="row between" style={{padding:'18px 14px 18px 16px',borderBottom:'1px solid var(--hairline-soft)',minHeight:62,flexShrink:0}}>
+          <div className="row" style={{gap:10,overflow:'hidden'}}>
+            <span className="ss-logo-name" style={{fontSize:20,fontWeight:600,color:'var(--ink-deep)'}}>SenseStock</span>
+          </div>
+          <button className="ss-toggle-btn" onClick={()=>setCollapsed(c=>!c)}>
+            <SidebarToggleIcon open={!collapsed}/>
+          </button>
         </div>
-        <button className="ss-toggle-btn" onClick={()=>setCollapsed(c=>!c)}>
-          <SidebarToggleIcon open={!collapsed}/>
-        </button>
-      </div>
-      <nav style={{padding:'8px 6px',display:'flex',flexDirection:'column',gap:2,flex:1,overflow:'auto'}}>
-        {navItems.map(({id,label,I})=>{
-          const a=cur===id||(id==='search'&&cur==='detail');
-          return (
-            <button key={id} onClick={()=>onNav(id)} className="ss-nav-item row" style={{gap:10,padding:'8px',borderRadius:'var(--r-md)',background:a?'var(--primary-soft)':'transparent',color:a?'var(--primary-deep)':'var(--charcoal)',fontWeight:a?600:500,fontSize:14,border:'none',cursor:'pointer',textAlign:'left',fontFamily:'inherit',width:'100%'}}>
-              <span style={{color:a?'var(--primary)':'var(--slate)',display:'flex',width:20,justifyContent:'center',flexShrink:0}}><I/></span>
-              <span className="ss-nav-label">{label}</span>
-              <span className="ss-tooltip">{label}</span>
-            </button>
-          );
-        })}
-      </nav>
-      <div className="row" style={{borderTop:'1px solid var(--hairline-soft)',padding:'12px 6px',gap:10,flexShrink:0}}>
-        <div className="ss-avatar" style={{width:32,height:32,borderRadius:'50%',background:'var(--tint-lavender)',color:'var(--brand-purple-800)',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:600,fontSize:14,flexShrink:0}}>
-          {user?.name?.[0]||'U'}
+        <nav style={{padding:'8px 6px',display:'flex',flexDirection:'column',gap:2,flex:1,overflow:'auto'}}>
+          {navItems.map(({id,label,I})=>{
+            const a=cur===id||(id==='search'&&cur==='detail');
+            return (
+              <button
+                key={id}
+                onClick={()=>onNav(id)}
+                className="ss-nav-item row"
+                onMouseEnter={e=>{if(collapsed){const r=e.currentTarget.getBoundingClientRect();setTooltip({label,y:r.top+r.height/2});}}}
+                onMouseLeave={()=>setTooltip(null)}
+                style={{gap:10,padding:'8px',borderRadius:'var(--r-md)',background:a?'var(--primary-soft)':'transparent',color:a?'var(--primary-deep)':'var(--charcoal)',fontWeight:a?600:500,fontSize:14,border:'none',cursor:'pointer',textAlign:'left',fontFamily:'inherit',width:'100%'}}
+              >
+                <span style={{color:a?'var(--primary)':'var(--slate)',display:'flex',width:20,justifyContent:'center',flexShrink:0}}><I/></span>
+                <span className="ss-nav-label">{label}</span>
+              </button>
+            );
+          })}
+        </nav>
+        <div className="row" style={{borderTop:'1px solid var(--hairline-soft)',padding:'12px 6px',gap:10,flexShrink:0}}>
+          <div className="ss-avatar" style={{width:32,height:32,borderRadius:'50%',background:'var(--tint-lavender)',color:'var(--brand-purple-800)',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:600,fontSize:14,flexShrink:0}}>
+            {user?.name?.[0]||'U'}
+          </div>
+          <div className="ss-user-info col flex1">
+            <span style={{fontSize:14,fontWeight:600,color:'var(--charcoal)'}}>{user?.name}</span>
+            <span style={{fontSize:11,color:'var(--steel)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{user?.email}</span>
+          </div>
+          <button className="ss-logout-btn btn btn-ghost btn-icon" onClick={onLogout} style={{color:'var(--slate)',flexShrink:0}}><IC.logout/></button>
         </div>
-        <div className="ss-user-info col flex1">
-          <span style={{fontSize:14,fontWeight:600,color:'var(--charcoal)'}}>{user?.name}</span>
-          <span style={{fontSize:11,color:'var(--steel)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{user?.email}</span>
+      </aside>
+      {collapsed&&tooltip&&(
+        <div style={{position:'fixed',left:60,top:tooltip.y,transform:'translateY(-50%)',background:'#2D2D2D',color:'#fff',fontSize:12,fontWeight:500,lineHeight:1.4,padding:'4px 8px',borderRadius:6,whiteSpace:'nowrap',pointerEvents:'none',zIndex:200}}>
+          {tooltip.label}
         </div>
-        <button className="ss-logout-btn btn btn-ghost btn-icon" onClick={onLogout} style={{color:'var(--slate)',flexShrink:0}}><IC.logout/></button>
-      </div>
-    </aside>
+      )}
+    </>
   );
 }
 
@@ -690,12 +702,12 @@ function Search({items,onItemClick,onDelete}) {
                     <span style={{fontSize:12,color:'var(--steel)'}}>·</span>
                     <span style={{fontSize:12,color:'var(--slate)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.space} / {it.group} / {it.cell}</span>
                   </div>
-                  {it.note&&<div style={{fontSize:12,color:'var(--steel)',marginTop:2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.note}</div>}
+                  {it.note&&<div style={{fontSize:11,color:'var(--steel)',marginTop:2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.note}</div>}
                 </div>
                 <div style={{textAlign:'right',flexShrink:0}}>
                   <div style={{fontWeight:600,fontSize:15,color:isLow?'var(--error)':'var(--ink-deep)'}}>{it.qty}{it.min!=null&&<span style={{fontSize:12,color:'var(--slate)',fontWeight:400}}> / {it.min}</span>}</div>
-                  {isLow&&<div style={{fontSize:11,color:'var(--error)',fontWeight:600}}>재고 부족</div>}
-                  <div style={{fontSize:12,color:'var(--steel)',marginTop:1}}>{it.received}</div>
+                  {isLow&&<div style={{fontSize:10,color:'var(--error)',fontWeight:600}}>재고 부족</div>}
+                  <div style={{fontSize:11,color:'var(--steel)',marginTop:1}}>{it.received}</div>
                 </div>
               </div>
             );
