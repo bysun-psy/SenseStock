@@ -916,7 +916,7 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
               </div>
               <div style={{flex:1,overflow:'auto',paddingBottom:8}}>
                 <table className="table mobile-hide">
-                  <thead><tr><th style={{width:200}}>품목명</th><th style={{width:140}}>용도</th><th style={{width:160}}>위치</th><th style={{width:200}}>규격</th><th style={{width:80,textAlign:'right'}}>수량</th></tr></thead>
+                  <thead><tr><th style={{width:200}}>품목명</th><th style={{width:120}}>용도</th><th style={{width:140}}>위치</th><th style={{width:160}}>규격</th><th style={{width:60,textAlign:'right'}}>수량</th></tr></thead>
                   <tbody>
                     {selItems.map(it=>{
                       const u=useById(it.useId);
