@@ -70,24 +70,26 @@ const STYLE_SHEET = `
   --r-sm:6px; --r-md:8px; --r-lg:12px; --r-full:9999px;
   --shadow-2:0 4px 12px rgba(15,15,15,.08); --shadow-3:0 24px 48px -8px rgba(15,15,15,.20); --shadow-4:0 16px 48px -8px rgba(15,15,15,.16);
   --fs-body:14px; --fs-sm:12px; --fs-label:12px; --fs-btn:14px; --fs-nav:14px; --fs-input:14px; --fs-section:16px; --fs-topbar:24px;
+  --h-btn:36px; --h-btn-sm:30px; --h-btn-ghost:32px;
 }
 @media (min-width:769px) {
   :root {
     --fs-body:16px; --fs-sm:14px; --fs-label:13px; --fs-btn:15px; --fs-nav:15px; --fs-input:15px; --fs-section:18px; --fs-topbar:28px;
+    --h-btn:40px; --h-btn-sm:34px; --h-btn-ghost:36px;
   }
 }
 *{box-sizing:border-box}
 body,#root{margin:0;padding:0}
 .app{font-family:'Pretendard','Inter',-apple-system,system-ui,sans-serif;color:var(--ink);background:var(--surface);font-size:var(--fs-body);line-height:1.55;-webkit-font-smoothing:antialiased;height:100vh;height:100dvh;overflow:hidden}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:36px;padding:0 14px;border-radius:var(--r-md);font-size:var(--fs-btn);font-weight:500;border:1px solid transparent;cursor:pointer;white-space:nowrap;font-family:inherit;transition:background 120ms}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:var(--h-btn);padding:0 14px;border-radius:var(--r-md);font-size:var(--fs-btn);font-weight:500;border:1px solid transparent;cursor:pointer;white-space:nowrap;font-family:inherit;transition:background 120ms}
 .btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-pressed)}
 .btn-primary:disabled{background:var(--hairline-strong);color:var(--steel);cursor:not-allowed}
 .btn-secondary{background:var(--canvas);color:var(--ink);border-color:var(--hairline-strong)}.btn-secondary:hover{background:var(--surface)}
 .btn-secondary:disabled{color:var(--stone);cursor:not-allowed}
-.btn-ghost{background:transparent;color:var(--ink);padding:0 10px;height:32px;border:none}.btn-ghost:hover{background:var(--surface)}
+.btn-ghost{background:transparent;color:var(--ink);padding:0 10px;height:var(--h-btn-ghost);border:none}.btn-ghost:hover{background:var(--surface)}
 .btn-danger{background:var(--canvas);color:var(--error);border-color:#EBC7C7}.btn-danger:hover{background:#FCEFEF}
-.btn-sm{height:30px;padding:0 10px;font-size:13px}
-.btn-icon{width:32px;height:32px;padding:0}
+.btn-sm{height:var(--h-btn-sm);padding:0 10px;font-size:var(--fs-btn)}
+.btn-icon{width:var(--h-btn-ghost);height:var(--h-btn-ghost);padding:0}
 .input,.select,.textarea{width:100%;height:40px;padding:0 12px;border-radius:var(--r-md);border:1px solid var(--hairline-strong);background:var(--canvas);color:var(--ink);font:inherit;font-size:var(--fs-input);outline:none;transition:border-color 120ms}
 .textarea{height:auto;padding:10px 12px;resize:vertical;min-height:80px}
 .input::placeholder{color:var(--stone)}
@@ -633,7 +635,7 @@ function Search({items,onItemClick,onDelete}) {
         <div style={{position:'relative',maxWidth:640}}>
           <span style={{position:'absolute',left:12,top:'50%',transform:'translateY(-50%)',color:'var(--slate)',display:'flex'}}><IC.search/></span>
           <input className="search-pill" placeholder="품목명으로 검색…" value={q} onChange={e=>{setQ(e.target.value);setSubmitted(false);setSuggOpen(true);}} onFocus={()=>setSuggOpen(true)} onBlur={()=>setTimeout(()=>setSuggOpen(false),150)} onKeyDown={e=>e.key==='Enter'&&submit()}/>
-          <button className="btn btn-primary btn-sm" onClick={submit} style={{position:'absolute',right:6,top:'50%',transform:'translateY(-50%)',height:32}}>찾기</button>
+          <button className="btn btn-primary btn-sm" onClick={submit} style={{position:'absolute',right:6,top:'50%',transform:'translateY(-50%)',height:'var(--h-btn-sm)'}}>찾기</button>
           {suggOpen&&sugg.length>0&&(
             <div className="card" style={{position:'absolute',top:'calc(100% + 6px)',left:0,right:0,padding:6,zIndex:10,boxShadow:'var(--shadow-2)'}}>
               <div style={{fontSize:'var(--fs-sm)',fontWeight:600,color:'var(--steel)',padding:'4px 10px'}}>추천</div>
