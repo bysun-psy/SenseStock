@@ -1408,37 +1408,53 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
         </div>}/>
       <div className="mobile-content mobile-pad" style={{flex:1,overflow:'auto',padding:32,paddingBottom:100}}>
         <div style={{maxWidth:860,margin:'0 auto',display:'flex',flexDirection:'column',gap:16}}>
-          <div className="card mobile-grid-1" style={{padding:24,display:'grid',gridTemplateColumns:'1.4fr 1fr',gap:24}}>
-            <div>
-              <span className="badge" style={{background:u.color,color:'#fff'}}>{u.name}</span>
-              <h2 className="mobile-h2" style={{margin:'12px 0 6px',fontSize:28,fontWeight:600,color:'var(--ink-deep)'}}>{item.name}</h2>
-              <div style={{fontSize:'var(--fs-body)',color:'var(--charcoal)'}}><span style={{color:'var(--slate)'}}>위치</span> <b>{item.space} / {item.group} / {item.cell}</b></div>
-              {item.note&&<div style={{marginTop:12,padding:'10px 14px',background:'var(--tint-yellow)',borderRadius:'var(--r-md)',fontSize:'var(--fs-body)'}}>📌 {item.note}</div>}
-            </div>
-            <div style={{background:isLow?'var(--tint-rose)':'var(--tint-mint)',borderRadius:'var(--r-lg)',padding:'18px 20px',display:'flex',flexDirection:'column',justifyContent:'center'}}>
-              <div style={{fontSize:'var(--fs-sm)',fontWeight:600,color:isLow?'var(--brand-pink-deep)':'var(--brand-green)'}}>{isLow?'재고 부족':'재고 양호'}</div>
-              <div style={{fontSize:36,fontWeight:600,color:'var(--ink-deep)',marginTop:4,display:'flex',alignItems:'baseline',gap:4}}>{item.qty}{item.min!=null&&<span style={{fontSize:18,color:'var(--slate)',fontWeight:500}}> / {item.min}</span>}</div>
-              <div style={{fontSize:'var(--fs-sm)',color:'var(--slate)',marginTop:4}}>{item.min!=null?'현재 / 최소':'현재 수량'}</div>
+          {/* 카드 1: 품목명 + 미니맵 */}
+          <div className="card" style={{padding:24}}>
+            <span className="badge" style={{background:u.color,color:'#fff'}}>{u.name}</span>
+            <h2 className="mobile-h2" style={{margin:'12px 0 6px',fontSize:28,fontWeight:600,color:'var(--ink-deep)'}}>{item.name}</h2>
+            <div style={{fontSize:'var(--fs-body)',color:'var(--charcoal)'}}><span style={{color:'var(--slate)'}}>위치</span> <b>{item.space} / {item.group} / {item.cell}</b></div>
+            <div style={{marginTop:12,borderTop:'1px solid var(--hairline)',paddingTop:14}}>
+              <ItemMiniMap item={item} u={u}/>
             </div>
           </div>
+          {/* 카드 2: 상세 정보 (규격·입고·수량·재고상태) + 비고 */}
           <div className="card" style={{padding:24}}>
             <div style={{fontSize:'var(--fs-section)',fontWeight:600,marginBottom:16}}>상세 정보</div>
-            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:20,marginBottom:20}}>
-              <div>
-                <div style={{fontSize:'var(--fs-label)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>용도</div>
-                <div className="row" style={{gap:6,marginTop:4}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:'var(--fs-body)',fontWeight:500}}>{u.name}</span></div>
-              </div>
-              {[['규격',item.spec||'–'],['입고 시기',item.received||'–'],['공간',item.space],['구역',item.group],['셀',item.cell]].map(([l,v])=>(
-                <div key={l}><div style={{fontSize:'var(--fs-label)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>{l}</div><div style={{fontSize:'var(--fs-body)',fontWeight:500,marginTop:4}}>{v}</div></div>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:20}}>
+              {[['규격',item.spec||'–'],['입고 시기',item.received||'–']].map(([l,v])=>(
+                <div key={l}>
+                  <div style={{fontSize:'var(--fs-label)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>{l}</div>
+                  <div style={{fontSize:'var(--fs-body)',fontWeight:500,marginTop:4}}>{v}</div>
+                </div>
               ))}
+              <div>
+                <div style={{fontSize:'var(--fs-label)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>현재 수량</div>
+                <div style={{fontSize:'var(--fs-body)',fontWeight:600,marginTop:4,color:isLow?'var(--error)':'var(--ink)'}}>
+                  {item.qty}{item.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--steel)',fontWeight:400}}> / {item.min} 최소</span>}
+                </div>
+              </div>
+              <div>
+                <div style={{fontSize:'var(--fs-label)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>재고 상태</div>
+                <div style={{fontSize:'var(--fs-body)',fontWeight:600,marginTop:4,color:isLow?'var(--error)':'var(--brand-green)'}}>{isLow?'재고 부족':'재고 양호'}</div>
+              </div>
             </div>
-            <div style={{borderTop:'1px solid var(--hairline)',marginBottom:14}}/>
-            <ItemMiniMap item={item} u={u}/>
+            {item.note&&(
+              <>
+                <div style={{borderTop:'1px solid var(--hairline)',margin:'16px 0'}}/>
+                <div style={{padding:'10px 14px',background:'var(--tint-yellow)',borderRadius:'var(--r-md)',fontSize:'var(--fs-body)',display:'flex',alignItems:'flex-start',gap:8}}>
+                  <span style={{flexShrink:0}}>📌</span>{item.note}
+                </div>
+              </>
+            )}
           </div>
+          {/* 카드 3: 시스템 정보 (품목 ID 제외) */}
           <div className="card" style={{padding:16,background:'var(--surface)',marginBottom:0}}>
-            <div className="row wrap" style={{gap:'12px 32px'}}>
-              {[['최초 등록일',item.createdAt],['최종 수정일',item.updatedAt],['최종 수정인',item.updatedBy],['품목 ID',`#${item.id}`]].map(([l,v])=>(
-                <div key={l} className="col"><span style={{fontSize:'var(--fs-label)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>{l}</span><span style={{fontSize:'var(--fs-body)',fontWeight:500,marginTop:2}}>{v}</span></div>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:12}}>
+              {[['최초 등록일',item.createdAt],['최종 수정일',item.updatedAt],['최종 수정인',item.updatedBy]].map(([l,v])=>(
+                <div key={l} className="col">
+                  <span style={{fontSize:'var(--fs-label)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4,whiteSpace:'nowrap'}}>{l}</span>
+                  <span style={{fontSize:'var(--fs-body)',fontWeight:500,marginTop:2,whiteSpace:'nowrap'}}>{v}</span>
+                </div>
               ))}
             </div>
           </div>
