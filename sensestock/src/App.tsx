@@ -69,12 +69,12 @@ const STYLE_SHEET = `
   --use-6:#E69A1F; --use-7:#F4D31E; --use-8:#2BAA50; --use-9:#2B7FD3; --use-10:#1A2E5C; --use-11:#A1318C;
   --r-sm:6px; --r-md:8px; --r-lg:12px; --r-full:9999px;
   --shadow-2:0 4px 12px rgba(15,15,15,.08); --shadow-3:0 24px 48px -8px rgba(15,15,15,.20); --shadow-4:0 16px 48px -8px rgba(15,15,15,.16);
-  --fs-body:14px; --fs-sm:12px; --fs-label:12px; --fs-btn:14px; --fs-nav:14px; --fs-input:14px; --fs-section:16px; --fs-topbar:22px;
+  --fs-body:14px; --fs-sm:12px; --fs-label:12px; --fs-btn:14px; --fs-nav:14px; --fs-input:14px; --fs-section:16px; --fs-topbar:22px; --fs-table:13px;
   --h-btn:36px; --h-btn-sm:30px; --h-btn-ghost:32px; --h-topbar:72px;
 }
 @media (min-width:769px) {
   :root {
-    --fs-body:16px; --fs-sm:14px; --fs-label:13px; --fs-btn:15px; --fs-nav:15px; --fs-input:15px; --fs-section:18px; --fs-topbar:24px;
+    --fs-body:16px; --fs-sm:14px; --fs-label:13px; --fs-btn:15px; --fs-nav:15px; --fs-input:15px; --fs-section:18px; --fs-topbar:24px; --fs-table:14px;
     --h-btn:40px; --h-btn-sm:34px; --h-btn-ghost:36px; --h-topbar:88px;
   }
 }
@@ -643,7 +643,7 @@ function Search({items,onItemClick,onDelete}) {
                 const u=useById(s.useId);
                 return (
                   <button key={s.id} onMouseDown={()=>{setQ(s.name);submit();}} className="row" style={{gap:8,width:'100%',padding:'8px 10px',background:'transparent',border:'none',borderRadius:'var(--r-sm)',cursor:'pointer',fontFamily:'inherit',textAlign:'left'}} onMouseEnter={e=>e.currentTarget.style.background='var(--surface)'} onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
-                    <span className="swatch" style={{background:u.color,flexShrink:0}}/><span style={{fontSize:'var(--fs-body)',color:'var(--charcoal)',flex:1,textAlign:'left'}}>{hi(s.name,q)}</span><span style={{fontSize:'var(--fs-sm)',color:'var(--slate)',flexShrink:0}}>{s.space}·{s.group}</span>
+                    <span className="swatch" style={{background:u.color,flexShrink:0}}/><span style={{fontSize:'var(--fs-table)',color:'var(--charcoal)',flex:1,textAlign:'left'}}>{hi(s.name,q)}</span><span style={{fontSize:'var(--fs-sm)',color:'var(--slate)',flexShrink:0}}>{s.space}·{s.group}</span>
                   </button>
                 );
               })}
@@ -677,12 +677,12 @@ function Search({items,onItemClick,onDelete}) {
               return (
                 <tr key={it.id} className={isSel?'sel':''} onClick={e=>{if(e.target.tagName==='INPUT') return; onItemClick(it);}}>
                   <td onClick={e=>{e.stopPropagation();tog(setSel,it.id);}}><input type="checkbox" checked={isSel} onChange={()=>{}}/></td>
-                  <td style={{maxWidth:220}}><div style={{fontWeight:500,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{q?hi(it.name,q):it.name}</div>{it.note&&<div style={{fontSize:'var(--fs-sm)',color:'var(--steel)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.note}</div>}</td>
-                  <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color,flexShrink:0}}/><span style={{color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.short}</span></span></td>
-                  <td><span><b>{it.space}</b><span style={{color:'var(--slate)'}}> / {it.group} / {it.cell}</span></span></td>
-                  <td><span style={{color:'var(--slate)',whiteSpace:'nowrap'}}>{it.spec||'–'}</span></td>
-                  <td style={{textAlign:'right'}}><span style={{fontWeight:600,color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}> / {it.min}</span>}{isLow&&<div style={{fontSize:'var(--fs-label)',color:'var(--error)',fontWeight:600}}>재고 부족</div>}</td>
-                  <td><span style={{color:'var(--slate)',whiteSpace:'nowrap'}}>{it.received}</span></td>
+                  <td style={{maxWidth:220}}><div style={{fontWeight:500,fontSize:'var(--fs-table)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{q?hi(it.name,q):it.name}</div>{it.note&&<div style={{fontSize:'var(--fs-sm)',color:'var(--steel)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.note}</div>}</td>
+                  <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color,flexShrink:0}}/><span style={{fontSize:'var(--fs-table)',color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.short}</span></span></td>
+                  <td><span style={{fontSize:'var(--fs-table)'}}><b>{it.space}</b><span style={{color:'var(--slate)'}}> / {it.group} / {it.cell}</span></span></td>
+                  <td><span style={{fontSize:'var(--fs-table)',color:'var(--slate)',whiteSpace:'nowrap'}}>{it.spec||'–'}</span></td>
+                  <td style={{textAlign:'right'}}><span style={{fontWeight:600,fontSize:'var(--fs-table)',color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}> / {it.min}</span>}{isLow&&<div style={{fontSize:'var(--fs-label)',color:'var(--error)',fontWeight:600}}>재고 부족</div>}</td>
+                  <td><span style={{fontSize:'var(--fs-table)',color:'var(--slate)',whiteSpace:'nowrap'}}>{it.received}</span></td>
                 </tr>
               );
             })}
@@ -923,11 +923,11 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
                       const isLow=it.min!=null&&it.qty<it.min;
                       return (
                         <tr key={it.id} onClick={()=>{setShowList(false);onItemClick(it);}}>
-                          <td><div style={{fontWeight:500}}>{it.name}</div>{it.note&&<div style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}>{it.note}</div>}</td>
-                          <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color}}/>{u.short}</span></td>
-                          <td><b>{it.group}</b> / {it.cell}</td>
-                          <td style={{fontSize:'var(--fs-body)',color:'var(--slate)'}}>{it.spec||'–'}</td>
-                          <td><span style={{fontWeight:600,color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}> / {it.min}</span>}</td>
+                          <td><div style={{fontWeight:500,fontSize:'var(--fs-table)'}}>{it.name}</div>{it.note&&<div style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}>{it.note}</div>}</td>
+                          <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:'var(--fs-table)'}}>{u.short}</span></span></td>
+                          <td style={{fontSize:'var(--fs-table)'}}><b>{it.group}</b> / {it.cell}</td>
+                          <td style={{fontSize:'var(--fs-table)',color:'var(--slate)'}}>{it.spec||'–'}</td>
+                          <td><span style={{fontWeight:600,fontSize:'var(--fs-table)',color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}> / {it.min}</span>}</td>
                         </tr>
                       );
                     })}
