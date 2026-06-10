@@ -31,14 +31,14 @@ const SIDEBAR_CSS = `
   @media (max-width:768px) {
     .ss-aside { display:none !important; }
     .bottom-nav { display:flex !important; position:fixed; bottom:0; left:0; right:0; height:60px; background:var(--canvas); border-top:1px solid var(--hairline); z-index:50; align-items:stretch; }
-    .bottom-nav-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; border:none; background:transparent; cursor:pointer; font-family:inherit; font-size:10px; font-weight:500; color:var(--slate); padding:0; }
+    .bottom-nav-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; border:none; background:transparent; cursor:pointer; font-family:inherit; font-size:12px; font-weight:500; color:var(--slate); padding:0; }
     .bottom-nav-item.active { color:var(--primary); }
     .bottom-nav-item.active .bnav-icon { color:var(--primary); }
     .bnav-icon { color:var(--slate); display:flex; }
     .mobile-content { padding-bottom:100px !important; }
     .app { height:100dvh !important; }
     .mobile-topbar { padding:14px 16px !important; }
-    .mobile-topbar h1 { font-size:17px !important; white-space:nowrap; overflow:visible !important; text-overflow:clip !important; }
+    .mobile-topbar h1 { font-size:20px !important; white-space:nowrap; overflow:visible !important; text-overflow:clip !important; }
     .mobile-topbar .topbar-sub { display:none; }
     .mobile-topbar .topbar-actions { gap:6px !important; flex-shrink:1 !important; min-width:0; }
     .mobile-topbar .topbar-actions .btn { flex-shrink:0; }
@@ -746,7 +746,7 @@ function FBox({title,x,y,w,h,tp='top',children}) {
   return (
     <>
       <div style={{position:'absolute',left:x,top:y,width:w,height:h,border:'1.5px solid var(--ink-deep)',borderRadius:4,pointerEvents:'none'}}/>
-      {title&&<div style={{position:'absolute',...pos,fontSize:11,fontWeight:700,color:'var(--ink-deep)',whiteSpace:'nowrap'}}>{title}</div>}
+      {title&&<div style={{position:'absolute',...pos,fontSize:12,fontWeight:700,color:'var(--ink-deep)',whiteSpace:'nowrap'}}>{title}</div>}
       {children}
     </>
   );
@@ -1106,7 +1106,7 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
               <div style={{fontSize:12,fontWeight:600,color:'var(--steel)',marginBottom:8}}>시스템 정보</div>
               <div className="row wrap" style={{gap:32}}>
                 {[['최초 등록일',item.createdAt],['최종 수정일',item.updatedAt],['최종 수정인',item.updatedBy],['품목 ID',`#${item.id}`]].map(([l,v])=>(
-                  <div key={l} className="col"><span style={{fontSize:11,color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>{l}</span><span style={{fontSize:14,fontWeight:500,marginTop:2}}>{v}</span></div>
+                  <div key={l} className="col"><span style={{fontSize:12,color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>{l}</span><span style={{fontSize:14,fontWeight:500,marginTop:2}}>{v}</span></div>
                 ))}
               </div>
             </div>
