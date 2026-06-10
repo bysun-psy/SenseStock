@@ -418,7 +418,7 @@ function Login() {
             {loading?'로그인 중...':'Google 계정으로 로그인'}
           </button>
           <div style={{marginTop:20,fontSize:'var(--fs-sm)',color:'var(--steel)',textAlign:'center'}}>
-            외부 회원가입은 제공하지 않습니다.<br/>접속 권한은 관리자에게 요청하세요.
+            외부 회원가입은 제공하지 않습니다.<br/>접속 권한은 관리자에게 요청하세요.<br/>bysun@spc.co.kr
           </div>
         </div>
       </div>
