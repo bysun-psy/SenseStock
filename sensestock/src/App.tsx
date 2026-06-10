@@ -507,7 +507,7 @@ function Dashboard({items,activity,onNav,onItemClick}) {
             </div>
           </div>
           <div className="card" style={{padding:24}}>
-            <div style={{fontWeight:500,fontSize:16,marginBottom:4}}>용도별 분포</div>
+            <div style={{fontWeight:600,fontSize:16,marginBottom:4}}>용도별 분포</div>
             <div style={{fontSize:14,color:'var(--slate)',marginBottom:20}}>{USES.length}개 분류 · 총 {total}품목</div>
             {isMobile?(
               <div className="col" style={{gap:16,alignItems:'center'}}>
@@ -536,7 +536,7 @@ function Dashboard({items,activity,onNav,onItemClick}) {
         </div>
         <div className="mobile-grid-1" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16}}>
           <div className="card" style={{padding:24}}>
-            <div style={{fontWeight:500,fontSize:16,marginBottom:4}}>공간별 분포</div>
+            <div style={{fontWeight:600,fontSize:16,marginBottom:4}}>공간별 분포</div>
             <div style={{fontSize:14,color:'var(--slate)',marginBottom:20}}>{SPACES.length}개 공간</div>
             <div className="row" style={{gap:isMobile?12:24,alignItems:'center',flexWrap:isMobile?'wrap':'nowrap'}}>
               <Donut data={spData} total={total} size={isMobile?100:160}/>
@@ -550,7 +550,7 @@ function Dashboard({items,activity,onNav,onItemClick}) {
             </div>
           </div>
           <div className="card" style={{padding:24}}>
-            <div style={{fontWeight:500,fontSize:16,marginBottom:16}}>최근 활동</div>
+            <div style={{fontWeight:600,fontSize:16,marginBottom:16}}>최근 활동</div>
             <div className="col">
               {activity.map((a,i)=>{
                 const d=aDot[a.action]||aDot.create;
