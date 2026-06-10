@@ -731,7 +731,7 @@ function Search({items,onItemClick,onDelete}) {
           </div>
           <div className="row between" style={{marginTop:20}}>
             <button className="btn btn-danger" onClick={()=>{onDelete([...sel]);setDelModal(false);setSel(new Set());}}><IC.trash/> 삭제</button>
-            <button className="btn btn-secondary" onClick={()=>setDelModal(false)}>취소</button>
+            <button className="btn btn-secondary" onClick={()=>setDelModal(false)}><IC.x/>취소</button>
           </div>
         </div>
       </Modal>
@@ -1141,7 +1141,7 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
           </div>
           <div className="row between">
             <button className="btn btn-danger" onClick={()=>{if(onDelete&&item)onDelete(item.id);setDelM(false);}}><IC.trash/> 삭제</button>
-            <button className="btn btn-secondary" onClick={()=>setDelM(false)}>취소</button>
+            <button className="btn btn-secondary" onClick={()=>setDelM(false)}><IC.x/>취소</button>
           </div>
         </div>
       </Modal>
@@ -1453,7 +1453,7 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
           </div>
           <div className="row between">
             <button className="btn btn-danger" onClick={()=>{onDelete(item.id);setDelM(false);}}><IC.trash/> 삭제</button>
-            <button className="btn btn-secondary" onClick={()=>setDelM(false)}>취소</button>
+            <button className="btn btn-secondary" onClick={()=>setDelM(false)}><IC.x/>취소</button>
           </div>
         </div>
       </Modal>
