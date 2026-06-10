@@ -105,7 +105,7 @@ body,#root{margin:0;padding:0}
 .chip.active{background:var(--ink-deep);color:#fff;border-color:var(--ink-deep)}
 .table{width:100%;border-collapse:separate;border-spacing:0}
 .table thead th{text-align:left;padding:12px 16px;font-size:var(--fs-label);font-weight:500;color:var(--slate);border-bottom:1px solid var(--hairline);background:var(--surface-soft);position:sticky;top:0;z-index:1}
-.table tbody td{padding:9px 16px;border-bottom:1px solid var(--hairline-soft);vertical-align:middle}
+.table tbody td{padding:12px 16px;border-bottom:1px solid var(--hairline-soft);vertical-align:middle}
 .table tbody tr{cursor:pointer}
 .table tbody tr:hover td{background:var(--surface-soft)}
 .table tbody tr.sel td{background:var(--primary-soft)}
