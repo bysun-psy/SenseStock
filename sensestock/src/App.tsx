@@ -1169,7 +1169,7 @@ function MiniCell({group,cell,label,x,y,w,h,vert,itemGroup,itemCell,itemColor}:{
   const tc=isTarget?(darkColors.includes(itemColor)?'rgba(255,255,255,.9)':'var(--ink)'):'#9B9A97';
   return (
     <div style={{position:'absolute',left:x,top:y,width:w,height:h,background:bg,border:isTarget?'2.5px solid #1A1916':'1px solid #DEDCD7',borderRadius:4,display:'flex',alignItems:vert?'flex-end':'flex-start',justifyContent:vert?'center':'flex-start',padding:vert?5:5,boxSizing:'border-box',boxShadow:isTarget?'0 4px 12px rgba(15,15,15,.18)':'none'}}>
-      <span style={{fontSize:14,fontWeight:isTarget?700:600,color:tc,writingMode:vert?'vertical-rl':'horizontal-tb',lineHeight:1.2}}>{label}</span>
+      <span style={{fontSize:18,fontWeight:isTarget?700:600,color:tc,writingMode:vert?'vertical-rl':'horizontal-tb',lineHeight:1.2}}>{label}</span>
     </div>
   );
 }
