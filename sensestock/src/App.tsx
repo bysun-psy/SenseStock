@@ -14,7 +14,7 @@ function useMediaQuery(query:string):boolean {
 }
 
 const SIDEBAR_CSS = `
-  .ss-aside { transition: width 0.22s ease; overflow: hidden; }
+  .ss-aside.collapsed { overflow: visible !important; }
   .ss-aside.collapsed { width: 52px !important; }
   .ss-aside.collapsed .ss-logo-name,
   .ss-aside.collapsed .ss-nav-label,
@@ -23,7 +23,7 @@ const SIDEBAR_CSS = `
   .ss-aside.collapsed .ss-avatar { margin:0 auto; }
   .ss-logo-name,.ss-nav-label,.ss-user-info,.ss-logout-btn { opacity:1; transition:opacity 0.15s; overflow:hidden; white-space:nowrap; }
   .ss-nav-item { position:relative; min-height:36px; }
-  .ss-tooltip { display:none; position:absolute; left:calc(100% + 8px); top:50%; transform:translateY(-50%); background:#2D2D2D; color:#fff; font-size:12px; font-weight:500; padding:4px 8px; border-radius:6px; white-space:nowrap; pointer-events:none; z-index:100; }
+  .ss-tooltip { display:none; position:absolute; left:calc(100% + 8px); top:50%; transform:translateY(-50%); background:#2D2D2D; color:#fff; font-size:12px; font-weight:500; line-height:1.4; padding:4px 8px; border-radius:6px; white-space:nowrap; pointer-events:none; z-index:100; }
   .ss-aside.collapsed .ss-nav-item:hover .ss-tooltip { display:block; }
   .ss-toggle-btn { width:24px; height:24px; border-radius:6px; background:none; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--slate); flex-shrink:0; padding:0; }
   .bottom-nav { display:none; }
