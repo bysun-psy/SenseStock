@@ -515,7 +515,7 @@ function Dashboard({items,activity,onNav,onItemClick}) {
   const aDot={create:{bg:'var(--tint-mint)',fg:'var(--brand-green)',l:'+'},update:{bg:'var(--tint-sky)',fg:'var(--link-blue)',l:'~'},delete:{bg:'var(--tint-rose)',fg:'var(--brand-pink-deep)',l:'–'}};
   return (
     <div className="col" style={{height:'100%'}}>
-      <Topbar title="대시 보드" sub="관능평가실 비품 현황"/>
+      <Topbar title="대시 보드" sub="관능평가실 물품 현황"/>
       <div className={`mobile-content mobile-pad`} style={{flex:1,overflow:'auto',padding:32,paddingBottom:100}}>
         <div className="mobile-grid-1" style={{display:'grid',gridTemplateColumns:'1fr 2.5fr',gap:16,marginBottom:16}}>
           <div className="card" style={{padding:24,display:'flex',flexDirection:'column',justifyContent:'center'}}>
@@ -865,7 +865,7 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
   const pp={space,itemMap:iMap,selected:sel,onToggle:tog};
   return (
     <div className="col" style={{height:'100%'}}>
-      <Topbar title="공간 조회" sub="배치도 기반 비품 위치 확인" action={
+      <Topbar title="공간 조회" sub="배치도 기반 물품 위치 확인" action={
         <div className="row" style={{gap:12}}>
           {!isMobile&&<span style={{fontSize:'var(--fs-body)',color:'var(--slate)'}}>{sel.size}개 셀 선택</span>}
           <button className="btn btn-secondary btn-sm" disabled={!sel.size} onClick={()=>setSel(new Set())} title="초기화" style={isMobile?{width:30,padding:0}:{}}><IC.refresh/>{!isMobile&&<span> 초기화</span>}</button>
@@ -1069,7 +1069,7 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
   const cells=form.space&&form.group?(ZONES[form.space]||[]).filter(z=>z.group===form.group).flatMap(z=>z.cells):[];
   return (
     <div className="col" style={{height:'100%'}}>
-      <Topbar title={isEdit?'품목 수정':'신규 등록'} sub={isEdit&&item?`최종 수정: ${item.updatedAt} · ${item.updatedBy}`:'비품 정보를 입력하세요'} action={
+      <Topbar title={isEdit?'품목 수정':'신규 등록'} sub={isEdit&&item?`최종 수정: ${item.updatedAt} · ${item.updatedBy}`:'물품 정보를 입력하세요'} action={
         <div className="row" style={{gap:12}}>
           {isEdit&&<button className="btn btn-danger btn-sm" onClick={()=>setDelM(true)}><IC.trash/> 삭제</button>}
           <button className="btn btn-secondary btn-sm" onClick={onCancel} style={{minWidth:68}}><IC.x/> 취소</button>
@@ -1133,7 +1133,7 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
         <div style={{padding:28}}>
           <div className="row" style={{gap:12,marginBottom:16}}>
             <div style={{width:40,height:40,borderRadius:'50%',background:'var(--tint-rose)',color:'var(--brand-pink-deep)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><IC.alert/></div>
-            <div><div style={{fontSize:'var(--fs-section)',fontWeight:600}}>이 품목을 삭제할까요?</div><div style={{fontSize:'var(--fs-body)',color:'var(--slate)',marginTop:2}}>{form.name}</div></div>
+            <div><div style={{fontSize:'var(--fs-section)',fontWeight:600}}>이 품목을 삭제할까요?</div><div style={{fontSize:'var(--fs-body)',color:'var(--slate)',marginTop:2}}>{form.name}</div><div style={{fontSize:'var(--fs-body)',color:'var(--slate)',marginTop:2}}>이 작업은 되돌릴 수 없습니다.</div></div>
           </div>
           <div className="row between">
             <button className="btn btn-danger" onClick={()=>{if(onDelete&&item)onDelete(item.id);setDelM(false);}}><IC.trash/> 삭제</button>
