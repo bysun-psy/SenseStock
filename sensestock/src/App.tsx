@@ -706,16 +706,15 @@ function Search({items,onItemClick,onDelete}) {
                 <div style={{flex:1,minWidth:0}}>
                   <div style={{fontWeight:500,fontSize:'var(--fs-body)',color:'var(--ink-deep)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{q?hi(it.name,q):it.name}</div>
                   <div className="row" style={{gap:6,marginTop:3,alignItems:'center'}}>
-                    <span className="swatch" style={{background:u.color,flexShrink:0}}/><span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}>{u.short}</span>
+                    <span className="swatch" style={{background:u.color,flexShrink:0}}/>
                     <span style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}>·</span>
-                    <span style={{fontSize:'var(--fs-sm)',color:'var(--slate)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.space} / {it.group} / {it.cell}</span>
+                    <span style={{fontSize:'var(--fs-sm)',color:'var(--slate)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.space} / {it.group} / {it.cell}{it.spec&&` · ${it.spec}`</span>
                   </div>
                   {it.note&&<div style={{fontSize:'var(--fs-label)',color:'var(--steel)',marginTop:2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.note}</div>}
                 </div>
                 <div style={{textAlign:'right',flexShrink:0}}>
                   <div style={{fontWeight:600,fontSize:15,color:isLow?'var(--error)':'var(--ink-deep)'}}>{it.qty}{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--slate)',fontWeight:400}}> / {it.min}</span>}</div>
                   {isLow&&<div style={{fontSize:'var(--fs-label)',color:'var(--error)',fontWeight:600}}>재고 부족</div>}
-                  <div style={{fontSize:'var(--fs-sm)',color:'var(--steel)',marginTop:1}}>{it.received}</div>
                 </div>
               </div>
             );
@@ -925,8 +924,8 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
                         <tr key={it.id} onClick={()=>{setShowList(false);onItemClick(it);}}>
                           <td><div style={{fontWeight:600,fontSize:'var(--fs-table)'}}>{it.name}</div>{it.note&&<div style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}>{it.note}</div>}</td>
                           <td style={{fontSize:'var(--fs-table)',color:'var(--slate)'}}>{it.spec||'–'}</td>
-                          <td style={{fontSize:'var(--fs-table)'}}><b>{it.group}</b> / {it.cell}</td>
-                          <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:'var(--fs-table)'}}>{u.short}</span></span></td>
+                          <td style={{fontSize:'var(--fs-table)'}}><b>{it.group}</b> / {it.cell}{it.spec&&` · ${it.spec}`}</td>
+                          <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:'var(--fs-table)'}}></span></span></td>
                           <td><span style={{fontSize:'var(--fs-table)',color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}> / {it.min}</span>}</td>
                         </tr>
                       );
