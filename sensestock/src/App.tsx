@@ -923,11 +923,11 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
                       const isLow=it.min!=null&&it.qty<it.min;
                       return (
                         <tr key={it.id} onClick={()=>{setShowList(false);onItemClick(it);}}>
-                          <td><div style={{fontWeight:500,fontSize:'var(--fs-table)'}}>{it.name}</div>{it.note&&<div style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}>{it.note}</div>}</td>
+                          <td><div style={{fontWeight:600,fontSize:'var(--fs-table)'}}>{it.name}</div>{it.note&&<div style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}>{it.note}</div>}</td>
                           <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:'var(--fs-table)'}}>{u.short}</span></span></td>
                           <td style={{fontSize:'var(--fs-table)'}}><b>{it.group}</b> / {it.cell}</td>
                           <td style={{fontSize:'var(--fs-table)',color:'var(--slate)'}}>{it.spec||'–'}</td>
-                          <td><span style={{fontWeight:600,fontSize:'var(--fs-table)',color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}> / {it.min}</span>}</td>
+                          <td><span style={{fontSize:'var(--fs-table)',color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}> / {it.min}</span>}</td>
                         </tr>
                       );
                     })}
