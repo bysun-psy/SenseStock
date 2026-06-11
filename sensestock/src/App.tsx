@@ -612,7 +612,7 @@ function Search({items,onItemClick,onDelete}) {
       seen.add(it.name); out.push(it);
       if(out.length>=6) break;
     }
-    return out;
+    return out.sort((a,b)=>a.name.localeCompare(b.name,'ko'));
   },[q,items]);
   const filtered=useMemo(()=>{
     if(!submitted) return [];
@@ -620,7 +620,7 @@ function Search({items,onItemClick,onDelete}) {
     if(q.trim()){const l=q.toLowerCase();r=r.filter(i=>i.name.toLowerCase().includes(l));}
     if(uf.size) r=r.filter(i=>uf.has(i.useId));
     if(sf.size) r=r.filter(i=>sf.has(i.space));
-    return r;
+    return r.sort((a,b)=>a.name.localeCompare(b.name,'ko'));
   },[items,q,uf,sf,submitted]);
   const reset=()=>{setQ('');setUf(new Set());setSf(new Set());setSel(new Set());setSubmitted(false);};
   return (
