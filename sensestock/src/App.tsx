@@ -34,7 +34,7 @@ const SIDEBAR_CSS = `
     .bottom-nav-item.active .bnav-icon { color:var(--primary); }
     .bnav-icon { color:var(--slate); display:flex; }
     .mobile-content { padding-bottom:100px !important; }
-    .app { height:100dvh !important; }
+    .app { height:100dvh !important; padding-bottom:60px !important; }
     .mobile-topbar { padding:14px 16px !important; }
     .mobile-topbar h1 { font-size:22px !important; white-space:nowrap; overflow:visible !important; text-overflow:clip !important; }
     .mobile-topbar .topbar-sub { display:none; }
@@ -69,12 +69,12 @@ const STYLE_SHEET = `
   --use-6:#E69A1F; --use-7:#F4D31E; --use-8:#2BAA50; --use-9:#2B7FD3; --use-10:#1A2E5C; --use-11:#A1318C;
   --r-sm:6px; --r-md:8px; --r-lg:12px; --r-full:9999px;
   --shadow-2:0 4px 12px rgba(15,15,15,.08); --shadow-3:0 24px 48px -8px rgba(15,15,15,.20); --shadow-4:0 16px 48px -8px rgba(15,15,15,.16);
-  --fs-body:14px; --fs-sm:12px; --fs-label:12px; --fs-btn:14px; --fs-nav:14px; --fs-input:14px; --fs-section:16px; --fs-topbar:22px;
+  --fs-body:14px; --fs-sm:12px; --fs-label:12px; --fs-btn:14px; --fs-nav:14px; --fs-input:14px; --fs-section:16px; --fs-topbar:22px; --fs-table:13px;
   --h-btn:36px; --h-btn-sm:30px; --h-btn-ghost:32px; --h-topbar:72px;
 }
 @media (min-width:769px) {
   :root {
-    --fs-body:16px; --fs-sm:14px; --fs-label:13px; --fs-btn:15px; --fs-nav:15px; --fs-input:15px; --fs-section:18px; --fs-topbar:24px;
+    --fs-body:16px; --fs-sm:14px; --fs-label:13px; --fs-btn:15px; --fs-nav:15px; --fs-input:15px; --fs-section:18px; --fs-topbar:24px; --fs-table:14px;
     --h-btn:40px; --h-btn-sm:34px; --h-btn-ghost:36px; --h-topbar:88px;
   }
 }
@@ -141,7 +141,7 @@ const ZONES = {
     {group:'선반',cells:['1','2','3','4']},
     {group:'실험대 위',cells:['1','2','3','4','5']},
     {group:'실험대 아래',cells:['1','2','3','4','5','6']},
-    {group:'실험대 서랍',cells:['서랍 1','서랍 2','서랍 3','서랍 4','서랍 5','서랍 6']},
+    {group:'실험대 아래',cells:['서랍 1','서랍 2','서랍 3','서랍 4','서랍 5','서랍 6']},
     {group:'조리대 좌측',cells:['서랍 1','서랍 2','서랍 3','4','5']},
     {group:'조리대 우측',cells:['서랍 1','서랍 2','서랍 3','4','5']},
     {group:'싱크대 위',cells:['1','2','3','4','5','6']},
@@ -181,12 +181,12 @@ const SEED = [
   mk(13,'마그네틱 바',5,'준비','실험대 아래','4',36,8,'20~50mm','','2026-03'),
   mk(14,'데시케이터',6,'준비','실험대 아래','5',2,null,'직경 300mm','실리카겔 포함','2025-07'),
   mk(15,'항온수조',6,'준비','실험대 아래','6',1,null,'WiseBath WB-22','','2025-09'),
-  mk(16,'파라필름',4,'준비','실험대 서랍','서랍 1',4,2,'Bemis PM-996','','2026-04'),
-  mk(17,'알루미늄 호일',4,'준비','실험대 서랍','서랍 2',6,2,'50m','','2026-04'),
-  mk(18,'니트릴 장갑',7,'준비','실험대 서랍','서랍 3',2,4,'L사이즈 100매입','재주문 필요','2026-05'),
-  mk(19,'실험 노트',9,'준비','실험대 서랍','서랍 4',8,3,'A4 200매','','2026-04'),
-  mk(20,'네임펜',9,'준비','실험대 서랍','서랍 5',12,4,'검정','','2026-04'),
-  mk(21,'마이크로피펫',5,'준비','실험대 서랍','서랍 6',6,null,'20~200μL','연 1회 교정','2025-12'),
+  mk(16,'파라필름',4,'준비','실험대 아래','서랍 1',4,2,'Bemis PM-996','','2026-04'),
+  mk(17,'알루미늄 호일',4,'준비','실험대 아래','서랍 2',6,2,'50m','','2026-04'),
+  mk(18,'니트릴 장갑',7,'준비','실험대 아래','서랍 3',2,4,'L사이즈 100매입','재주문 필요','2026-05'),
+  mk(19,'실험 노트',9,'준비','실험대 아래','서랍 4',8,3,'A4 200매','','2026-04'),
+  mk(20,'네임펜',9,'준비','실험대 아래','서랍 5',12,4,'검정','','2026-04'),
+  mk(21,'마이크로피펫',5,'준비','실험대 아래','서랍 6',6,null,'20~200μL','연 1회 교정','2025-12'),
   mk(22,'스테인리스 볼',8,'준비','조리대 좌측','서랍 1',12,null,'20/25/30 cm','','2026-01'),
   mk(23,'계량컵 세트',8,'준비','조리대 좌측','서랍 2',4,null,'4종 1세트','','2025-12'),
   mk(24,'실리콘 주걱',8,'준비','조리대 좌측','서랍 3',8,null,'내열 220℃','','2026-02'),
@@ -396,7 +396,7 @@ function Login() {
         </div>
         <p style={{color:'var(--on-dark-muted)',fontSize:'var(--fs-section)',lineHeight:1.6}}>
           누군가의 기억 대신, 팀이 함께 보는 위치·재고 정보.<br/>
-          SenseStock은 관능평가실 비품을 모두가 독립적으로 찾을 수 있게 합니다.
+          SenseStock은 관능평가실 물품을 모두가 편리하게 찾을 수 있도록 합니다.
         </p>
       </div>
       <div style={{position:'relative',zIndex:2,width:'100%',maxWidth:420}}>
@@ -418,7 +418,7 @@ function Login() {
             {loading?'로그인 중...':'Google 계정으로 로그인'}
           </button>
           <div style={{marginTop:20,fontSize:'var(--fs-sm)',color:'var(--steel)',textAlign:'center'}}>
-            외부 회원가입은 제공하지 않습니다.<br/>접속 권한은 관리자에게 요청하세요.
+            외부 회원가입은 제공하지 않습니다.<br/>접속 권한은 관리자에게 요청하세요.<br/>bysun@spc.co.kr
           </div>
         </div>
       </div>
@@ -515,7 +515,7 @@ function Dashboard({items,activity,onNav,onItemClick}) {
   const aDot={create:{bg:'var(--tint-mint)',fg:'var(--brand-green)',l:'+'},update:{bg:'var(--tint-sky)',fg:'var(--link-blue)',l:'~'},delete:{bg:'var(--tint-rose)',fg:'var(--brand-pink-deep)',l:'–'}};
   return (
     <div className="col" style={{height:'100%'}}>
-      <Topbar title="대시 보드" sub="관능평가실 비품 현황"/>
+      <Topbar title="대시 보드" sub="관능평가실 물품 현황"/>
       <div className={`mobile-content mobile-pad`} style={{flex:1,overflow:'auto',padding:32,paddingBottom:100}}>
         <div className="mobile-grid-1" style={{display:'grid',gridTemplateColumns:'1fr 2.5fr',gap:16,marginBottom:16}}>
           <div className="card" style={{padding:24,display:'flex',flexDirection:'column',justifyContent:'center'}}>
@@ -543,10 +543,10 @@ function Dashboard({items,activity,onNav,onItemClick}) {
             ):(
               <div className="row" style={{gap:32,alignItems:'center'}}>
                 <Donut data={useData} total={total} size={180}/>
-                <div style={{flex:1,display:'grid',gridTemplateColumns:'1fr 1fr',gap:'6px 24px'}}>
+                <div style={{flex:1,display:'grid',gridTemplateColumns:'1fr 1fr',gap:'6px 72px'}}>
                   {useData.map(u=>(
-                    <div key={u.name} className="row" style={{gap:8,padding:'4px 0'}}>
-                      <span className="swatch" style={{background:u.c}}/><span style={{flex:1,fontSize:'var(--fs-body)',color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.name}</span><span style={{fontSize:'var(--fs-body)',fontWeight:600}}>{u.v}</span>
+                    <div key={u.name} style={{display:'grid',gridTemplateColumns:'10px 1fr auto',gap:'0 8px',alignItems:'center',padding:'4px 0'}}>
+                      <span className="swatch" style={{background:u.c}}/><span style={{fontSize:'var(--fs-body)',color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.name}</span><span style={{fontSize:'var(--fs-body)',fontWeight:600,textAlign:'right'}}>{u.v}</span>
                     </div>
                   ))}
                 </div>
@@ -612,7 +612,7 @@ function Search({items,onItemClick,onDelete}) {
       seen.add(it.name); out.push(it);
       if(out.length>=6) break;
     }
-    return out;
+    return out.sort((a,b)=>a.name.localeCompare(b.name,'ko'));
   },[q,items]);
   const filtered=useMemo(()=>{
     if(!submitted) return [];
@@ -620,7 +620,7 @@ function Search({items,onItemClick,onDelete}) {
     if(q.trim()){const l=q.toLowerCase();r=r.filter(i=>i.name.toLowerCase().includes(l));}
     if(uf.size) r=r.filter(i=>uf.has(i.useId));
     if(sf.size) r=r.filter(i=>sf.has(i.space));
-    return r;
+    return r.sort((a,b)=>a.name.localeCompare(b.name,'ko'));
   },[items,q,uf,sf,submitted]);
   const reset=()=>{setQ('');setUf(new Set());setSf(new Set());setSel(new Set());setSubmitted(false);};
   return (
@@ -643,7 +643,7 @@ function Search({items,onItemClick,onDelete}) {
                 const u=useById(s.useId);
                 return (
                   <button key={s.id} onMouseDown={()=>{setQ(s.name);submit();}} className="row" style={{gap:8,width:'100%',padding:'8px 10px',background:'transparent',border:'none',borderRadius:'var(--r-sm)',cursor:'pointer',fontFamily:'inherit',textAlign:'left'}} onMouseEnter={e=>e.currentTarget.style.background='var(--surface)'} onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
-                    <span className="swatch" style={{background:u.color,flexShrink:0}}/><span style={{fontSize:'var(--fs-body)',color:'var(--charcoal)',flex:1,textAlign:'left'}}>{hi(s.name,q)}</span><span style={{fontSize:'var(--fs-sm)',color:'var(--slate)',flexShrink:0}}>{s.space}·{s.group}</span>
+                    <span className="swatch" style={{background:u.color,flexShrink:0}}/><span style={{fontSize:'var(--fs-table)',color:'var(--charcoal)',flex:1,textAlign:'left'}}>{hi(s.name,q)}</span><span style={{fontSize:'var(--fs-sm)',color:'var(--slate)',flexShrink:0}}>{s.space}·{s.group}</span>
                   </button>
                 );
               })}
@@ -667,7 +667,7 @@ function Search({items,onItemClick,onDelete}) {
             <th style={{width:36}}>
               {filtered.length>0&&<input type="checkbox" checked={sel.size===filtered.length&&filtered.length>0} onChange={e=>setSel(e.target.checked?new Set(filtered.map(i=>i.id)):new Set())}/>}
             </th>
-            <th style={{width:220}}>품목명</th><th style={{width:130}}>용도</th><th style={{width:180}}>위치</th><th style={{width:110}}>규격</th><th style={{width:110,textAlign:'right'}}>수량/최소</th><th style={{width:70}}>입고</th>
+            <th style={{width:220}}>품목명</th><th style={{width:130}}>규격</th><th style={{width:180}}>위치</th><th style={{width:110}}>용도</th><th style={{width:110,textAlign:'right'}}>수량/최소</th><th style={{width:70}}>입고</th>
           </tr></thead>
           <tbody>
             {filtered.map(it=>{
@@ -677,22 +677,22 @@ function Search({items,onItemClick,onDelete}) {
               return (
                 <tr key={it.id} className={isSel?'sel':''} onClick={e=>{if(e.target.tagName==='INPUT') return; onItemClick(it);}}>
                   <td onClick={e=>{e.stopPropagation();tog(setSel,it.id);}}><input type="checkbox" checked={isSel} onChange={()=>{}}/></td>
-                  <td style={{maxWidth:220}}><div style={{fontWeight:500,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{q?hi(it.name,q):it.name}</div>{it.note&&<div style={{fontSize:'var(--fs-sm)',color:'var(--steel)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.note}</div>}</td>
-                  <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color,flexShrink:0}}/><span style={{fontSize:'var(--fs-body)',color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.short}</span></span></td>
-                  <td><span style={{fontSize:'var(--fs-body)'}}><b>{it.space}</b><span style={{color:'var(--slate)'}}> / {it.group} / {it.cell}</span></span></td>
-                  <td><span style={{fontSize:'var(--fs-body)',color:'var(--slate)',whiteSpace:'nowrap'}}>{it.spec||'–'}</span></td>
-                  <td style={{textAlign:'right'}}><span style={{fontWeight:600,color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}> / {it.min}</span>}{isLow&&<div style={{fontSize:'var(--fs-label)',color:'var(--error)',fontWeight:600}}>재고 부족</div>}</td>
-                  <td><span style={{fontSize:'var(--fs-body)',color:'var(--slate)',whiteSpace:'nowrap'}}>{it.received}</span></td>
+                  <td style={{maxWidth:220}}><div style={{fontWeight:600,fontSize:'var(--fs-table)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{q?hi(it.name,q):it.name}</div>{it.note&&<div style={{fontSize:'var(--fs-sm)',color:'var(--steel)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.note}</div>}</td>
+                  <td><span style={{fontSize:'var(--fs-table)',color:'var(--slate)',whiteSpace:'nowrap'}}>{it.spec||'–'}</span></td>
+                  <td><span style={{fontSize:'var(--fs-table)'}}><b>{it.space}</b><span style={{color:'var(--slate)'}}> / {it.group} / {it.cell}</span></span></td>
+                  <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color,flexShrink:0}}/><span style={{fontSize:'var(--fs-table)',color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.short}</span></span></td>
+                  <td style={{textAlign:'right'}}><span style={{fontSize:'var(--fs-table)',color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}> / {it.min}</span>}{isLow&&<div style={{fontSize:'var(--fs-label)',color:'var(--error)',fontWeight:600}}>재고 부족</div>}</td>
+                  <td><span style={{fontSize:'var(--fs-table)',color:'var(--slate)',whiteSpace:'nowrap'}}>{it.received}</span></td>
                 </tr>
               );
             })}
             {filtered.length===0&&submitted&&<tr><td colSpan={7} style={{padding:'48px 0',textAlign:'center',color:'var(--slate)'}}>일치하는 품목이 없습니다.</td></tr>}
-            {!submitted&&<tr><td colSpan={7} style={{padding:'48px 0',textAlign:'center',color:'var(--slate)'}}>검색어를 입력하고 검색 버튼을 눌러주세요.</td></tr>}
+            {!submitted&&<tr><td colSpan={7} style={{padding:'48px 0',textAlign:'center',color:'var(--slate)'}}>검색어를 입력하고 찾기 버튼을 눌러주세요.</td></tr>}
           </tbody>
         </table>
         {/* 모바일 카드 리스트 */}
         <div className="mobile-list desktop-hide">
-          {!submitted&&<div style={{padding:'48px 24px',textAlign:'center',color:'var(--slate)',fontSize:'var(--fs-body)'}}>검색어를 입력하고 검색 버튼을 눌러주세요.</div>}
+          {!submitted&&<div style={{padding:'48px 24px',textAlign:'center',color:'var(--slate)',fontSize:'var(--fs-body)'}}>검색어를 입력하고 찾기 버튼을 눌러주세요.</div>}
           {submitted&&filtered.length===0&&<div style={{padding:'48px 24px',textAlign:'center',color:'var(--slate)',fontSize:'var(--fs-body)'}}>일치하는 품목이 없습니다.</div>}
           {filtered.map(it=>{
             const u=useById(it.useId);
@@ -706,16 +706,13 @@ function Search({items,onItemClick,onDelete}) {
                 <div style={{flex:1,minWidth:0}}>
                   <div style={{fontWeight:500,fontSize:'var(--fs-body)',color:'var(--ink-deep)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{q?hi(it.name,q):it.name}</div>
                   <div className="row" style={{gap:6,marginTop:3,alignItems:'center'}}>
-                    <span className="swatch" style={{background:u.color,flexShrink:0}}/><span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}>{u.short}</span>
-                    <span style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}>·</span>
-                    <span style={{fontSize:'var(--fs-sm)',color:'var(--slate)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.space} / {it.group} / {it.cell}</span>
+                    <span className="swatch" style={{background:u.color,flexShrink:0}}/>
+                    <span style={{fontSize:'var(--fs-sm)',color:'var(--slate)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.space} / {it.group} / {it.cell}{it.spec&&' · '+it.spec}</span>
                   </div>
-                  {it.note&&<div style={{fontSize:'var(--fs-label)',color:'var(--steel)',marginTop:2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.note}</div>}
                 </div>
                 <div style={{textAlign:'right',flexShrink:0}}>
                   <div style={{fontWeight:600,fontSize:15,color:isLow?'var(--error)':'var(--ink-deep)'}}>{it.qty}{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--slate)',fontWeight:400}}> / {it.min}</span>}</div>
                   {isLow&&<div style={{fontSize:'var(--fs-label)',color:'var(--error)',fontWeight:600}}>재고 부족</div>}
-                  <div style={{fontSize:'var(--fs-sm)',color:'var(--steel)',marginTop:1}}>{it.received}</div>
                 </div>
               </div>
             );
@@ -731,7 +728,7 @@ function Search({items,onItemClick,onDelete}) {
           </div>
           <div className="row between" style={{marginTop:20}}>
             <button className="btn btn-danger" onClick={()=>{onDelete([...sel]);setDelModal(false);setSel(new Set());}}><IC.trash/> 삭제</button>
-            <button className="btn btn-secondary" onClick={()=>setDelModal(false)}>취소</button>
+            <button className="btn btn-secondary" onClick={()=>setDelModal(false)}><IC.x/>취소</button>
           </div>
         </div>
       </Modal>
@@ -780,10 +777,10 @@ function PrepPlan(p) {
       <FBox title="실험대 위" x={325} y={40} w={620} h={110} tp="right">
         {['1','2','3','4','5'].map((ce,i)=><Cell key={ce} {...c('실험대 위',ce,325+i*124,40,124,110,ce)}/>)}
       </FBox>
-      <FBox title="실험대 아래/서랍" x={170} y={195} w={775} h={150} tp="right">
+      <FBox title="실험대 아래" x={170} y={195} w={775} h={150} tp="right">
         <Cell {...c('실험대 아래','1',170,195,90,150,'1')}/>
         <Cell {...c('실험대 아래','2',260,195,90,150,'2')}/>
-        {['서랍 1','서랍 2','서랍 3','서랍 4','서랍 5','서랍 6'].map((ce,i)=><Cell key={ce} {...c('실험대 서랍',ce,358+(i%2)*70,195+Math.floor(i/2)*50,70,50,ce)}/>)}
+        {['서랍 1','서랍 2','서랍 3','서랍 4','서랍 5','서랍 6'].map((ce,i)=><Cell key={ce} {...c('실험대 아래',ce,358+(i%2)*70,195+Math.floor(i/2)*50,70,50,ce)}/>)}
         {['3','4','5','6'].map((ce,i)=><Cell key={ce} {...c('실험대 아래',ce,506+i*110,195,110,150,ce)}/>)}
       </FBox>
       <FBox title="조리대 좌측" x={325} y={465} w={260} h={150}>
@@ -864,11 +861,11 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
   useEffect(()=>{setSel(new Set());setShowList(false);},[space]);
   const iMap=useMemo(()=>itemsByLoc(items.filter(i=>i.space===space)),[items,space]);
   const tog=key=>setSel(s=>{const n=new Set(s);n.has(key)?n.delete(key):n.add(key);return n;});
-  const selItems=useMemo(()=>{const out=[];for(const k of sel){const[g,c]=k.split('||');out.push(...(iMap[`${space}/${g}/${c}`]||[]));}return out;},[sel,iMap,space]);
+  const selItems=useMemo(()=>{const out=[];for(const k of sel){const[g,c]=k.split('||');out.push(...(iMap[`${space}/${g}/${c}`]||[]));}return out.sort((a,b)=>a.name.localeCompare(b.name,'ko'));},[sel,iMap,space]);
   const pp={space,itemMap:iMap,selected:sel,onToggle:tog};
   return (
     <div className="col" style={{height:'100%'}}>
-      <Topbar title="공간 조회" sub="배치도 기반 비품 위치 확인" action={
+      <Topbar title="공간 조회" sub="배치도 기반 물품 위치 확인" action={
         <div className="row" style={{gap:12}}>
           {!isMobile&&<span style={{fontSize:'var(--fs-body)',color:'var(--slate)'}}>{sel.size}개 셀 선택</span>}
           <button className="btn btn-secondary btn-sm" disabled={!sel.size} onClick={()=>setSel(new Set())} title="초기화" style={isMobile?{width:30,padding:0}:{}}><IC.refresh/>{!isMobile&&<span> 초기화</span>}</button>
@@ -905,8 +902,8 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
         {(space==='토론1'||space==='토론2')&&<DiscPlan space={space} title={space==='토론1'?'Discussion Room 1':'Discussion Room 2'} p={pp}/>}
         {space==='창고'&&<StorePlan {...pp}/>}
         {showList&&(
-          <div onClick={()=>setShowList(false)} style={{position:'fixed',inset:0,bottom:60,background:'rgba(15,15,15,.3)',zIndex:30,display:'flex',alignItems:'flex-end'}}>
-            <div onClick={e=>e.stopPropagation()} className="card" style={{width:'100%',maxHeight:'65%',borderRadius:'var(--r-lg) var(--r-lg) 0 0',background:'var(--canvas)',boxShadow:'var(--shadow-4)',display:'flex',flexDirection:'column'}}>
+          <div onClick={()=>setShowList(false)} style={{position:'fixed',inset:0,background:'rgba(15,15,15,.3)',zIndex:60,display:'flex',alignItems:'flex-end',justifyContent:'center',padding:isMobile?0:'0 0 24px 0'}}>
+            <div onClick={e=>e.stopPropagation()} className="card" style={{width:'100%',maxWidth:isMobile?'100%':'calc(100% - 528px)',marginLeft:isMobile?0:'264px',maxHeight:isMobile?'65%':'calc(65% - 48px)',borderRadius:isMobile?'var(--r-lg) var(--r-lg) 0 0':'var(--r-lg)',background:'var(--canvas)',boxShadow:isMobile?'var(--shadow-4)':'0 -4px 24px rgba(15,15,15,.18)',border:isMobile?'none':'1px solid var(--hairline-strong)',display:'flex',flexDirection:'column'}}>
               <div className="row between" style={{padding:'16px 24px',borderBottom:'1px solid var(--hairline)',flexShrink:0}}>
                 <div className="row" style={{gap:10}}>
                   <span style={{fontSize:20,fontWeight:600}}>{space} · {sel.size}개 셀</span>
@@ -916,18 +913,18 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
               </div>
               <div style={{flex:1,overflow:'auto',paddingBottom:8}}>
                 <table className="table mobile-hide">
-                  <thead><tr><th>품목명</th><th style={{width:140}}>용도</th><th style={{width:160}}>위치</th><th style={{width:120}}>규격</th><th style={{width:100,textAlign:'right'}}>수량</th></tr></thead>
+                  <thead><tr><th style={{width:200}}>품목명</th><th style={{width:120}}>규격</th><th style={{width:140}}>위치</th><th style={{width:160}}>용도</th><th style={{width:60}}>수량</th></tr></thead>
                   <tbody>
                     {selItems.map(it=>{
                       const u=useById(it.useId);
                       const isLow=it.min!=null&&it.qty<it.min;
                       return (
                         <tr key={it.id} onClick={()=>{setShowList(false);onItemClick(it);}}>
-                          <td><div style={{fontWeight:500}}>{it.name}</div>{it.note&&<div style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}>{it.note}</div>}</td>
-                          <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color}}/>{u.short}</span></td>
-                          <td><b>{it.group}</b> / {it.cell}</td>
-                          <td style={{fontSize:'var(--fs-body)',color:'var(--slate)'}}>{it.spec||'–'}</td>
-                          <td style={{textAlign:'right'}}><span style={{fontWeight:600,color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}> / {it.min}</span>}</td>
+                          <td><div style={{fontWeight:600,fontSize:'var(--fs-table)'}}>{it.name}</div>{it.note&&<div style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}>{it.note}</div>}</td>
+                          <td style={{fontSize:'var(--fs-table)',color:'var(--slate)'}}>{it.spec||'–'}</td>
+                          <td style={{fontSize:'var(--fs-table)'}}><b>{it.group}</b> / {it.cell}{it.spec&&' · '+it.spec}</td>
+                          <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color}}/><span className="mobile-hide" style={{fontSize:'var(--fs-table)',color:'var(--charcoal)'}}>{u.short}</span></span></td>
+                          <td><span style={{fontSize:'var(--fs-table)',color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}> / {it.min}</span>}</td>
                         </tr>
                       );
                     })}
@@ -944,9 +941,8 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
                           <div style={{flex:1,minWidth:0}}>
                             <div style={{fontWeight:600,fontSize:'var(--fs-section)',color:'var(--ink-deep)',marginBottom:4}}>{it.name}</div>
                             <div className="row" style={{gap:6,flexWrap:'wrap'}}>
-                              <span className="row" style={{gap:4}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}>{u.short}</span></span>
-                              <span style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}>·</span>
-                              <span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}><b style={{color:'var(--charcoal)'}}>{it.group}</b> / {it.cell}</span>
+                              <span className="swatch" style={{background:u.color}}/>
+                              <span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}><b style={{color:'var(--charcoal)'}}>{it.group}</b> / {it.cell}{it.spec&&<> · <span style={{color:'var(--charcoal)'}}>{it.spec}</span></>}</span>
                             </div>
                           </div>
                           <div style={{textAlign:'right',flexShrink:0}}>
@@ -1073,11 +1069,11 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
   const cells=form.space&&form.group?(ZONES[form.space]||[]).filter(z=>z.group===form.group).flatMap(z=>z.cells):[];
   return (
     <div className="col" style={{height:'100%'}}>
-      <Topbar title={isEdit?'품목 수정':'신규 등록'} sub={isEdit&&item?`최종 수정: ${item.updatedAt} · ${item.updatedBy}`:'비품 정보를 입력하세요'} action={
+      <Topbar title={isEdit?'품목 수정':'신규 등록'} sub={isEdit&&item?`최종 수정: ${item.updatedAt} · ${item.updatedBy}`:'물품 정보를 입력하세요'} action={
         <div className="row" style={{gap:12}}>
           {isEdit&&<button className="btn btn-danger btn-sm" onClick={()=>setDelM(true)}><IC.trash/> 삭제</button>}
-          <button className="btn btn-secondary btn-sm" onClick={onCancel} style={{minWidth:68}}>취소</button>
-          <button className="btn btn-primary btn-sm" onClick={submit} style={{minWidth:68}}>{isEdit?'저장':'등록'}</button>
+          <button className="btn btn-secondary btn-sm" onClick={onCancel} style={{minWidth:68}}><IC.x/> 취소</button>
+          <button className="btn btn-primary btn-sm" onClick={submit} style={{minWidth:68}}>{isEdit?<><IC.check/> 저장</>:<><IC.plus/> 등록</>}</button>
         </div>}/>
       <div className="mobile-content mobile-pad" style={{flex:1,overflow:'auto',padding:32,paddingBottom:100}}>
         <div style={{maxWidth:860,margin:'0 auto',display:'flex',flexDirection:'column',gap:16}}>
@@ -1137,11 +1133,11 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
         <div style={{padding:28}}>
           <div className="row" style={{gap:12,marginBottom:16}}>
             <div style={{width:40,height:40,borderRadius:'50%',background:'var(--tint-rose)',color:'var(--brand-pink-deep)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><IC.alert/></div>
-            <div><div style={{fontSize:'var(--fs-section)',fontWeight:600}}>이 품목을 삭제할까요?</div><div style={{fontSize:'var(--fs-body)',color:'var(--slate)',marginTop:2}}>{form.name}</div></div>
+            <div><div style={{fontSize:'var(--fs-section)',fontWeight:600}}>이 품목을 삭제할까요?</div><div style={{fontSize:'var(--fs-body)',color:'var(--slate)',marginTop:2}}>{form.name}</div><div style={{fontSize:'var(--fs-body)',color:'var(--slate)',marginTop:2}}>이 작업은 되돌릴 수 없습니다.</div></div>
           </div>
           <div className="row between">
             <button className="btn btn-danger" onClick={()=>{if(onDelete&&item)onDelete(item.id);setDelM(false);}}><IC.trash/> 삭제</button>
-            <button className="btn btn-secondary" onClick={()=>setDelM(false)}>취소</button>
+            <button className="btn btn-secondary" onClick={()=>setDelM(false)}><IC.x/>취소</button>
           </div>
         </div>
       </Modal>
@@ -1225,16 +1221,16 @@ function MiniMapPrep({itemGroup,itemCell,itemColor}:{itemGroup:string,itemCell:s
         <MiniCell {...c('실험대 위','3',573,40,124,110)}/>
         <MiniCell {...c('실험대 위','4',697,40,124,110)}/>
         <MiniCell {...c('실험대 위','5',821,40,124,110)}/>
-        {/* 실험대 아래/서랍 */}
+        {/* 실험대 아래 */}
         <div style={{position:'absolute',left:170,top:195,width:775,height:150,border:'1.5px solid #1A1916',borderRadius:4}}/>
         <MiniCell {...c('실험대 아래','1',170,195,90,150)}/>
         <MiniCell {...c('실험대 아래','2',260,195,90,150)}/>
-        <MiniCell {...c('실험대 서랍','서랍 1',358,195,70,50,'서1')}/>
-        <MiniCell {...c('실험대 서랍','서랍 2',428,195,70,50,'서2')}/>
-        <MiniCell {...c('실험대 서랍','서랍 3',358,245,70,50,'서3')}/>
-        <MiniCell {...c('실험대 서랍','서랍 4',428,245,70,50,'서4')}/>
-        <MiniCell {...c('실험대 서랍','서랍 5',358,295,70,50,'서5')}/>
-        <MiniCell {...c('실험대 서랍','서랍 6',428,295,70,50,'서6')}/>
+        <MiniCell {...c('실험대 아래','서랍 1',358,195,70,50,'서1')}/>
+        <MiniCell {...c('실험대 아래','서랍 2',428,195,70,50,'서2')}/>
+        <MiniCell {...c('실험대 아래','서랍 3',358,245,70,50,'서3')}/>
+        <MiniCell {...c('실험대 아래','서랍 4',428,245,70,50,'서4')}/>
+        <MiniCell {...c('실험대 아래','서랍 5',358,295,70,50,'서5')}/>
+        <MiniCell {...c('실험대 아래','서랍 6',428,295,70,50,'서6')}/>
         <MiniCell {...c('실험대 아래','3',506,195,110,150)}/>
         <MiniCell {...c('실험대 아래','4',616,195,110,150)}/>
         <MiniCell {...c('실험대 아래','5',726,195,110,150)}/>
@@ -1395,50 +1391,72 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
   return (
     <div className="col" style={{height:'100%'}}>
       <Topbar title="품목 상세" sub={`${item.name} · #${item.id} · ${item.space} / ${item.group} / ${item.cell}`} action={
-        <div className="row" style={{gap:isMobile?6:12}}>
-          <button className="btn btn-danger btn-sm" onClick={()=>setDelM(true)} style={{gap:isMobile?0:6,paddingLeft:isMobile?8:12,paddingRight:isMobile?8:12}}>
-            <IC.trash/>{!isMobile&&<span>삭제</span>}
+        <div className="row" style={{gap:12}}>
+          <button className="btn btn-danger btn-sm" onClick={()=>setDelM(true)}>
+            <IC.trash/><span>삭제</span>
           </button>
-          <button className="btn btn-secondary btn-sm" onClick={onBack} style={{gap:isMobile?0:6,paddingLeft:isMobile?8:12,paddingRight:isMobile?8:12}}>
-            <IC.back/>{!isMobile&&<span>이전</span>}
+          <button className="btn btn-secondary btn-sm" onClick={onBack}>
+            <IC.back/><span>이전</span>
           </button>
-          <button className="btn btn-primary btn-sm" onClick={onEdit} style={{gap:isMobile?0:6,paddingLeft:isMobile?8:12,paddingRight:isMobile?8:12}}>
-            <IC.edit/>{!isMobile&&<span>수정</span>}
+          <button className="btn btn-primary btn-sm" onClick={onEdit}>
+            <IC.edit/><span>수정</span>
           </button>
         </div>}/>
       <div className="mobile-content mobile-pad" style={{flex:1,overflow:'auto',padding:32,paddingBottom:100}}>
         <div style={{maxWidth:860,margin:'0 auto',display:'flex',flexDirection:'column',gap:16}}>
-          <div className="card mobile-grid-1" style={{padding:24,display:'grid',gridTemplateColumns:'1.4fr 1fr',gap:24}}>
-            <div>
-              <span className="badge" style={{background:u.color,color:'#fff'}}>{u.name}</span>
-              <h2 className="mobile-h2" style={{margin:'12px 0 6px',fontSize:28,fontWeight:600,color:'var(--ink-deep)'}}>{item.name}</h2>
-              <div style={{fontSize:'var(--fs-body)',color:'var(--charcoal)'}}><span style={{color:'var(--slate)'}}>위치</span> <b>{item.space} / {item.group} / {item.cell}</b></div>
-              {item.note&&<div style={{marginTop:12,padding:'10px 14px',background:'var(--tint-yellow)',borderRadius:'var(--r-md)',fontSize:'var(--fs-body)'}}>📌 {item.note}</div>}
-            </div>
-            <div style={{background:isLow?'var(--tint-rose)':'var(--tint-mint)',borderRadius:'var(--r-lg)',padding:'18px 20px',display:'flex',flexDirection:'column',justifyContent:'center'}}>
-              <div style={{fontSize:'var(--fs-sm)',fontWeight:600,color:isLow?'var(--brand-pink-deep)':'var(--brand-green)'}}>{isLow?'재고 부족':'재고 양호'}</div>
-              <div style={{fontSize:36,fontWeight:600,color:'var(--ink-deep)',marginTop:4,display:'flex',alignItems:'baseline',gap:4}}>{item.qty}{item.min!=null&&<span style={{fontSize:18,color:'var(--slate)',fontWeight:500}}> / {item.min}</span>}</div>
-              <div style={{fontSize:'var(--fs-sm)',color:'var(--slate)',marginTop:4}}>{item.min!=null?'현재 / 최소':'현재 수량'}</div>
+          {/* 카드 1: 품목명 + 미니맵 */}
+          <div className="card" style={{padding:24}}>
+            <span className="badge" style={{background:u.color,color:'#fff'}}>{u.name}</span>
+            <h2 className="mobile-h2" style={{margin:'12px 0 6px',fontSize:28,fontWeight:600,color:'var(--ink-deep)'}}>{item.name}</h2>
+            <div style={{fontSize:'var(--fs-body)',color:'var(--charcoal)'}}><span style={{color:'var(--slate)'}}>위치</span> <b>{item.space} / {item.group} / {item.cell}</b></div>
+            <div style={{marginTop:12,borderTop:'1px solid var(--hairline)',paddingTop:14}}>
+              <ItemMiniMap item={item} u={u}/>
+              <div style={{marginTop:14,display:'flex',alignItems:'center',gap:6}}>
+  <span style={{flexShrink:0}}>📍</span>
+  <span style={{fontSize:'var(--fs-body)',color:'var(--slate)'}}>
+  <b style={{color:'var(--error)'}}>사용 후 제자리에 !</b> - 위치가 달라졌다면 <b style={{color:'var(--charcoal)'}}>수정</b> 버튼으로 업데이트해 주세요
+</span>
+</div>
             </div>
           </div>
+          {/* 카드 2: 상세 정보 (규격·입고·수량·재고상태) + 비고 */}
           <div className="card" style={{padding:24}}>
             <div style={{fontSize:'var(--fs-section)',fontWeight:600,marginBottom:16}}>상세 정보</div>
-            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:20,marginBottom:20}}>
-              <div>
-                <div style={{fontSize:'var(--fs-label)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>용도</div>
-                <div className="row" style={{gap:6,marginTop:4}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:'var(--fs-body)',fontWeight:500}}>{u.name}</span></div>
-              </div>
-              {[['규격',item.spec||'–'],['입고 시기',item.received||'–'],['공간',item.space],['구역',item.group],['셀',item.cell]].map(([l,v])=>(
-                <div key={l}><div style={{fontSize:'var(--fs-label)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>{l}</div><div style={{fontSize:'var(--fs-body)',fontWeight:500,marginTop:4}}>{v}</div></div>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:20}}>
+              {[['규격',item.spec||'–'],['입고 시기',item.received||'–']].map(([l,v])=>(
+                <div key={l}>
+                  <div style={{fontSize:'var(--fs-label)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>{l}</div>
+                  <div style={{fontSize:'var(--fs-body)',fontWeight:500,marginTop:4}}>{v}</div>
+                </div>
               ))}
+              <div>
+                <div style={{fontSize:'var(--fs-label)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>현재 수량</div>
+                <div style={{fontSize:'var(--fs-body)',fontWeight:600,marginTop:4,color:isLow?'var(--error)':'var(--ink)'}}>
+                  {item.qty}{item.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--steel)',fontWeight:400}}> / {item.min} 최소</span>}
+                </div>
+              </div>
+              <div>
+                <div style={{fontSize:'var(--fs-label)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>재고 상태</div>
+                <div style={{fontSize:'var(--fs-body)',fontWeight:600,marginTop:4,color:isLow?'var(--error)':'var(--brand-green)'}}>{isLow?'재고 부족':'재고 양호'}</div>
+              </div>
             </div>
-            <div style={{borderTop:'1px solid var(--hairline)',marginBottom:14}}/>
-            <ItemMiniMap item={item} u={u}/>
+            {item.note&&(
+              <>
+                <div style={{borderTop:'1px solid var(--hairline)',margin:'16px 0'}}/>
+                <div style={{padding:'10px 14px',background:'var(--tint-yellow)',borderRadius:'var(--r-md)',fontSize:'var(--fs-body)',display:'flex',alignItems:'flex-start',gap:8}}>
+                  <span style={{flexShrink:0}}>📌</span>{item.note}
+                </div>
+              </>
+            )}
           </div>
+          {/* 카드 3: 시스템 정보 (품목 ID 제외) */}
           <div className="card" style={{padding:16,background:'var(--surface)',marginBottom:0}}>
-            <div className="row wrap" style={{gap:'12px 32px'}}>
-              {[['최초 등록일',item.createdAt],['최종 수정일',item.updatedAt],['최종 수정인',item.updatedBy],['품목 ID',`#${item.id}`]].map(([l,v])=>(
-                <div key={l} className="col"><span style={{fontSize:'var(--fs-label)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>{l}</span><span style={{fontSize:'var(--fs-body)',fontWeight:500,marginTop:2}}>{v}</span></div>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:12}}>
+              {[['최초 등록일',item.createdAt],['최종 수정일',item.updatedAt],['최종 수정인',item.updatedBy]].map(([l,v])=>(
+                <div key={l} className="col">
+                  <span style={{fontSize:'var(--fs-label)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4,whiteSpace:'nowrap'}}>{l}</span>
+                  <span style={{fontSize:'var(--fs-body)',fontWeight:500,marginTop:2,whiteSpace:'nowrap'}}>{v}</span>
+                </div>
               ))}
             </div>
           </div>
@@ -1449,11 +1467,11 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
         <div style={{padding:28}}>
           <div className="row" style={{gap:12,marginBottom:16}}>
             <div style={{width:40,height:40,borderRadius:'50%',background:'var(--tint-rose)',color:'var(--brand-pink-deep)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><IC.alert/></div>
-            <div><div style={{fontSize:'var(--fs-section)',fontWeight:600}}>이 품목을 삭제할까요?</div><div style={{fontSize:'var(--fs-body)',color:'var(--slate)',marginTop:2}}>{item.name}</div></div>
+            <div><div style={{fontSize:'var(--fs-section)',fontWeight:600}}>이 품목을 삭제할까요?</div><div style={{fontSize:'var(--fs-body)',color:'var(--slate)',marginTop:2}}>{item.name}</div><div style={{fontSize:'var(--fs-body)',color:'var(--slate)',marginTop:2}}>이 작업은 되돌릴 수 없습니다.</div></div>
           </div>
           <div className="row between">
             <button className="btn btn-danger" onClick={()=>{onDelete(item.id);setDelM(false);}}><IC.trash/> 삭제</button>
-            <button className="btn btn-secondary" onClick={()=>setDelM(false)}>취소</button>
+            <button className="btn btn-secondary" onClick={()=>setDelM(false)}><IC.x/>취소</button>
           </div>
         </div>
       </Modal>
