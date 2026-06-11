@@ -708,7 +708,7 @@ function Search({items,onItemClick,onDelete}) {
                   <div className="row" style={{gap:6,marginTop:3,alignItems:'center'}}>
                     <span className="swatch" style={{background:u.color,flexShrink:0}}/>
                     <span style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}>·</span>
-                    <span style={{fontSize:'var(--fs-sm)',color:'var(--slate)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.space} / {it.group} / {it.cell}{it.spec&&` · ${it.spec}`</span>
+                    <span style={{fontSize:'var(--fs-sm)',color:'var(--slate)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.space} / {it.group} / {it.cell}{it.spec&&' · '+it.spec}</span>
                   </div>
                   {it.note&&<div style={{fontSize:'var(--fs-label)',color:'var(--steel)',marginTop:2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.note}</div>}
                 </div>
