@@ -1128,12 +1128,12 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
                 <label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer'}}>
                   <input type="checkbox" checked={!!form.isAsset} onChange={e=>setF('isAsset',e.target.checked)} style={{width:15,height:15,accentColor:'var(--primary)',cursor:'pointer'}}/>
                   <span style={{fontSize:'var(--fs-body)',fontWeight:500}}>자산</span>
-                  <span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}>고정 자산으로 관리</span>
+                  <span className="mobile-hide" style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}>고정 자산으로 관리</span>
                 </label>
                 <label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer'}}>
                   <input type="checkbox" checked={!!form.isEquipment} onChange={e=>setF('isEquipment',e.target.checked)} style={{width:15,height:15,accentColor:'var(--brand-teal)',cursor:'pointer'}}/>
                   <span style={{fontSize:'var(--fs-body)',fontWeight:500}}>비품</span>
-                  <span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}>비품대장 등록 대상</span>
+                  <span className="mobile-hide" style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}>비품대장 등록 대상</span>
                 </label>
               </div>
             </div>
