@@ -69,12 +69,12 @@ const STYLE_SHEET = `
   --use-6:#E69A1F; --use-7:#F4D31E; --use-8:#2BAA50; --use-9:#2B7FD3; --use-10:#1A2E5C; --use-11:#A1318C;
   --r-sm:6px; --r-md:8px; --r-lg:12px; --r-full:9999px;
   --shadow-2:0 4px 12px rgba(15,15,15,.08); --shadow-3:0 24px 48px -8px rgba(15,15,15,.20); --shadow-4:0 16px 48px -8px rgba(15,15,15,.16);
-  --fs-body:14px; --fs-sm:12px; --fs-label:12px; --fs-btn:14px; --fs-nav:14px; --fs-input:14px; --fs-section:16px; --fs-topbar:22px; --fs-table:13px;
+  --fs-body:14px; --fs-sm:12px; --fs-label:12px; --fs-btn:14px; --fs-nav:14px; --fs-input:14px; --fs-section:16px; --fs-topbar:22px;
   --h-btn:36px; --h-btn-sm:30px; --h-btn-ghost:32px; --h-topbar:72px;
 }
 @media (min-width:769px) {
   :root {
-    --fs-body:16px; --fs-sm:14px; --fs-label:13px; --fs-btn:15px; --fs-nav:15px; --fs-input:15px; --fs-section:18px; --fs-topbar:24px; --fs-table:14px;
+    --fs-body:16px; --fs-sm:14px; --fs-label:13px; --fs-btn:15px; --fs-nav:15px; --fs-input:15px; --fs-section:18px; --fs-topbar:24px;
     --h-btn:40px; --h-btn-sm:34px; --h-btn-ghost:36px; --h-topbar:88px;
   }
 }
@@ -396,7 +396,7 @@ function Login() {
         </div>
         <p style={{color:'var(--on-dark-muted)',fontSize:'var(--fs-section)',lineHeight:1.6}}>
           누군가의 기억 대신, 팀이 함께 보는 위치·재고 정보.<br/>
-          SenseStock은 관능평가실 물품을 모두가 편리하게 찾을 수 있도록 합니다.
+          SenseStock은 관능평가실 비품을 모두가 독립적으로 찾을 수 있게 합니다.
         </p>
       </div>
       <div style={{position:'relative',zIndex:2,width:'100%',maxWidth:420}}>
@@ -418,7 +418,7 @@ function Login() {
             {loading?'로그인 중...':'Google 계정으로 로그인'}
           </button>
           <div style={{marginTop:20,fontSize:'var(--fs-sm)',color:'var(--steel)',textAlign:'center'}}>
-            외부 회원가입은 제공하지 않습니다.<br/>접속 권한은 관리자에게 요청하세요.<br/>bysun@spc.co.kr
+            외부 회원가입은 제공하지 않습니다.<br/>접속 권한은 관리자에게 요청하세요.
           </div>
         </div>
       </div>
@@ -643,7 +643,7 @@ function Search({items,onItemClick,onDelete}) {
                 const u=useById(s.useId);
                 return (
                   <button key={s.id} onMouseDown={()=>{setQ(s.name);submit();}} className="row" style={{gap:8,width:'100%',padding:'8px 10px',background:'transparent',border:'none',borderRadius:'var(--r-sm)',cursor:'pointer',fontFamily:'inherit',textAlign:'left'}} onMouseEnter={e=>e.currentTarget.style.background='var(--surface)'} onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
-                    <span className="swatch" style={{background:u.color,flexShrink:0}}/><span style={{fontSize:'var(--fs-table)',color:'var(--charcoal)',flex:1,textAlign:'left'}}>{hi(s.name,q)}</span><span style={{fontSize:'var(--fs-sm)',color:'var(--slate)',flexShrink:0}}>{s.space}·{s.group}</span>
+                    <span className="swatch" style={{background:u.color,flexShrink:0}}/><span style={{fontSize:'var(--fs-body)',color:'var(--charcoal)',flex:1,textAlign:'left'}}>{hi(s.name,q)}</span><span style={{fontSize:'var(--fs-sm)',color:'var(--slate)',flexShrink:0}}>{s.space}·{s.group}</span>
                   </button>
                 );
               })}
@@ -677,12 +677,12 @@ function Search({items,onItemClick,onDelete}) {
               return (
                 <tr key={it.id} className={isSel?'sel':''} onClick={e=>{if(e.target.tagName==='INPUT') return; onItemClick(it);}}>
                   <td onClick={e=>{e.stopPropagation();tog(setSel,it.id);}}><input type="checkbox" checked={isSel} onChange={()=>{}}/></td>
-                  <td style={{maxWidth:220}}><div style={{fontWeight:500,fontSize:'var(--fs-table)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{q?hi(it.name,q):it.name}</div>{it.note&&<div style={{fontSize:'var(--fs-sm)',color:'var(--steel)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.note}</div>}</td>
-                  <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color,flexShrink:0}}/><span style={{fontSize:'var(--fs-table)',color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.short}</span></span></td>
-                  <td><span style={{fontSize:'var(--fs-table)'}}><b>{it.space}</b><span style={{color:'var(--slate)'}}> / {it.group} / {it.cell}</span></span></td>
-                  <td><span style={{fontSize:'var(--fs-table)',color:'var(--slate)',whiteSpace:'nowrap'}}>{it.spec||'–'}</span></td>
-                  <td style={{textAlign:'right'}}><span style={{fontWeight:600,fontSize:'var(--fs-table)',color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}> / {it.min}</span>}{isLow&&<div style={{fontSize:'var(--fs-label)',color:'var(--error)',fontWeight:600}}>재고 부족</div>}</td>
-                  <td><span style={{fontSize:'var(--fs-table)',color:'var(--slate)',whiteSpace:'nowrap'}}>{it.received}</span></td>
+                  <td style={{maxWidth:220}}><div style={{fontWeight:500,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{q?hi(it.name,q):it.name}</div>{it.note&&<div style={{fontSize:'var(--fs-sm)',color:'var(--steel)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.note}</div>}</td>
+                  <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color,flexShrink:0}}/><span style={{color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.short}</span></span></td>
+                  <td><span><b>{it.space}</b><span style={{color:'var(--slate)'}}> / {it.group} / {it.cell}</span></span></td>
+                  <td><span style={{color:'var(--slate)',whiteSpace:'nowrap'}}>{it.spec||'–'}</span></td>
+                  <td style={{textAlign:'right'}}><span style={{fontWeight:600,color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}> / {it.min}</span>}{isLow&&<div style={{fontSize:'var(--fs-label)',color:'var(--error)',fontWeight:600}}>재고 부족</div>}</td>
+                  <td><span style={{color:'var(--slate)',whiteSpace:'nowrap'}}>{it.received}</span></td>
                 </tr>
               );
             })}
@@ -780,7 +780,7 @@ function PrepPlan(p) {
       <FBox title="실험대 위" x={325} y={40} w={620} h={110} tp="right">
         {['1','2','3','4','5'].map((ce,i)=><Cell key={ce} {...c('실험대 위',ce,325+i*124,40,124,110,ce)}/>)}
       </FBox>
-      <FBox title="실험대 아래" x={170} y={195} w={775} h={150} tp="right">
+      <FBox title="실험대 아래/서랍" x={170} y={195} w={775} h={150} tp="right">
         <Cell {...c('실험대 아래','1',170,195,90,150,'1')}/>
         <Cell {...c('실험대 아래','2',260,195,90,150,'2')}/>
         {['서랍 1','서랍 2','서랍 3','서랍 4','서랍 5','서랍 6'].map((ce,i)=><Cell key={ce} {...c('실험대 서랍',ce,358+(i%2)*70,195+Math.floor(i/2)*50,70,50,ce)}/>)}
@@ -923,11 +923,11 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
                       const isLow=it.min!=null&&it.qty<it.min;
                       return (
                         <tr key={it.id} onClick={()=>{setShowList(false);onItemClick(it);}}>
-                          <td><div style={{fontWeight:500,fontSize:'var(--fs-table)'}}>{it.name}</div>{it.note&&<div style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}>{it.note}</div>}</td>
-                          <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:'var(--fs-table)'}}>{u.short}</span></span></td>
-                          <td style={{fontSize:'var(--fs-table)'}}><b>{it.group}</b> / {it.cell}</td>
-                          <td style={{fontSize:'var(--fs-table)',color:'var(--slate)'}}>{it.spec||'–'}</td>
-                          <td><span style={{fontWeight:600,fontSize:'var(--fs-table)',color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}> / {it.min}</span>}</td>
+                          <td><div style={{fontWeight:500}}>{it.name}</div>{it.note&&<div style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}>{it.note}</div>}</td>
+                          <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color}}/>{u.short}</span></td>
+                          <td><b>{it.group}</b> / {it.cell}</td>
+                          <td style={{fontSize:'var(--fs-body)',color:'var(--slate)'}}>{it.spec||'–'}</td>
+                          <td><span style={{fontWeight:600,color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}> / {it.min}</span>}</td>
                         </tr>
                       );
                     })}
@@ -1225,7 +1225,7 @@ function MiniMapPrep({itemGroup,itemCell,itemColor}:{itemGroup:string,itemCell:s
         <MiniCell {...c('실험대 위','3',573,40,124,110)}/>
         <MiniCell {...c('실험대 위','4',697,40,124,110)}/>
         <MiniCell {...c('실험대 위','5',821,40,124,110)}/>
-        {/* 실험대 아래 */}
+        {/* 실험대 아래/서랍 */}
         <div style={{position:'absolute',left:170,top:195,width:775,height:150,border:'1.5px solid #1A1916',borderRadius:4}}/>
         <MiniCell {...c('실험대 아래','1',170,195,90,150)}/>
         <MiniCell {...c('실험대 아래','2',260,195,90,150)}/>
@@ -1408,53 +1408,41 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
         </div>}/>
       <div className="mobile-content mobile-pad" style={{flex:1,overflow:'auto',padding:32,paddingBottom:100}}>
         <div style={{maxWidth:860,margin:'0 auto',display:'flex',flexDirection:'column',gap:16}}>
-          {/* 카드 1: 품목명 + 미니맵 */}
-          <div className="card" style={{padding:24}}>
-            <span className="badge" style={{background:u.color,color:'#fff'}}>{u.name}</span>
-            <h2 className="mobile-h2" style={{margin:'12px 0 6px',fontSize:28,fontWeight:600,color:'var(--ink-deep)'}}>{item.name}</h2>
-            <div style={{fontSize:'var(--fs-body)',color:'var(--charcoal)'}}><span style={{color:'var(--slate)'}}>위치</span> <b>{item.space} / {item.group} / {item.cell}</b></div>
-            <div style={{marginTop:12,borderTop:'1px solid var(--hairline)',paddingTop:14}}>
-              <ItemMiniMap item={item} u={u}/>
+          <div className="card mobile-grid-1" style={{padding:24,display:'grid',gridTemplateColumns:'1.4fr 1fr',gap:24}}>
+            <div>
+              <span className="badge" style={{background:u.color,color:'#fff'}}>{u.name}</span>
+              <h2 className="mobile-h2" style={{margin:'12px 0 6px',fontSize:28,fontWeight:600,color:'var(--ink-deep)'}}>{item.name}</h2>
+              <div style={{fontSize:'var(--fs-body)',color:'var(--charcoal)'}}><span style={{color:'var(--slate)'}}>위치</span> <b>{item.space} / {item.group} / {item.cell}</b></div>
+              {item.note&&<div style={{marginTop:12,padding:'10px 14px',background:'var(--tint-yellow)',borderRadius:'var(--r-md)',fontSize:'var(--fs-body)'}}>📌 {item.note}</div>}
+            </div>
+            <div style={{background:isLow?'var(--tint-rose)':'var(--tint-mint)',borderRadius:'var(--r-lg)',padding:'18px 20px',display:'flex',flexDirection:'column',justifyContent:'center'}}>
+              <div style={{fontSize:'var(--fs-sm)',fontWeight:600,color:isLow?'var(--brand-pink-deep)':'var(--brand-green)'}}>{isLow?'재고 부족':'재고 양호'}</div>
+              <div style={{fontSize:36,fontWeight:600,color:'var(--ink-deep)',marginTop:4,display:'flex',alignItems:'baseline',gap:4}}>{item.qty}{item.min!=null&&<span style={{fontSize:18,color:'var(--slate)',fontWeight:500}}> / {item.min}</span>}</div>
+              <div style={{fontSize:'var(--fs-sm)',color:'var(--slate)',marginTop:4}}>{item.min!=null?'현재 / 최소':'현재 수량'}</div>
             </div>
           </div>
-          {/* 카드 2: 상세 정보 (규격·입고·수량·재고상태) + 비고 */}
           <div className="card" style={{padding:24}}>
             <div style={{fontSize:'var(--fs-section)',fontWeight:600,marginBottom:16}}>상세 정보</div>
-            <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:20}}>
-              {[['규격',item.spec||'–'],['입고 시기',item.received||'–']].map(([l,v])=>(
-                <div key={l}>
-                  <div style={{fontSize:'var(--fs-label)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>{l}</div>
-                  <div style={{fontSize:'var(--fs-body)',fontWeight:500,marginTop:4}}>{v}</div>
-                </div>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:20,marginBottom:20}}>
+              <div>
+                <div style={{fontSize:'var(--fs-label)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>용도</div>
+                <div className="row" style={{gap:6,marginTop:4}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:'var(--fs-body)',fontWeight:500}}>{u.name}</span></div>
+              </div>
+              {[['규격',item.spec||'–'],['입고 시기',item.received||'–'],['공간',item.space],['구역',item.group],['셀',item.cell]].map(([l,v])=>(
+                <div key={l}><div style={{fontSize:'var(--fs-label)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>{l}</div><div style={{fontSize:'var(--fs-body)',fontWeight:500,marginTop:4}}>{v}</div></div>
               ))}
-              <div>
-                <div style={{fontSize:'var(--fs-label)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>현재 수량</div>
-                <div style={{fontSize:'var(--fs-body)',fontWeight:600,marginTop:4,color:isLow?'var(--error)':'var(--ink)'}}>
-                  {item.qty}{item.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--steel)',fontWeight:400}}> / {item.min} 최소</span>}
-                </div>
-              </div>
-              <div>
-                <div style={{fontSize:'var(--fs-label)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>재고 상태</div>
-                <div style={{fontSize:'var(--fs-body)',fontWeight:600,marginTop:4,color:isLow?'var(--error)':'var(--brand-green)'}}>{isLow?'재고 부족':'재고 양호'}</div>
-              </div>
             </div>
-            {item.note&&(
-              <>
-                <div style={{borderTop:'1px solid var(--hairline)',margin:'16px 0'}}/>
-                <div style={{padding:'10px 14px',background:'var(--tint-yellow)',borderRadius:'var(--r-md)',fontSize:'var(--fs-body)',display:'flex',alignItems:'flex-start',gap:8}}>
-                  <span style={{flexShrink:0}}>📌</span>{item.note}
-                </div>
-              </>
-            )}
+            <div style={{borderTop:'1px solid var(--hairline)',marginBottom:14}}/>
+            <ItemMiniMap item={item} u={u}/>
+            <div style={{marginTop:8,padding:'8px 12px',borderTop:'1px solid var(--hairline)',display:'flex',alignItems:'center',gap:6}}>
+              <span style={{flexShrink:0}}>📍</span>
+              <span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}>사용 후 제자리에 — 위치가 달라졌다면 <b style={{color:'var(--charcoal)'}}>수정</b> 버튼으로 업데이트해 주세요</span>
+            </div>
           </div>
-          {/* 카드 3: 시스템 정보 (품목 ID 제외) */}
           <div className="card" style={{padding:16,background:'var(--surface)',marginBottom:0}}>
-            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:12}}>
-              {[['최초 등록일',item.createdAt],['최종 수정일',item.updatedAt],['최종 수정인',item.updatedBy]].map(([l,v])=>(
-                <div key={l} className="col">
-                  <span style={{fontSize:'var(--fs-label)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4,whiteSpace:'nowrap'}}>{l}</span>
-                  <span style={{fontSize:'var(--fs-body)',fontWeight:500,marginTop:2,whiteSpace:'nowrap'}}>{v}</span>
-                </div>
+            <div className="row wrap" style={{gap:'12px 32px'}}>
+              {[['최초 등록일',item.createdAt],['최종 수정일',item.updatedAt],['최종 수정인',item.updatedBy],['품목 ID',`#${item.id}`]].map(([l,v])=>(
+                <div key={l} className="col"><span style={{fontSize:'var(--fs-label)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>{l}</span><span style={{fontSize:'var(--fs-body)',fontWeight:500,marginTop:2}}>{v}</span></div>
               ))}
             </div>
           </div>
