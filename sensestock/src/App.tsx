@@ -1467,7 +1467,7 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
         <div style={{padding:28}}>
           <div className="row" style={{gap:12,marginBottom:16}}>
             <div style={{width:40,height:40,borderRadius:'50%',background:'var(--tint-rose)',color:'var(--brand-pink-deep)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><IC.alert/></div>
-            <div><div style={{fontSize:'var(--fs-section)',fontWeight:600}}>이 품목을 삭제할까요?</div><div style={{fontSize:'var(--fs-body)',color:'var(--slate)',marginTop:2}}>{item.name}</div></div>
+            <div><div style={{fontSize:'var(--fs-section)',fontWeight:600}}>이 품목을 삭제할까요?</div><div style={{fontSize:'var(--fs-body)',color:'var(--slate)',marginTop:2}}>{item.name}</div><div style={{fontSize:'var(--fs-body)',color:'var(--slate)',marginTop:2}}>이 작업은 되돌릴 수 없습니다.</div></div>
           </div>
           <div className="row between">
             <button className="btn btn-danger" onClick={()=>{onDelete(item.id);setDelM(false);}}><IC.trash/> 삭제</button>
