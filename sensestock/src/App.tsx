@@ -1415,6 +1415,10 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
             <div style={{fontSize:'var(--fs-body)',color:'var(--charcoal)'}}><span style={{color:'var(--slate)'}}>위치</span> <b>{item.space} / {item.group} / {item.cell}</b></div>
             <div style={{marginTop:12,borderTop:'1px solid var(--hairline)',paddingTop:14}}>
               <ItemMiniMap item={item} u={u}/>
+              <div style={{marginTop:8,padding:'8px 12px',borderTop:'1px solid var(--hairline)',display:'flex',alignItems:'center',gap:6}}>
+  <span style={{flexShrink:0}}>📍</span>
+  <span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}>사용 후 제자리에!!! - 위치가 달라졌다면 <b style={{color:'var(--charcoal)'}}>수정</b> 버튼으로 업데이트해 주세요</span>
+</div>
             </div>
           </div>
           {/* 카드 2: 상세 정보 (규격·입고·수량·재고상태) + 비고 */}
