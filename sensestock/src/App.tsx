@@ -160,8 +160,8 @@ const ZONES = {
   ],
 };
 
-const mk=(id,name,useId,space,group,cell,qty,min,spec='',note='',received='2026-04')=>({
-  id,name,useId,space,group,cell,qty,min,spec,note,received,
+const mk=(id,name,useId,space,group,cell,qty,min,spec='',note='',received='2026-04',isAsset=false,isEquipment=false)=>({
+  id,name,useId,space,group,cell,qty,min,spec,note,received,isAsset,isEquipment,
   createdAt:'2026-03-12',updatedAt:'2026-05-10',updatedBy:'김연구'
 });
 
@@ -597,6 +597,7 @@ function Search({items,onItemClick,onDelete}) {
   const [q,setQ]=useState('');
   const [uf,setUf]=useState(new Set());
   const [sf,setSf]=useState(new Set());
+  const [cf,setCf]=useState(new Set()); // 구분 필터: 'asset' | 'equipment'
   const [sel,setSel]=useState(new Set());
   const [delModal,setDelModal]=useState(false);
   const [suggOpen,setSuggOpen]=useState(false);
@@ -620,9 +621,10 @@ function Search({items,onItemClick,onDelete}) {
     if(q.trim()){const l=q.toLowerCase();r=r.filter(i=>i.name.toLowerCase().includes(l));}
     if(uf.size) r=r.filter(i=>uf.has(i.useId));
     if(sf.size) r=r.filter(i=>sf.has(i.space));
+    if(cf.size) r=r.filter(i=>(cf.has('asset')&&i.isAsset)||(cf.has('equipment')&&i.isEquipment));
     return r.sort((a,b)=>a.name.localeCompare(b.name,'ko'));
-  },[items,q,uf,sf,submitted]);
-  const reset=()=>{setQ('');setUf(new Set());setSf(new Set());setSel(new Set());setSubmitted(false);};
+  },[items,q,uf,sf,cf,submitted]);
+  const reset=()=>{setQ('');setUf(new Set());setSf(new Set());setCf(new Set());setSel(new Set());setSubmitted(false);};
   return (
     <div className="col" style={{height:'100%'}}>
       <Topbar title="품목 찾기" sub={`전체 ${items.length}개 품목`} action={sel.size>0?(
@@ -657,7 +659,12 @@ function Search({items,onItemClick,onDelete}) {
         <div className="row wrap" style={{gap:8,marginTop:8}}>
           <span style={{fontSize:'var(--fs-sm)',fontWeight:500,color:'var(--slate)'}}>공간</span>
           {SPACES.map(s=><button key={s} className={`chip ${sf.has(s)?'active':''}`} onClick={()=>tog(setSf,s)}>{s}</button>)}
-          {(uf.size+sf.size+(q?1:0))>0&&<button style={{fontSize:'var(--fs-sm)',color:'var(--link-blue)',background:'none',border:'none',cursor:'pointer'}} onClick={reset}>필터 초기화</button>}
+        </div>
+        <div className="row wrap" style={{gap:8,marginTop:8}}>
+          <span style={{fontSize:'var(--fs-sm)',fontWeight:500,color:'var(--slate)'}}>구분</span>
+          <button className={`chip ${cf.has('asset')?'active':''}`} onClick={()=>tog(setCf,'asset')} style={!cf.has('asset')?{borderColor:'var(--brand-purple-300)',color:'var(--primary-deep)',background:'var(--primary-soft)'}:{}}>자산</button>
+          <button className={`chip ${cf.has('equipment')?'active':''}`} onClick={()=>tog(setCf,'equipment')} style={!cf.has('equipment')?{borderColor:'var(--brand-teal)',color:'var(--brand-teal)',background:'var(--tint-mint)'}:{}}>비품</button>
+          {(uf.size+sf.size+cf.size+(q?1:0))>0&&<button style={{fontSize:'var(--fs-sm)',color:'var(--link-blue)',background:'none',border:'none',cursor:'pointer'}} onClick={reset}>필터 초기화</button>}
         </div>
       </div>
       <div className="mobile-content mobile-scroll-x" style={{flex:1,overflow:'auto'}}>
@@ -667,7 +674,7 @@ function Search({items,onItemClick,onDelete}) {
             <th style={{width:36}}>
               {filtered.length>0&&<input type="checkbox" checked={sel.size===filtered.length&&filtered.length>0} onChange={e=>setSel(e.target.checked?new Set(filtered.map(i=>i.id)):new Set())}/>}
             </th>
-            <th style={{width:220}}>품목명</th><th style={{width:130}}>규격</th><th style={{width:180}}>위치</th><th style={{width:110}}>용도</th><th style={{width:110,textAlign:'right'}}>수량/최소</th><th style={{width:70}}>입고</th>
+            <th style={{width:220}}>품목명</th><th style={{width:130}}>규격</th><th style={{width:180}}>위치</th><th style={{width:110}}>용도</th><th style={{width:110,textAlign:'right'}}>수량/최소</th><th style={{width:70}}>입고</th><th style={{width:90}}>구분</th>
           </tr></thead>
           <tbody>
             {filtered.map(it=>{
@@ -683,11 +690,16 @@ function Search({items,onItemClick,onDelete}) {
                   <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color,flexShrink:0}}/><span style={{fontSize:'var(--fs-table)',color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.short}</span></span></td>
                   <td style={{textAlign:'right'}}><span style={{fontSize:'var(--fs-table)',color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}> / {it.min}</span>}{isLow&&<div style={{fontSize:'var(--fs-label)',color:'var(--error)',fontWeight:600}}>재고 부족</div>}</td>
                   <td><span style={{fontSize:'var(--fs-table)',color:'var(--slate)',whiteSpace:'nowrap'}}>{it.received}</span></td>
+                  <td>
+                    {it.isAsset&&<span style={{display:'inline-flex',alignItems:'center',padding:'2px 8px',borderRadius:'var(--r-full)',fontSize:'var(--fs-label)',fontWeight:600,background:'var(--primary-soft)',color:'var(--primary-deep)',border:'1px solid var(--brand-purple-300)',marginRight:3}}>자산</span>}
+                    {it.isEquipment&&<span style={{display:'inline-flex',alignItems:'center',padding:'2px 8px',borderRadius:'var(--r-full)',fontSize:'var(--fs-label)',fontWeight:600,background:'var(--tint-mint)',color:'var(--brand-teal)',border:'1px solid var(--brand-teal)'}}>비품</span>}
+                    {!it.isAsset&&!it.isEquipment&&<span style={{color:'var(--stone)'}}>–</span>}
+                  </td>
                 </tr>
               );
             })}
-            {filtered.length===0&&submitted&&<tr><td colSpan={7} style={{padding:'48px 0',textAlign:'center',color:'var(--slate)'}}>일치하는 품목이 없습니다.</td></tr>}
-            {!submitted&&<tr><td colSpan={7} style={{padding:'48px 0',textAlign:'center',color:'var(--slate)'}}>검색어를 입력하고 찾기 버튼을 눌러주세요.</td></tr>}
+            {filtered.length===0&&submitted&&<tr><td colSpan={8} style={{padding:'48px 0',textAlign:'center',color:'var(--slate)'}}>일치하는 품목이 없습니다.</td></tr>}
+            {!submitted&&<tr><td colSpan={8} style={{padding:'48px 0',textAlign:'center',color:'var(--slate)'}}>검색어를 입력하고 찾기 버튼을 눌러주세요.</td></tr>}
           </tbody>
         </table>
         {/* 모바일 카드 리스트 */}
@@ -704,7 +716,13 @@ function Search({items,onItemClick,onDelete}) {
                   <input type="checkbox" checked={isSel} onChange={()=>{}} style={{width:16,height:16}}/>
                 </div>
                 <div style={{flex:1,minWidth:0}}>
-                  <div style={{fontWeight:500,fontSize:'var(--fs-body)',color:'var(--ink-deep)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{q?hi(it.name,q):it.name}</div>
+                  <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8}}>
+                    <div style={{fontWeight:500,fontSize:'var(--fs-body)',color:'var(--ink-deep)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1,minWidth:0}}>{q?hi(it.name,q):it.name}</div>
+                    <div style={{display:'flex',gap:4,flexShrink:0}}>
+                      {it.isAsset&&<span style={{display:'inline-flex',alignItems:'center',padding:'1px 6px',borderRadius:'var(--r-full)',fontSize:11,fontWeight:600,background:'var(--primary-soft)',color:'var(--primary-deep)',border:'1px solid var(--brand-purple-300)'}}>자산</span>}
+                      {it.isEquipment&&<span style={{display:'inline-flex',alignItems:'center',padding:'1px 6px',borderRadius:'var(--r-full)',fontSize:11,fontWeight:600,background:'var(--tint-mint)',color:'var(--brand-teal)',border:'1px solid var(--brand-teal)'}}>비품</span>}
+                    </div>
+                  </div>
                   <div className="row" style={{gap:6,marginTop:3,alignItems:'center'}}>
                     <span className="swatch" style={{background:u.color,flexShrink:0}}/>
                     <span style={{fontSize:'var(--fs-sm)',color:'var(--slate)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.space} / {it.group} / {it.cell}{it.spec&&' · '+it.spec}</span>
@@ -913,7 +931,7 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
               </div>
               <div style={{flex:1,overflow:'auto',paddingBottom:8}}>
                 <table className="table mobile-hide">
-                  <thead><tr><th style={{width:200}}>품목명</th><th style={{width:120}}>규격</th><th style={{width:140}}>위치</th><th style={{width:160}}>용도</th><th style={{width:60}}>수량</th></tr></thead>
+                  <thead><tr><th style={{width:200}}>품목명</th><th style={{width:120}}>규격</th><th style={{width:140}}>위치</th><th style={{width:160}}>용도</th><th style={{width:60}}>수량</th><th style={{width:90}}>구분</th></tr></thead>
                   <tbody>
                     {selItems.map(it=>{
                       const u=useById(it.useId);
@@ -922,13 +940,18 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
                         <tr key={it.id} onClick={()=>{setShowList(false);onItemClick(it);}}>
                           <td><div style={{fontWeight:600,fontSize:'var(--fs-table)'}}>{it.name}</div>{it.note&&<div style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}>{it.note}</div>}</td>
                           <td style={{fontSize:'var(--fs-table)',color:'var(--slate)'}}>{it.spec||'–'}</td>
-                          <td style={{fontSize:'var(--fs-table)'}}><b>{it.group}</b> / {it.cell}{it.spec&&' · '+it.spec}</td>
+                          <td style={{fontSize:'var(--fs-table)'}}><b>{it.group}</b> / {it.cell}</td>
                           <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color}}/><span className="mobile-hide" style={{fontSize:'var(--fs-table)',color:'var(--charcoal)'}}>{u.short}</span></span></td>
                           <td><span style={{fontSize:'var(--fs-table)',color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}> / {it.min}</span>}</td>
+                          <td>
+                            {it.isAsset&&<span style={{display:'inline-flex',alignItems:'center',padding:'2px 8px',borderRadius:'var(--r-full)',fontSize:'var(--fs-label)',fontWeight:600,background:'var(--primary-soft)',color:'var(--primary-deep)',border:'1px solid var(--brand-purple-300)',marginRight:3}}>자산</span>}
+                            {it.isEquipment&&<span style={{display:'inline-flex',alignItems:'center',padding:'2px 8px',borderRadius:'var(--r-full)',fontSize:'var(--fs-label)',fontWeight:600,background:'var(--tint-mint)',color:'var(--brand-teal)',border:'1px solid var(--brand-teal)'}}>비품</span>}
+                            {!it.isAsset&&!it.isEquipment&&<span style={{color:'var(--stone)'}}>–</span>}
+                          </td>
                         </tr>
                       );
                     })}
-                    {selItems.length===0&&<tr><td colSpan={5} style={{padding:'40px 0',textAlign:'center',color:'var(--slate)'}}>선택한 셀에 품목이 없습니다.</td></tr>}
+                    {selItems.length===0&&<tr><td colSpan={6} style={{padding:'40px 0',textAlign:'center',color:'var(--slate)'}}>선택한 셀에 품목이 없습니다.</td></tr>}
                   </tbody>
                 </table>
                 <div className="desktop-hide mobile-list" style={{flexDirection:'column'}}>
@@ -939,7 +962,13 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
                       <div key={it.id} onClick={()=>{setShowList(false);onItemClick(it);}} style={{padding:'12px 20px',borderBottom:'1px solid var(--hairline)',cursor:'pointer'}}>
                         <div className="row between" style={{alignItems:'flex-start',gap:8}}>
                           <div style={{flex:1,minWidth:0}}>
-                            <div style={{fontWeight:600,fontSize:'var(--fs-section)',color:'var(--ink-deep)',marginBottom:4}}>{it.name}</div>
+                            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8,marginBottom:4}}>
+                              <div style={{fontWeight:600,fontSize:'var(--fs-section)',color:'var(--ink-deep)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1,minWidth:0}}>{it.name}</div>
+                              <div style={{display:'flex',gap:4,flexShrink:0}}>
+                                {it.isAsset&&<span style={{display:'inline-flex',alignItems:'center',padding:'1px 6px',borderRadius:'var(--r-full)',fontSize:11,fontWeight:600,background:'var(--primary-soft)',color:'var(--primary-deep)',border:'1px solid var(--brand-purple-300)'}}>자산</span>}
+                                {it.isEquipment&&<span style={{display:'inline-flex',alignItems:'center',padding:'1px 6px',borderRadius:'var(--r-full)',fontSize:11,fontWeight:600,background:'var(--tint-mint)',color:'var(--brand-teal)',border:'1px solid var(--brand-teal)'}}>비품</span>}
+                              </div>
+                            </div>
                             <div className="row" style={{gap:6,flexWrap:'wrap'}}>
                               <span className="swatch" style={{background:u.color}}/>
                               <span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}><b style={{color:'var(--charcoal)'}}>{it.group}</b> / {it.cell}{it.spec&&<> · <span style={{color:'var(--charcoal)'}}>{it.spec}</span></>}</span>
@@ -1041,7 +1070,7 @@ function MonthPicker({value,onChange,editing}:{value:string,onChange:(v:string)=
     </div>
   );
 }
-function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||'',group:pre.group||'',cell:pre.cell||'',spec:'',qty:'',min:'',received:'',note:''};}function RegisterEdit({mode,item,prefill,onCancel,onSave,onDelete}) {
+function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||'',group:pre.group||'',cell:pre.cell||'',spec:'',qty:'',min:'',received:'',note:'',isAsset:false,isEquipment:false};}function RegisterEdit({mode,item,prefill,onCancel,onSave,onDelete}) {
   const isEdit=mode==='edit';
   const [form,setForm]=useState(()=>isEdit&&item?{...item}:blank(prefill||{}));
   const [ef,setEf]=useState(null);
@@ -1092,6 +1121,21 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginTop:16,minWidth:0}}>
               <Field label="규격"><input className={`input ${ef==='spec'?'is-editing':''}`} placeholder="예: 250 mL" value={form.spec} onChange={e=>setF('spec',e.target.value)} style={{minWidth:0}}/></Field>
               <Field label="입고 시기" ><MonthPicker value={form.received} onChange={v=>setF('received',v)} editing={ef==='received'}/></Field>
+            </div>
+            <div style={{marginTop:16}}>
+              <label className="field-label">구분</label>
+              <div style={{display:'flex',gap:24,marginTop:4}}>
+                <label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer'}}>
+                  <input type="checkbox" checked={!!form.isAsset} onChange={e=>setF('isAsset',e.target.checked)} style={{width:15,height:15,accentColor:'var(--primary)',cursor:'pointer'}}/>
+                  <span style={{fontSize:'var(--fs-body)',fontWeight:500}}>자산</span>
+                  <span className="mobile-hide" style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}>고정 자산으로 관리</span>
+                </label>
+                <label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer'}}>
+                  <input type="checkbox" checked={!!form.isEquipment} onChange={e=>setF('isEquipment',e.target.checked)} style={{width:15,height:15,accentColor:'var(--brand-teal)',cursor:'pointer'}}/>
+                  <span style={{fontSize:'var(--fs-body)',fontWeight:500}}>비품</span>
+                  <span className="mobile-hide" style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}>비품대장 등록 대상</span>
+                </label>
+              </div>
             </div>
           </div>
           <div className="card" style={{padding:24}}>
@@ -1422,13 +1466,21 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
           {/* 카드 2: 상세 정보 (규격·입고·수량·재고상태) + 비고 */}
           <div className="card" style={{padding:24}}>
             <div style={{fontSize:'var(--fs-section)',fontWeight:600,marginBottom:16}}>상세 정보</div>
-            <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:20}}>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:20}}>
               {[['규격',item.spec||'–'],['입고 시기',item.received||'–']].map(([l,v])=>(
                 <div key={l}>
                   <div style={{fontSize:'var(--fs-label)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>{l}</div>
                   <div style={{fontSize:'var(--fs-body)',fontWeight:500,marginTop:4}}>{v}</div>
                 </div>
               ))}
+              <div>
+                <div style={{fontSize:'var(--fs-label)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>구분</div>
+                <div style={{marginTop:4,display:'flex',gap:6,flexWrap:'wrap'}}>
+                  {item.isAsset&&<span style={{display:'inline-flex',alignItems:'center',padding:'2px 10px',borderRadius:'var(--r-full)',fontSize:'var(--fs-label)',fontWeight:600,background:'var(--primary-soft)',color:'var(--primary-deep)',border:'1px solid var(--brand-purple-300)'}}>자산</span>}
+                  {item.isEquipment&&<span style={{display:'inline-flex',alignItems:'center',padding:'2px 10px',borderRadius:'var(--r-full)',fontSize:'var(--fs-label)',fontWeight:600,background:'var(--tint-mint)',color:'var(--brand-teal)',border:'1px solid var(--brand-teal)'}}>비품</span>}
+                  {!item.isAsset&&!item.isEquipment&&<span style={{fontSize:'var(--fs-body)',color:'var(--stone)'}}>–</span>}
+                </div>
+              </div>
               <div>
                 <div style={{fontSize:'var(--fs-label)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>현재 수량</div>
                 <div style={{fontSize:'var(--fs-body)',fontWeight:600,marginTop:4,color:isLow?'var(--error)':'var(--ink)'}}>
