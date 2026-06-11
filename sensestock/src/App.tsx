@@ -923,7 +923,7 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
                         <tr key={it.id} onClick={()=>{setShowList(false);onItemClick(it);}}>
                           <td><div style={{fontWeight:600,fontSize:'var(--fs-table)'}}>{it.name}</div>{it.note&&<div style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}>{it.note}</div>}</td>
                           <td style={{fontSize:'var(--fs-table)',color:'var(--slate)'}}>{it.spec||'–'}</td>
-                          <td style={{fontSize:'var(--fs-table)'}}><b>{it.group}</b> / {it.cell}{it.spec&&' · '+it.spec}}</td>
+                          <td style={{fontSize:'var(--fs-table)'}}><b>{it.group}</b> / {it.cell}{it.spec&&' · '+it.spec}</td>
                           <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color}}/></span></td>
                           <td><span style={{fontSize:'var(--fs-table)',color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}> / {it.min}</span>}</td>
                         </tr>
