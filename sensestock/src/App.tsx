@@ -545,8 +545,8 @@ function Dashboard({items,activity,onNav,onItemClick}) {
                 <Donut data={useData} total={total} size={180}/>
                 <div style={{flex:1,display:'grid',gridTemplateColumns:'1fr 1fr',gap:'6px 24px'}}>
                   {useData.map(u=>(
-                    <div key={u.name} className="row" style={{gap:8,padding:'4px 0'}}>
-                      <span className="swatch" style={{background:u.c}}/><span style={{flex:1,fontSize:'var(--fs-body)',color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.name}</span><span style={{fontSize:'var(--fs-body)',fontWeight:600}}>{u.v}</span>
+                    <div key={u.name} style={{display:'grid',gridTemplateColumns:'10px 1fr auto',gap:'0 8px',alignItems:'center',padding:'4px 0'}}>
+                      <span className="swatch" style={{background:u.c}}/><span style={{fontSize:'var(--fs-body)',color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.name}</span><span style={{fontSize:'var(--fs-body)',fontWeight:600,textAlign:'right'}}>{u.v}</span>
                     </div>
                   ))}
                 </div>
