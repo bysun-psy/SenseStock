@@ -864,7 +864,7 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
   useEffect(()=>{setSel(new Set());setShowList(false);},[space]);
   const iMap=useMemo(()=>itemsByLoc(items.filter(i=>i.space===space)),[items,space]);
   const tog=key=>setSel(s=>{const n=new Set(s);n.has(key)?n.delete(key):n.add(key);return n;});
-  const selItems=useMemo(()=>{const out=[];for(const k of sel){const[g,c]=k.split('||');out.push(...(iMap[`${space}/${g}/${c}`]||[]));}return out;},[sel,iMap,space]);
+  const selItems=useMemo(()=>{const out=[];for(const k of sel){const[g,c]=k.split('||');out.push(...(iMap[`${space}/${g}/${c}`]||[]));}return out.sort((a,b)=>a.name.localeCompare(b.name,'ko'));},[sel,iMap,space]);
   const pp={space,itemMap:iMap,selected:sel,onToggle:tog};
   return (
     <div className="col" style={{height:'100%'}}>
