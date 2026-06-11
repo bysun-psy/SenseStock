@@ -1415,7 +1415,7 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
             <div style={{fontSize:'var(--fs-body)',color:'var(--charcoal)'}}><span style={{color:'var(--slate)'}}>위치</span> <b>{item.space} / {item.group} / {item.cell}</b></div>
             <div style={{marginTop:12,borderTop:'1px solid var(--hairline)',paddingTop:14}}>
               <ItemMiniMap item={item} u={u}/>
-              <div style={{marginTop:8,padding:'8px 8px',borderTop:'1px solid var(--hairline)',display:'flex',alignItems:'center',gap:6}}>
+              <div style={{marginTop:12,padding:'8px 8px',borderTop:'1px solid var(--hairline)',display:'flex',alignItems:'center',gap:6}}>
   <span style={{flexShrink:0}}>📍</span>
   <span style={{fontSize:'var(--fs-body)',color:'var(--slate)'}}>
   <b style={{color:'var(--error)'}}>사용 후 제자리에 !</b> - 위치가 달라졌다면 <b style={{color:'var(--charcoal)'}}>수정</b> 버튼으로 업데이트해 주세요
