@@ -543,10 +543,10 @@ function Dashboard({items,activity,onNav,onItemClick}) {
             ):(
               <div className="row" style={{gap:32,alignItems:'center'}}>
                 <Donut data={useData} total={total} size={180}/>
-                <div style={{flex:1,display:'grid',gridTemplateColumns:'1fr 1fr',gap:'6px 24px'}}>
+                <div style={{flex:1,display:'grid',gridTemplateColumns:'1fr 1fr',gap:'6px 72px'}}>
                   {useData.map(u=>(
-                    <div key={u.name} className="row" style={{gap:8,padding:'4px 0'}}>
-                      <span className="swatch" style={{background:u.c}}/><span style={{flex:1,fontSize:'var(--fs-body)',color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.name}</span><span style={{fontSize:'var(--fs-body)',fontWeight:600}}>{u.v}</span>
+                    <div key={u.name} style={{display:'grid',gridTemplateColumns:'10px 1fr auto',gap:'0 8px',alignItems:'center',padding:'4px 0'}}>
+                      <span className="swatch" style={{background:u.c}}/><span style={{fontSize:'var(--fs-body)',color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.name}</span><span style={{fontSize:'var(--fs-body)',fontWeight:600,textAlign:'right'}}>{u.v}</span>
                     </div>
                   ))}
                 </div>
@@ -1133,7 +1133,7 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
         <div style={{padding:28}}>
           <div className="row" style={{gap:12,marginBottom:16}}>
             <div style={{width:40,height:40,borderRadius:'50%',background:'var(--tint-rose)',color:'var(--brand-pink-deep)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><IC.alert/></div>
-            <div><div style={{fontSize:'var(--fs-section)',fontWeight:600}}>이 품목을 삭제할까요?</div><div style={{fontSize:'var(--fs-body)',color:'var(--slate)',marginTop:2}}>{form.name}</div></div>
+            <div><div style={{fontSize:'var(--fs-section)',fontWeight:600}}>이 품목을 삭제할까요?</div><div style={{fontSize:'var(--fs-body)',color:'var(--slate)',marginTop:2}}>{form.name}</div><div style={{fontSize:'var(--fs-body)',color:'var(--slate)',marginTop:2}}>이 작업은 되돌릴 수 없습니다.</div></div>
           </div>
           <div className="row between">
             <button className="btn btn-danger" onClick={()=>{if(onDelete&&item)onDelete(item.id);setDelM(false);}}><IC.trash/> 삭제</button>
@@ -1467,7 +1467,7 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
         <div style={{padding:28}}>
           <div className="row" style={{gap:12,marginBottom:16}}>
             <div style={{width:40,height:40,borderRadius:'50%',background:'var(--tint-rose)',color:'var(--brand-pink-deep)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><IC.alert/></div>
-            <div><div style={{fontSize:'var(--fs-section)',fontWeight:600}}>이 품목을 삭제할까요?</div><div style={{fontSize:'var(--fs-body)',color:'var(--slate)',marginTop:2}}>{item.name}</div></div>
+            <div><div style={{fontSize:'var(--fs-section)',fontWeight:600}}>이 품목을 삭제할까요?</div><div style={{fontSize:'var(--fs-body)',color:'var(--slate)',marginTop:2}}>{item.name}</div><div style={{fontSize:'var(--fs-body)',color:'var(--slate)',marginTop:2}}>이 작업은 되돌릴 수 없습니다.</div></div>
           </div>
           <div className="row between">
             <button className="btn btn-danger" onClick={()=>{onDelete(item.id);setDelM(false);}}><IC.trash/> 삭제</button>
