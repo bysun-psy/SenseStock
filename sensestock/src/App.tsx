@@ -942,8 +942,8 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
                           <div style={{flex:1,minWidth:0}}>
                             <div style={{fontWeight:600,fontSize:'var(--fs-section)',color:'var(--ink-deep)',marginBottom:4}}>{it.name}</div>
                             <div className="row" style={{gap:6,flexWrap:'wrap'}}>
-                              <span className="row" style={{gap:4}}><span className="swatch" style={{background:u.color}}/><span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}>{u.short}</span></span>
-                              <span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}><b style={{color:'var(--charcoal)'}}>{it.group}</b> / {it.cell}</span>
+                              <span className="swatch" style={{background:u.color}}/>
+                              <span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}><b style={{color:'var(--charcoal)'}}>{it.group}</b> / {it.cell}{it.spec&&<> · <span style={{color:'var(--charcoal)'}}>{it.spec}</span></>}</span>
                             </div>
                           </div>
                           <div style={{textAlign:'right',flexShrink:0}}>
