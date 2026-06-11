@@ -709,7 +709,6 @@ function Search({items,onItemClick,onDelete}) {
                     <span className="swatch" style={{background:u.color,flexShrink:0}}/>
                     <span style={{fontSize:'var(--fs-sm)',color:'var(--slate)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.space} / {it.group} / {it.cell}{it.spec&&' · '+it.spec}</span>
                   </div>
-                  {it.note&&<div style={{fontSize:'var(--fs-label)',color:'var(--steel)',marginTop:2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{it.note}</div>}
                 </div>
                 <div style={{textAlign:'right',flexShrink:0}}>
                   <div style={{fontWeight:600,fontSize:15,color:isLow?'var(--error)':'var(--ink-deep)'}}>{it.qty}{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--slate)',fontWeight:400}}> / {it.min}</span>}</div>
