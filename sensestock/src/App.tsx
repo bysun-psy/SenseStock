@@ -687,12 +687,12 @@ function Search({items,onItemClick,onDelete}) {
               );
             })}
             {filtered.length===0&&submitted&&<tr><td colSpan={7} style={{padding:'48px 0',textAlign:'center',color:'var(--slate)'}}>일치하는 품목이 없습니다.</td></tr>}
-            {!submitted&&<tr><td colSpan={7} style={{padding:'48px 0',textAlign:'center',color:'var(--slate)'}}>검색어를 입력하고 검색 버튼을 눌러주세요.</td></tr>}
+            {!submitted&&<tr><td colSpan={7} style={{padding:'48px 0',textAlign:'center',color:'var(--slate)'}}>검색어를 입력하고 찾기 버튼을 눌러주세요.</td></tr>}
           </tbody>
         </table>
         {/* 모바일 카드 리스트 */}
         <div className="mobile-list desktop-hide">
-          {!submitted&&<div style={{padding:'48px 24px',textAlign:'center',color:'var(--slate)',fontSize:'var(--fs-body)'}}>검색어를 입력하고 검색 버튼을 눌러주세요.</div>}
+          {!submitted&&<div style={{padding:'48px 24px',textAlign:'center',color:'var(--slate)',fontSize:'var(--fs-body)'}}>검색어를 입력하고 찾기 버튼을 눌러주세요.</div>}
           {submitted&&filtered.length===0&&<div style={{padding:'48px 24px',textAlign:'center',color:'var(--slate)',fontSize:'var(--fs-body)'}}>일치하는 품목이 없습니다.</div>}
           {filtered.map(it=>{
             const u=useById(it.useId);
