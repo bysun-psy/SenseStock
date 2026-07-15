@@ -1436,7 +1436,7 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
   const isMobile=useMediaQuery('(max-width:768px)');
   return (
     <div className="col" style={{height:'100%'}}>
-      <Topbar title="품목 상세" sub={`${item.name} · #${item.id} · ${item.space} / ${item.group} / ${item.cell}`} action={
+      <Topbar title="품목 상세" sub={`${item.name} · #${item.id} · ${item.space}${item.group ? ' / '+item.group : ''}${item.cell ? ' / '+item.cell : ''}`} action={
         <div className="row" style={{gap:12}}>
           <button className="btn btn-danger btn-sm" onClick={()=>setDelM(true)}>
             <IC.trash/><span>삭제</span>
