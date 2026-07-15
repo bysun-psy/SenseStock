@@ -1454,7 +1454,7 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
           <div className="card" style={{padding:24}}>
             <span className="badge" style={{background:u.color,color:'#fff'}}>{u.name}</span>
             <h2 className="mobile-h2" style={{margin:'12px 0 6px',fontSize:28,fontWeight:600,color:'var(--ink-deep)'}}>{item.name}</h2>
-            <div style={{fontSize:'var(--fs-body)',color:'var(--charcoal)'}}><span style={{color:'var(--slate)'}}>위치</span> <b>{item.space}{item.group ? ` / ${item.group}` : ''}{item.cell ? ` / ${item.cell}` : ''}</b></b></div>
+            <div style={{fontSize:'var(--fs-body)',color:'var(--charcoal)'}}><span style={{color:'var(--slate)'}}>위치</span> <b>{item.space}{item.group ? ' / ' + item.group : ''}{item.cell ? ' / ' + item.cell : ''}</b></div>
             <div style={{marginTop:12,borderTop:'1px solid var(--hairline)',paddingTop:14}}>
               <ItemMiniMap item={item} u={u}/>
               <div style={{marginTop:14,display:'flex',alignItems:'center',gap:6}}>
