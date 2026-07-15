@@ -308,7 +308,9 @@ function SidebarToggleIcon({open}) {
 
 function itemsByLoc(items) {
   const m={};
-  items.forEach(it=>{const k=`${it.space}/${it.group}/${it.cell}`;(m[k]=m[k]||[]).push(it);});
+  items.forEach(it=>{if (!it.group || !it.cell) return;
+                     const k=`${it.space}/${it.group}/${it.cell}`;
+                     (m[k]=m[k]||[]).push(it);});
   return m;
 }
 function dominant(its) {
@@ -1084,8 +1086,8 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
     if(!form.name.trim())e.name='품목명을 입력하세요.';
     if(!form.useId)e.useId='용도를 선택하세요.';
     if(!form.space)e.space='공간을 선택하세요.';
-    if(!form.group)e.group='구역을 선택하세요.';
-    if(!form.cell)e.cell='셀을 선택하세요.';
+    if(!form.isAsset && !form.group)e.group='구역을 선택하세요.';
+    if(!form.isAsset && !form.cell)e.cell='셀을 선택하세요.';
     if(rq){if(form.qty==='')e.qty='수량은 필수입니다.';if(form.min==='')e.min='최소 재고는 필수입니다.';}
     setErrs(e);return !Object.keys(e).length;
   };
@@ -1418,7 +1420,7 @@ function MiniMapStore({itemGroup,itemCell,itemColor}:{itemGroup:string,itemCell:
   );
 }
 
-function ItemMiniMap({item,u}:{item:any,u:any}) {
+function ItemMiniMap({item,u}:{if (!item.group || !item.cell) return null;item:any,u:any}) {
   const props={itemGroup:item.group,itemCell:item.cell,itemColor:u.color};
   if(item.space==='준비') return <MiniMapPrep {...props}/>;
   if(item.space==='서빙1'||item.space==='서빙2') return <MiniMapSimple space={item.space} {...props}/>;
@@ -1452,7 +1454,7 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
           <div className="card" style={{padding:24}}>
             <span className="badge" style={{background:u.color,color:'#fff'}}>{u.name}</span>
             <h2 className="mobile-h2" style={{margin:'12px 0 6px',fontSize:28,fontWeight:600,color:'var(--ink-deep)'}}>{item.name}</h2>
-            <div style={{fontSize:'var(--fs-body)',color:'var(--charcoal)'}}><span style={{color:'var(--slate)'}}>위치</span> <b>{item.space} / {item.group} / {item.cell}</b></div>
+            <div style={{fontSize:'var(--fs-body)',color:'var(--charcoal)'}}><span style={{color:'var(--slate)'}}>위치</span> <b>{item.space} / {item.group ? ` / ${item.group}` : ''} / {item.cell ? ` / ${item.cell}` : ''}</b></div>
             <div style={{marginTop:12,borderTop:'1px solid var(--hairline)',paddingTop:14}}>
               <ItemMiniMap item={item} u={u}/>
               <div style={{marginTop:14,display:'flex',alignItems:'center',gap:6}}>
