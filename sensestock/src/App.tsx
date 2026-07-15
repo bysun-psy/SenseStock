@@ -1420,7 +1420,7 @@ function MiniMapStore({itemGroup,itemCell,itemColor}:{itemGroup:string,itemCell:
   );
 }
 
-function ItemMiniMap({item,u}:{if (!item.group || !item.cell) return null;item:any,u:any}) {
+function ItemMiniMap({item,u}:{item:any,u:any}) {if (!item.group || !item.cell) return null;
   const props={itemGroup:item.group,itemCell:item.cell,itemColor:u.color};
   if(item.space==='준비') return <MiniMapPrep {...props}/>;
   if(item.space==='서빙1'||item.space==='서빙2') return <MiniMapSimple space={item.space} {...props}/>;
