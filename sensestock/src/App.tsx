@@ -154,9 +154,9 @@ const ZONES = {
   '토론1':[{group:'서랍',cells:['서랍 1','서랍 2','서랍 3']}],
   '토론2':[{group:'서랍',cells:['서랍 1','서랍 2','서랍 3']}],
   '창고':[
-    {group:'수납장',cells:['1','2','3','4','5','6','7','8']},
-    {group:'박스',cells:['1','2','3']},
-    {group:'선반',cells:['1','2','3','4','5','6','7','8']},
+    {group:'수납장',cells:['1','2','3','4']},
+    {group:'박스',cells:['1']},
+    {group:'선반',cells:['1','2','3','4','5','6','7','8','9']},
   ],
 };
 
@@ -862,13 +862,13 @@ function StorePlan(p) {
     <div style={{position:'relative',width:900,height:520,background:'var(--canvas)',border:'1px solid var(--hairline)',borderRadius:'var(--r-lg)',margin:'0 auto'}}>
       <div style={{position:'absolute',left:32,top:20,fontSize:22,fontWeight:600,color:'var(--ink-deep)'}}>창고</div>
       <FBox title="수납장" x={50} y={80} w={240} h={400}>
-        {['1','2','3','4','5','6','7','8'].map((ce,i)=><Cell key={ce} {...c('수납장',ce,50+(i%2)*120,80+Math.floor(i/2)*100,120,100)}/>)}
+        {['1','2','3','4'].map((ce,i)=><Cell key={ce} {...c('수납장',ce,50,80+i*100,240,100)}/>)}
       </FBox>
-      <FBox title="박스" x={360} y={80} w={180} h={400}>
-        {['1','2','3'].map((ce,i)=><Cell key={ce} {...c('박스',ce,360,80+i*133,180,133)}/>)}
+      <FBox title="박스" x={360} y={80} w={180} h={266}>
+        <Cell {...c('박스','1',360,80,180,266)}/>
       </FBox>
       <FBox title="선반" x={610} y={80} w={120} h={400}>
-        {['1','2','3','4','5','6','7','8'].map((ce,i)=><Cell key={ce} {...c('선반',ce,610,80+i*50,120,50)}/>)}
+        {['1','2','3','4','5','6','7','8','9'].map((ce,i)=><Cell key={ce} {...c('선반',ce,610,80+i*(400/9),120,400/9)}/>)}
       </FBox>
     </div>
   );
@@ -1407,15 +1407,15 @@ function MiniMapStore({itemGroup,itemCell,itemColor}:{itemGroup:string,itemCell:
   return (
     <div ref={wrapRef} style={{borderRadius:8,border:'1px solid #ECEBE8',background:'#F7F6F3',overflow:'hidden',position:'relative',height:rh}}>
       <div style={{transform:`scale(${scale})`,transformOrigin:'top left',width:ORIG_W,height:ORIG_H,position:'absolute',top:0,left:0,pointerEvents:'none'}}>
-        {/* 수납장 */}
-        <div style={{position:'absolute',left:50,top:80,width:240,height:400,border:'1.5px solid #1A1916',borderRadius:4}}/>
-        {['1','2','3','4','5','6','7','8'].map((ce,i)=><MiniCell key={ce} {...p} group="수납장" cell={ce} label={ce} x={50+(i%2)*120} y={80+Math.floor(i/2)*100} w={120} h={100}/>)}
-        {/* 박스 */}
-        <div style={{position:'absolute',left:360,top:80,width:180,height:400,border:'1.5px solid #1A1916',borderRadius:4}}/>
-        {['1','2','3'].map((ce,i)=><MiniCell key={ce} {...p} group="박스" cell={ce} label={ce} x={360} y={80+i*133} w={180} h={133}/>)}
-        {/* 선반 */}
-        <div style={{position:'absolute',left:610,top:80,width:120,height:400,border:'1.5px solid #1A1916',borderRadius:4}}/>
-        {['1','2','3','4','5','6','7','8'].map((ce,i)=><MiniCell key={ce} {...p} group="선반" cell={ce} label={ce} x={610} y={80+i*50} w={120} h={50}/>)}
+      {/* 수납장 */}
+      <div style={{position:'absolute',left:50,top:80,width:240,height:400,border:'1.5px solid #1A1916',borderRadius:4}}/>
+      {['1','2','3','4'].map((ce,i)=><MiniCell key={ce} {...p} group="수납장" cell={ce} label={ce} x={50} y={80+i*100} w={240} h={100}/>)}
+      {/* 박스 */}
+      <div style={{position:'absolute',left:360,top:80,width:180,height:266,border:'1.5px solid #1A1916',borderRadius:4}}/>
+      <MiniCell {...p} group="박스" cell="1" label="1" x={360} y={80} w={180} h={266}/>
+      {/* 선반 */}
+      <div style={{position:'absolute',left:610,top:80,width:120,height:400,border:'1.5px solid #1A1916',borderRadius:4}}/>
+      {['1','2','3','4','5','6','7','8','9'].map((ce,i)=><MiniCell key={ce} {...p} group="선반" cell={ce} label={ce} x={610} y={80+i*(400/9)} w={120} h={400/9}/>)}
       </div>
     </div>
   );
