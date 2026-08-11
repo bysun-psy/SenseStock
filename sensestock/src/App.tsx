@@ -666,7 +666,7 @@ function Search({items,onItemClick,onDelete}) {
         <div className="row wrap" style={{gap:8,marginTop:8}}>
           <span style={{fontSize:'var(--fs-sm)',fontWeight:500,color:'var(--slate)'}}>구분</span>
           <button className={`chip ${cf.has('asset')?'active':''}`} onClick={()=>tog(setCf,'asset')} style={!cf.has('asset')?{borderColor:'var(--brand-purple-300)',color:'var(--primary-deep)',background:'var(--primary-soft)'}:{}}>등재자산</button>
-          <button className={`chip ${cf.has('equipment')?'active':''}`} onClick={()=>tog(setCf,'equipment')} style={!cf.has('equipment')?{borderColor:'var(--brand-teal)',color:'var(--brand-teal)',background:'var(--tint-mint)'}:{}}>관리비품/관리소모품</button>
+          <button className={`chip ${cf.has('equipment')?'active':''}`} onClick={()=>tog(setCf,'equipment')} style={!cf.has('equipment')?{borderColor:'var(--brand-teal)',color:'var(--brand-teal)',background:'var(--tint-mint)'}:{}}>관리비품/소모품</button>
           {(uf.size+sf.size+cf.size+(q?1:0))>0&&<button style={{fontSize:'var(--fs-sm)',color:'var(--link-blue)',background:'none',border:'none',cursor:'pointer'}} onClick={reset}>필터 초기화</button>}
         </div>
       </div>
@@ -695,7 +695,7 @@ function Search({items,onItemClick,onDelete}) {
                   <td><span style={{fontSize:'var(--fs-table)',color:'var(--slate)',whiteSpace:'nowrap'}}>{it.received}</span></td>
                   <td>
                     {it.isAsset&&<span style={{display:'inline-flex',alignItems:'center',padding:'2px 8px',borderRadius:'var(--r-full)',fontSize:'var(--fs-label)',fontWeight:600,background:'var(--primary-soft)',color:'var(--primary-deep)',border:'1px solid var(--brand-purple-300)',marginRight:3}}>등재자산</span>}
-                    {it.isEquipment&&<span style={{display:'inline-flex',alignItems:'center',padding:'2px 8px',borderRadius:'var(--r-full)',fontSize:'var(--fs-label)',fontWeight:600,background:'var(--tint-mint)',color:'var(--brand-teal)',border:'1px solid var(--brand-teal)'}}>관리비품/관리소모품</span>}
+                    {it.isEquipment&&<span style={{display:'inline-flex',alignItems:'center',padding:'2px 8px',borderRadius:'var(--r-full)',fontSize:'var(--fs-label)',fontWeight:600,background:'var(--tint-mint)',color:'var(--brand-teal)',border:'1px solid var(--brand-teal)'}}>관리비품/소모품</span>}
                     {!it.isAsset&&!it.isEquipment&&<span style={{color:'var(--stone)'}}>–</span>}
                   </td>
                 </tr>
@@ -723,7 +723,7 @@ function Search({items,onItemClick,onDelete}) {
                     <div style={{fontWeight:500,fontSize:'var(--fs-body)',color:'var(--ink-deep)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1,minWidth:0}}>{q?hi(it.name,q):it.name}</div>
                     <div style={{display:'flex',gap:4,flexShrink:0}}>
                       {it.isAsset&&<span style={{display:'inline-flex',alignItems:'center',padding:'1px 6px',borderRadius:'var(--r-full)',fontSize:11,fontWeight:600,background:'var(--primary-soft)',color:'var(--primary-deep)',border:'1px solid var(--brand-purple-300)'}}>등재자산</span>}
-                      {it.isEquipment&&<span style={{display:'inline-flex',alignItems:'center',padding:'1px 6px',borderRadius:'var(--r-full)',fontSize:11,fontWeight:600,background:'var(--tint-mint)',color:'var(--brand-teal)',border:'1px solid var(--brand-teal)'}}>관리비품/관리소모품</span>}
+                      {it.isEquipment&&<span style={{display:'inline-flex',alignItems:'center',padding:'1px 6px',borderRadius:'var(--r-full)',fontSize:11,fontWeight:600,background:'var(--tint-mint)',color:'var(--brand-teal)',border:'1px solid var(--brand-teal)'}}>관리비품/소모품</span>}
                     </div>
                   </div>
                   <div className="row" style={{gap:6,marginTop:3,alignItems:'center'}}>
@@ -948,7 +948,7 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
                           <td><span style={{fontSize:'var(--fs-table)',color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}> / {it.min}</span>}</td>
                           <td>
                             {it.isAsset&&<span style={{display:'inline-flex',alignItems:'center',padding:'2px 8px',borderRadius:'var(--r-full)',fontSize:'var(--fs-label)',fontWeight:600,background:'var(--primary-soft)',color:'var(--primary-deep)',border:'1px solid var(--brand-purple-300)',marginRight:3}}>등재자산</span>}
-                            {it.isEquipment&&<span style={{display:'inline-flex',alignItems:'center',padding:'2px 8px',borderRadius:'var(--r-full)',fontSize:'var(--fs-label)',fontWeight:600,background:'var(--tint-mint)',color:'var(--brand-teal)',border:'1px solid var(--brand-teal)'}}>관리비품/관리소모품</span>}
+                            {it.isEquipment&&<span style={{display:'inline-flex',alignItems:'center',padding:'2px 8px',borderRadius:'var(--r-full)',fontSize:'var(--fs-label)',fontWeight:600,background:'var(--tint-mint)',color:'var(--brand-teal)',border:'1px solid var(--brand-teal)'}}>관리비품/소모품</span>}
                             {!it.isAsset&&!it.isEquipment&&<span style={{color:'var(--stone)'}}>–</span>}
                           </td>
                         </tr>
@@ -969,7 +969,7 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
                               <div style={{fontWeight:600,fontSize:'var(--fs-section)',color:'var(--ink-deep)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1,minWidth:0}}>{it.name}</div>
                               <div style={{display:'flex',gap:4,flexShrink:0}}>
                                 {it.isAsset&&<span style={{display:'inline-flex',alignItems:'center',padding:'1px 6px',borderRadius:'var(--r-full)',fontSize:11,fontWeight:600,background:'var(--primary-soft)',color:'var(--primary-deep)',border:'1px solid var(--brand-purple-300)'}}>등재자산</span>}
-                                {it.isEquipment&&<span style={{display:'inline-flex',alignItems:'center',padding:'1px 6px',borderRadius:'var(--r-full)',fontSize:11,fontWeight:600,background:'var(--tint-mint)',color:'var(--brand-teal)',border:'1px solid var(--brand-teal)'}}>관리비품/관리소모품</span>}
+                                {it.isEquipment&&<span style={{display:'inline-flex',alignItems:'center',padding:'1px 6px',borderRadius:'var(--r-full)',fontSize:11,fontWeight:600,background:'var(--tint-mint)',color:'var(--brand-teal)',border:'1px solid var(--brand-teal)'}}>관리비품/소모품</span>}
                               </div>
                             </div>
                             <div className="row" style={{gap:6,flexWrap:'wrap'}}>
@@ -1135,7 +1135,7 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
               </label>
               <label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer'}}>
                <input type="checkbox" checked={!!form.isEquipment} onChange={e=>setF('isEquipment',e.target.checked)} style={{width:15,height:15,accentColor:'var(--brand-teal)',cursor:'pointer',flexShrink:0}}/>
-               <span style={{fontSize:'var(--fs-body)',fontWeight:500,whiteSpace:'nowrap'}}>관리비품/관리소모품</span>
+               <span style={{fontSize:'var(--fs-body)',fontWeight:500,whiteSpace:'nowrap'}}>관리비품/소모품</span>
                <span className="mobile-hide" style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}>사용 부서에서 구매/폐기를 결정할 수 있는 구매단가 10만원 이상의 자원(모바일 기기 포함)</span>
               </label>
             </div>
@@ -1487,7 +1487,7 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
                 <div style={{fontSize:'var(--fs-label)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>구분</div>
                 <div style={{marginTop:4,display:'flex',gap:6,flexWrap:'wrap'}}>
                   {item.isAsset&&<span style={{display:'inline-flex',alignItems:'center',padding:'2px 10px',borderRadius:'var(--r-full)',fontSize:'var(--fs-label)',fontWeight:600,background:'var(--primary-soft)',color:'var(--primary-deep)',border:'1px solid var(--brand-purple-300)'}}>등재자산</span>}
-                  {item.isEquipment&&<span style={{display:'inline-flex',alignItems:'center',padding:'2px 10px',borderRadius:'var(--r-full)',fontSize:'var(--fs-label)',fontWeight:600,background:'var(--tint-mint)',color:'var(--brand-teal)',border:'1px solid var(--brand-teal)'}}>관리비품/관리소모품</span>}
+                  {item.isEquipment&&<span style={{display:'inline-flex',alignItems:'center',padding:'2px 10px',borderRadius:'var(--r-full)',fontSize:'var(--fs-label)',fontWeight:600,background:'var(--tint-mint)',color:'var(--brand-teal)',border:'1px solid var(--brand-teal)'}}>관리비품/소모품</span>}
                   {!item.isAsset&&!item.isEquipment&&<span style={{fontSize:'var(--fs-body)',color:'var(--stone)'}}>–</span>}
                 </div>
               </div>
