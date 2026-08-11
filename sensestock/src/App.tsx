@@ -1080,17 +1080,23 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
   const [errs,setErrs]=useState({});
   const [delM,setDelM]=useState(false);
   const [saved,setSaved]=useState(false);
-  const rq=form.useId&&QTY_REQ.includes(form.useId);
+  const isReg = !!form.isAsset || !!form.isEquipment;
   const setF=(k,v)=>{setForm(f=>{const n={...f,[k]:v};if(k==='space'){n.group='';n.cell='';}if(k==='group')n.cell='';return n;});setEf(k);};
   const validate=()=>{
     const e={};
     if(!form.name.trim())e.name='품목명을 입력하세요.';
     if(!form.useId)e.useId='용도를 선택하세요.';
     if(!form.space)e.space='공간을 선택하세요.';
-    if(!form.isAsset && !form.group)e.group='구역을 선택하세요.';
-    if(!form.isAsset && !form.cell)e.cell='셀을 선택하세요.';
-    if(rq){if(form.qty==='')e.qty='수량은 필수입니다.';if(form.min==='')e.min='최소 재고는 필수입니다.';}
-    setErrs(e);return !Object.keys(e).length;
+   if(isReg){
+    if(!form.spec.trim())e.spec='규격을 입력하세요.';
+    if(!form.received)e.received='입고 시기를 선택하세요.';
+    if(form.qty==='')e.qty='수량은 필수입니다.';
+    if(!form.unit)e.unit='단위를 선택하세요.';
+  } else {
+    if(!form.group)e.group='구역을 선택하세요.';
+    if(!form.cell)e.cell='셀을 선택하세요.';
+  } 
+  setErrs(e);return !Object.keys(e).length;
   };
   const submit=()=>{
     if(!validate())return;
@@ -1122,8 +1128,8 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
               <Field label="용도 분류" required err={errs.useId}><UseSelect value={form.useId} onChange={v=>setF('useId',v)} editing={ef==='useId'}/></Field>
             </div>
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginTop:16,minWidth:0}}>
-              <Field label="규격"><input className={`input ${ef==='spec'?'is-editing':''}`} placeholder="예: 250 mL" value={form.spec} onChange={e=>setF('spec',e.target.value)} style={{minWidth:0}}/></Field>
-              <Field label="입고 시기" ><MonthPicker value={form.received} onChange={v=>setF('received',v)} editing={ef==='received'}/></Field>
+              <Field label="규격" required={isReg} err={errs.spec}><input className={`input ${ef==='spec'?'is-editing':''}`} placeholder="예: 250 mL" value={form.spec} onChange={e=>setF('spec',e.target.value)} style={{minWidth:0}}/></Field>
+              <Field label="입고 시기" required={isReg} err={errs.received}><MonthPicker value={form.received} onChange={v=>setF('received',v)} editing={ef==='received'}/></Field>
             </div>
            <div style={{marginTop:16}}>
              <label className="field-label">구분</label>
@@ -1145,8 +1151,8 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
             <div style={{fontSize:'var(--fs-section)',fontWeight:600,marginBottom:16}}>위치</div>
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:16}}>
               <Field label="공간" required err={errs.space}><select className={`select ${ef==='space'?'is-editing':''}`} value={form.space} onChange={e=>setF('space',e.target.value)}><option value="">선택…</option>{SPACES.map(s=><option key={s} value={s}>{s}</option>)}</select></Field>
-              <Field label="구역" required err={errs.group}><select className={`select ${ef==='group'?'is-editing':''}`} value={form.group} onChange={e=>setF('group',e.target.value)} disabled={!form.space}><option value="">{form.space?'선택…':'공간을 먼저 선택'}</option>{groups.map(g=><option key={g} value={g}>{g}</option>)}</select></Field>
-              <Field label="셀" required err={errs.cell}><select className={`select ${ef==='cell'?'is-editing':''}`} value={form.cell} onChange={e=>setF('cell',e.target.value)} disabled={!form.group}><option value="">{form.group?'선택…':'구역을 먼저 선택'}</option>{cells.map(c=><option key={c} value={c}>{c}</option>)}</select></Field>
+              <Field label="구역" required={!isReg} err={errs.group}><select className={`select ${ef==='group'?'is-editing':''}`} value={form.group} onChange={e=>setF('group',e.target.value)} disabled={!form.space}><option value="">{form.space?'선택…':'공간을 먼저 선택'}</option>{groups.map(g=><option key={g} value={g}>{g}</option>)}</select></Field>
+              <Field label="셀" required={!isReg} err={errs.group}><select className={`select ${ef==='cell'?'is-editing':''}`} value={form.cell} onChange={e=>setF('cell',e.target.value)} disabled={!form.group}><option value="">{form.group?'선택…':'구역을 먼저 선택'}</option>{cells.map(c=><option key={c} value={c}>{c}</option>)}</select></Field>
             </div>
           </div>
           <div className="card" style={{padding:24}}>
@@ -1155,14 +1161,14 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
               {rq&&<span className="badge" style={{background:'var(--tint-peach)',color:'var(--brand-orange-deep)'}}>수량 필수</span>}
             </div>
            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:16}}>
-            <Field label={`수량${rq?' *':''}`} err={errs.qty}><input className={`input ${ef==='qty'?'is-editing':''}`} type="number" placeholder="0" value={form.qty??''} onChange={e=>setF('qty',e.target.value)}/></Field>
-            <Field label="단위">
+            <Field label="수량" required={isReg} err={errs.qty}><input className={`input ${ef==='qty'?'is-editing':''}`} type="number" placeholder="0" value={form.qty??''} onChange={e=>setF('qty',e.target.value)}/></Field>
+            <Field label="단위" required={isReg} err={errs.unit}>
              <select className={`select ${ef==='unit'?'is-editing':''}`} value={form.unit} onChange={e=>setF('unit',e.target.value)}>
               <option value="">선택…</option>
               {UNITS.map(u=><option key={u} value={u}>{u}</option>)}
              </select>
             </Field>
-            <Field label={`최소 재고${rq?' *':''}`} err={errs.min}><input className={`input ${ef==='min'?'is-editing':''}`} type="number" placeholder={rq?'필수':'선택'} value={form.min??''} onChange={e=>setF('min',e.target.value)}/></Field>
+            <Field label="최소 재고" err={errs.min}><input className={`input ${ef==='min'?'is-editing':''}`} type="number" placeholder={rq?'필수':'선택'} value={form.min??''} onChange={e=>setF('min',e.target.value)}/></Field>
             </div>
           </div>
           <div className="card" style={{padding:24}}>
