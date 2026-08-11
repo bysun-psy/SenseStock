@@ -1152,13 +1152,13 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:16}}>
               <Field label="공간" required err={errs.space}><select className={`select ${ef==='space'?'is-editing':''}`} value={form.space} onChange={e=>setF('space',e.target.value)}><option value="">선택…</option>{SPACES.map(s=><option key={s} value={s}>{s}</option>)}</select></Field>
               <Field label="구역" required={!isReg} err={errs.group}><select className={`select ${ef==='group'?'is-editing':''}`} value={form.group} onChange={e=>setF('group',e.target.value)} disabled={!form.space}><option value="">{form.space?'선택…':'공간을 먼저 선택'}</option>{groups.map(g=><option key={g} value={g}>{g}</option>)}</select></Field>
-              <Field label="셀" required={!isReg} err={errs.group}><select className={`select ${ef==='cell'?'is-editing':''}`} value={form.cell} onChange={e=>setF('cell',e.target.value)} disabled={!form.group}><option value="">{form.group?'선택…':'구역을 먼저 선택'}</option>{cells.map(c=><option key={c} value={c}>{c}</option>)}</select></Field>
+              <Field label="셀" required={!isReg} err={errs.cell}><select className={`select ${ef==='cell'?'is-editing':''}`} value={form.cell} onChange={e=>setF('cell',e.target.value)} disabled={!form.group}><option value="">{form.group?'선택…':'구역을 먼저 선택'}</option>{cells.map(c=><option key={c} value={c}>{c}</option>)}</select></Field>
             </div>
           </div>
           <div className="card" style={{padding:24}}>
             <div className="row between" style={{marginBottom:16}}>
               <div style={{fontSize:'var(--fs-section)',fontWeight:600}}>수량 정보</div>
-              {rq&&<span className="badge" style={{background:'var(--tint-peach)',color:'var(--brand-orange-deep)'}}>수량 필수</span>}
+              {isReg&&<span className="badge" style={{background:'var(--tint-peach)',color:'var(--brand-orange-deep)'}}>수량 필수</span>}
             </div>
            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:16}}>
             <Field label="수량" required={isReg} err={errs.qty}><input className={`input ${ef==='qty'?'is-editing':''}`} type="number" placeholder="0" value={form.qty??''} onChange={e=>setF('qty',e.target.value)}/></Field>
@@ -1168,7 +1168,7 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
               {UNITS.map(u=><option key={u} value={u}>{u}</option>)}
              </select>
             </Field>
-            <Field label="최소 재고" err={errs.min}><input className={`input ${ef==='min'?'is-editing':''}`} type="number" placeholder={rq?'필수':'선택'} value={form.min??''} onChange={e=>setF('min',e.target.value)}/></Field>
+            <Field label="최소 재고" err={errs.min}><input className={`input ${ef==='min'?'is-editing':''}`} type="number" placeholder="선택" value={form.min??''} onChange={e=>setF('min',e.target.value)}/></Field>
             </div>
           </div>
           <div className="card" style={{padding:24}}>
