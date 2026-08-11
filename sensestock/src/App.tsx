@@ -136,6 +136,7 @@ const FALLBACK_USE = {id:0,name:'미분류',color:'var(--steel)',short:'미분�
 const useById = id => USES.find(u=>u.id===id) || FALLBACK_USE;
 const QTY_REQ = [1,2,4,7,11];
 const SPACES = ['준비','서빙1','서빙2','토론1','토론2','창고'];
+const UNITS = ['EA','BOX','SET','묶음','롤','줄','봉','통','팩','병'];
 const ZONES = {
   '준비':[
     {group:'선반',cells:['1','2','3','4','5']},
@@ -1072,9 +1073,9 @@ function MonthPicker({value,onChange,editing}:{value:string,onChange:(v:string)=
     </div>
   );
 }
-function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||'',group:pre.group||'',cell:pre.cell||'',spec:'',qty:'',min:'',received:'',note:'',isAsset:false,isEquipment:false};}function RegisterEdit({mode,item,prefill,onCancel,onSave,onDelete}) {
+function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||'',group:pre.group||'',cell:pre.cell||'',spec:'',qty:'',min:'',unit:'',received:'',note:'',isAsset:false,isEquipment:false};}function RegisterEdit({mode,item,prefill,onCancel,onSave,onDelete}) {
   const isEdit=mode==='edit';
-  const [form,setForm]=useState(()=>isEdit&&item?{...item}:blank(prefill||{}));
+  const [form,setForm]=useState(()=>isEdit&&item?{...item,unit:item.unit||''}:blank(prefill||{}));
   const [ef,setEf]=useState(null);
   const [errs,setErrs]=useState({});
   const [delM,setDelM]=useState(false);
@@ -1153,9 +1154,15 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
               <div style={{fontSize:'var(--fs-section)',fontWeight:600}}>수량 정보</div>
               {rq&&<span className="badge" style={{background:'var(--tint-peach)',color:'var(--brand-orange-deep)'}}>수량 필수</span>}
             </div>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16}}>
-              <Field label={`수량${rq?' *':''}`} err={errs.qty}><input className={`input ${ef==='qty'?'is-editing':''}`} type="number" placeholder="0" value={form.qty??''} onChange={e=>setF('qty',e.target.value)}/></Field>
-              <Field label={`최소 재고${rq?' *':''}`} err={errs.min}><input className={`input ${ef==='min'?'is-editing':''}`} type="number" placeholder={rq?'필수':'선택'} value={form.min??''} onChange={e=>setF('min',e.target.value)}/></Field>
+           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:16}}>
+            <Field label={`수량${rq?' *':''}`} err={errs.qty}><input className={`input ${ef==='qty'?'is-editing':''}`} type="number" placeholder="0" value={form.qty??''} onChange={e=>setF('qty',e.target.value)}/></Field>
+            <Field label="단위">
+             <select className={`select ${ef==='unit'?'is-editing':''}`} value={form.unit} onChange={e=>setF('unit',e.target.value)}>
+              <option value="">선택…</option>
+              {UNITS.map(u=><option key={u} value={u}>{u}</option>)}
+             </select>
+            </Field>
+            <Field label={`최소 재고${rq?' *':''}`} err={errs.min}><input className={`input ${ef==='min'?'is-editing':''}`} type="number" placeholder={rq?'필수':'선택'} value={form.min??''} onChange={e=>setF('min',e.target.value)}/></Field>
             </div>
           </div>
           <div className="card" style={{padding:24}}>
