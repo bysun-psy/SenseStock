@@ -136,9 +136,10 @@ const FALLBACK_USE = {id:0,name:'미분류',color:'var(--steel)',short:'미분�
 const useById = id => USES.find(u=>u.id===id) || FALLBACK_USE;
 const QTY_REQ = [1,2,4,7,11];
 const SPACES = ['준비','서빙1','서빙2','토론1','토론2','창고'];
+const UNITS = ['EA','BOX','SET','묶음','롤','줄','봉','통','팩','병'];
 const ZONES = {
   '준비':[
-    {group:'선반',cells:['1','2','3','4']},
+    {group:'선반',cells:['1','2','3','4','5']},
     {group:'실험대 위',cells:['1','2','3','4','5']},
     {group:'실험대 아래',cells:['1','2','3','4','5','6']},
     {group:'실험대 아래',cells:['서랍 1','서랍 2','서랍 3','서랍 4','서랍 5','서랍 6']},
@@ -154,9 +155,9 @@ const ZONES = {
   '토론1':[{group:'서랍',cells:['서랍 1','서랍 2','서랍 3']}],
   '토론2':[{group:'서랍',cells:['서랍 1','서랍 2','서랍 3']}],
   '창고':[
-    {group:'수납장',cells:['1','2','3','4','5','6','7','8']},
-    {group:'박스',cells:['1','2','3']},
-    {group:'선반',cells:['1','2','3','4','5','6','7','8']},
+    {group:'수납장',cells:['1','2','3','4']},
+    {group:'박스',cells:['1']},
+    {group:'선반',cells:['1','2','3','4','5','6','7','8','9']},
   ],
 };
 
@@ -308,7 +309,9 @@ function SidebarToggleIcon({open}) {
 
 function itemsByLoc(items) {
   const m={};
-  items.forEach(it=>{const k=`${it.space}/${it.group}/${it.cell}`;(m[k]=m[k]||[]).push(it);});
+  items.forEach(it=>{if (!it.group || !it.cell) return;
+                     const k=`${it.space}/${it.group}/${it.cell}`;
+                     (m[k]=m[k]||[]).push(it);});
   return m;
 }
 function dominant(its) {
@@ -662,8 +665,8 @@ function Search({items,onItemClick,onDelete}) {
         </div>
         <div className="row wrap" style={{gap:8,marginTop:8}}>
           <span style={{fontSize:'var(--fs-sm)',fontWeight:500,color:'var(--slate)'}}>구분</span>
-          <button className={`chip ${cf.has('asset')?'active':''}`} onClick={()=>tog(setCf,'asset')} style={!cf.has('asset')?{borderColor:'var(--brand-purple-300)',color:'var(--primary-deep)',background:'var(--primary-soft)'}:{}}>자산</button>
-          <button className={`chip ${cf.has('equipment')?'active':''}`} onClick={()=>tog(setCf,'equipment')} style={!cf.has('equipment')?{borderColor:'var(--brand-teal)',color:'var(--brand-teal)',background:'var(--tint-mint)'}:{}}>비품</button>
+          <button className={`chip ${cf.has('asset')?'active':''}`} onClick={()=>tog(setCf,'asset')} style={!cf.has('asset')?{borderColor:'var(--brand-purple-300)',color:'var(--primary-deep)',background:'var(--primary-soft)'}:{}}>등재자산</button>
+          <button className={`chip ${cf.has('equipment')?'active':''}`} onClick={()=>tog(setCf,'equipment')} style={!cf.has('equipment')?{borderColor:'var(--brand-teal)',color:'var(--brand-teal)',background:'var(--tint-mint)'}:{}}>관리 비품/소모품</button>
           {(uf.size+sf.size+cf.size+(q?1:0))>0&&<button style={{fontSize:'var(--fs-sm)',color:'var(--link-blue)',background:'none',border:'none',cursor:'pointer'}} onClick={reset}>필터 초기화</button>}
         </div>
       </div>
@@ -691,8 +694,8 @@ function Search({items,onItemClick,onDelete}) {
                   <td style={{textAlign:'right'}}><span style={{fontSize:'var(--fs-table)',color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}> / {it.min}</span>}{isLow&&<div style={{fontSize:'var(--fs-label)',color:'var(--error)',fontWeight:600}}>재고 부족</div>}</td>
                   <td><span style={{fontSize:'var(--fs-table)',color:'var(--slate)',whiteSpace:'nowrap'}}>{it.received}</span></td>
                   <td>
-                    {it.isAsset&&<span style={{display:'inline-flex',alignItems:'center',padding:'2px 8px',borderRadius:'var(--r-full)',fontSize:'var(--fs-label)',fontWeight:600,background:'var(--primary-soft)',color:'var(--primary-deep)',border:'1px solid var(--brand-purple-300)',marginRight:3}}>자산</span>}
-                    {it.isEquipment&&<span style={{display:'inline-flex',alignItems:'center',padding:'2px 8px',borderRadius:'var(--r-full)',fontSize:'var(--fs-label)',fontWeight:600,background:'var(--tint-mint)',color:'var(--brand-teal)',border:'1px solid var(--brand-teal)'}}>비품</span>}
+                    {it.isAsset&&<span style={{display:'inline-flex',alignItems:'center',padding:'2px 8px',borderRadius:'var(--r-full)',fontSize:'var(--fs-label)',fontWeight:600,background:'var(--primary-soft)',color:'var(--primary-deep)',border:'1px solid var(--brand-purple-300)',marginRight:3}}>등재자산</span>}
+                    {it.isEquipment&&<span style={{display:'inline-flex',alignItems:'center',padding:'2px 8px',borderRadius:'var(--r-full)',fontSize:'var(--fs-label)',fontWeight:600,background:'var(--tint-mint)',color:'var(--brand-teal)',border:'1px solid var(--brand-teal)'}}>관리 비품/소모품</span>}
                     {!it.isAsset&&!it.isEquipment&&<span style={{color:'var(--stone)'}}>–</span>}
                   </td>
                 </tr>
@@ -719,8 +722,8 @@ function Search({items,onItemClick,onDelete}) {
                   <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8}}>
                     <div style={{fontWeight:500,fontSize:'var(--fs-body)',color:'var(--ink-deep)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1,minWidth:0}}>{q?hi(it.name,q):it.name}</div>
                     <div style={{display:'flex',gap:4,flexShrink:0}}>
-                      {it.isAsset&&<span style={{display:'inline-flex',alignItems:'center',padding:'1px 6px',borderRadius:'var(--r-full)',fontSize:11,fontWeight:600,background:'var(--primary-soft)',color:'var(--primary-deep)',border:'1px solid var(--brand-purple-300)'}}>자산</span>}
-                      {it.isEquipment&&<span style={{display:'inline-flex',alignItems:'center',padding:'1px 6px',borderRadius:'var(--r-full)',fontSize:11,fontWeight:600,background:'var(--tint-mint)',color:'var(--brand-teal)',border:'1px solid var(--brand-teal)'}}>비품</span>}
+                      {it.isAsset&&<span style={{display:'inline-flex',alignItems:'center',padding:'1px 6px',borderRadius:'var(--r-full)',fontSize:11,fontWeight:600,background:'var(--primary-soft)',color:'var(--primary-deep)',border:'1px solid var(--brand-purple-300)'}}>등재자산</span>}
+                      {it.isEquipment&&<span style={{display:'inline-flex',alignItems:'center',padding:'1px 6px',borderRadius:'var(--r-full)',fontSize:11,fontWeight:600,background:'var(--tint-mint)',color:'var(--brand-teal)',border:'1px solid var(--brand-teal)'}}>관리 비품/소모품</span>}
                     </div>
                   </div>
                   <div className="row" style={{gap:6,marginTop:3,alignItems:'center'}}>
@@ -790,7 +793,7 @@ function PrepPlan(p) {
   return (
     <div style={{position:'relative',width:1280,height:760,background:'var(--canvas)',border:'1px solid var(--hairline)',borderRadius:'var(--r-lg)',margin:'0 auto'}}>
       <FBox title="선반" x={60} y={40} w={70} h={330} tp="left">
-        {['1','2','3','4'].map((ce,i)=><Cell key={ce} {...c('선반',ce,60,40+i*82.5,70,82.5,ce,true)}/>)}
+        {['1','2','3','4','5'].map((ce,i)=><Cell key={ce} {...c('선반',ce,60,40+i*66,70,66,ce,true)}/>)}
       </FBox>
       <FBox title="실험대 위" x={325} y={40} w={620} h={110} tp="right">
         {['1','2','3','4','5'].map((ce,i)=><Cell key={ce} {...c('실험대 위',ce,325+i*124,40,124,110,ce)}/>)}
@@ -860,13 +863,13 @@ function StorePlan(p) {
     <div style={{position:'relative',width:900,height:520,background:'var(--canvas)',border:'1px solid var(--hairline)',borderRadius:'var(--r-lg)',margin:'0 auto'}}>
       <div style={{position:'absolute',left:32,top:20,fontSize:22,fontWeight:600,color:'var(--ink-deep)'}}>창고</div>
       <FBox title="수납장" x={50} y={80} w={240} h={400}>
-        {['1','2','3','4','5','6','7','8'].map((ce,i)=><Cell key={ce} {...c('수납장',ce,50+(i%2)*120,80+Math.floor(i/2)*100,120,100)}/>)}
+        {['1','2','3','4'].map((ce,i)=><Cell key={ce} {...c('수납장',ce,50,80+i*100,240,100)}/>)}
       </FBox>
-      <FBox title="박스" x={360} y={80} w={180} h={400}>
-        {['1','2','3'].map((ce,i)=><Cell key={ce} {...c('박스',ce,360,80+i*133,180,133)}/>)}
+      <FBox title="박스" x={360} y={214} w={180} h={266}>
+        <Cell {...c('박스','1',360,214,180,266)}/>
       </FBox>
       <FBox title="선반" x={610} y={80} w={120} h={400}>
-        {['1','2','3','4','5','6','7','8'].map((ce,i)=><Cell key={ce} {...c('선반',ce,610,80+i*50,120,50)}/>)}
+        {['1','2','3','4','5','6','7','8','9'].map((ce,i)=><Cell key={ce} {...c('선반',ce,610,80+i*(400/9),120,400/9)}/>)}
       </FBox>
     </div>
   );
@@ -944,8 +947,8 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
                           <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color}}/><span className="mobile-hide" style={{fontSize:'var(--fs-table)',color:'var(--charcoal)'}}>{u.short}</span></span></td>
                           <td><span style={{fontSize:'var(--fs-table)',color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}> / {it.min}</span>}</td>
                           <td>
-                            {it.isAsset&&<span style={{display:'inline-flex',alignItems:'center',padding:'2px 8px',borderRadius:'var(--r-full)',fontSize:'var(--fs-label)',fontWeight:600,background:'var(--primary-soft)',color:'var(--primary-deep)',border:'1px solid var(--brand-purple-300)',marginRight:3}}>자산</span>}
-                            {it.isEquipment&&<span style={{display:'inline-flex',alignItems:'center',padding:'2px 8px',borderRadius:'var(--r-full)',fontSize:'var(--fs-label)',fontWeight:600,background:'var(--tint-mint)',color:'var(--brand-teal)',border:'1px solid var(--brand-teal)'}}>비품</span>}
+                            {it.isAsset&&<span style={{display:'inline-flex',alignItems:'center',padding:'2px 8px',borderRadius:'var(--r-full)',fontSize:'var(--fs-label)',fontWeight:600,background:'var(--primary-soft)',color:'var(--primary-deep)',border:'1px solid var(--brand-purple-300)',marginRight:3}}>등재자산</span>}
+                            {it.isEquipment&&<span style={{display:'inline-flex',alignItems:'center',padding:'2px 8px',borderRadius:'var(--r-full)',fontSize:'var(--fs-label)',fontWeight:600,background:'var(--tint-mint)',color:'var(--brand-teal)',border:'1px solid var(--brand-teal)'}}>관리 비품/소모품</span>}
                             {!it.isAsset&&!it.isEquipment&&<span style={{color:'var(--stone)'}}>–</span>}
                           </td>
                         </tr>
@@ -965,8 +968,8 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
                             <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8,marginBottom:4}}>
                               <div style={{fontWeight:600,fontSize:'var(--fs-section)',color:'var(--ink-deep)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1,minWidth:0}}>{it.name}</div>
                               <div style={{display:'flex',gap:4,flexShrink:0}}>
-                                {it.isAsset&&<span style={{display:'inline-flex',alignItems:'center',padding:'1px 6px',borderRadius:'var(--r-full)',fontSize:11,fontWeight:600,background:'var(--primary-soft)',color:'var(--primary-deep)',border:'1px solid var(--brand-purple-300)'}}>자산</span>}
-                                {it.isEquipment&&<span style={{display:'inline-flex',alignItems:'center',padding:'1px 6px',borderRadius:'var(--r-full)',fontSize:11,fontWeight:600,background:'var(--tint-mint)',color:'var(--brand-teal)',border:'1px solid var(--brand-teal)'}}>비품</span>}
+                                {it.isAsset&&<span style={{display:'inline-flex',alignItems:'center',padding:'1px 6px',borderRadius:'var(--r-full)',fontSize:11,fontWeight:600,background:'var(--primary-soft)',color:'var(--primary-deep)',border:'1px solid var(--brand-purple-300)'}}>등재자산</span>}
+                                {it.isEquipment&&<span style={{display:'inline-flex',alignItems:'center',padding:'1px 6px',borderRadius:'var(--r-full)',fontSize:11,fontWeight:600,background:'var(--tint-mint)',color:'var(--brand-teal)',border:'1px solid var(--brand-teal)'}}>관리 비품/소모품</span>}
                               </div>
                             </div>
                             <div className="row" style={{gap:6,flexWrap:'wrap'}}>
@@ -1070,24 +1073,30 @@ function MonthPicker({value,onChange,editing}:{value:string,onChange:(v:string)=
     </div>
   );
 }
-function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||'',group:pre.group||'',cell:pre.cell||'',spec:'',qty:'',min:'',received:'',note:'',isAsset:false,isEquipment:false};}function RegisterEdit({mode,item,prefill,onCancel,onSave,onDelete}) {
+function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||'',group:pre.group||'',cell:pre.cell||'',spec:'',qty:'',min:'',unit:'',received:'',note:'',isAsset:false,isEquipment:false};}function RegisterEdit({mode,item,prefill,onCancel,onSave,onDelete}) {
   const isEdit=mode==='edit';
-  const [form,setForm]=useState(()=>isEdit&&item?{...item}:blank(prefill||{}));
+  const [form,setForm]=useState(()=>isEdit&&item?{...item,unit:item.unit||''}:blank(prefill||{}));
   const [ef,setEf]=useState(null);
   const [errs,setErrs]=useState({});
   const [delM,setDelM]=useState(false);
   const [saved,setSaved]=useState(false);
-  const rq=form.useId&&QTY_REQ.includes(form.useId);
+  const isReg = !!form.isAsset || !!form.isEquipment;
   const setF=(k,v)=>{setForm(f=>{const n={...f,[k]:v};if(k==='space'){n.group='';n.cell='';}if(k==='group')n.cell='';return n;});setEf(k);};
   const validate=()=>{
     const e={};
     if(!form.name.trim())e.name='품목명을 입력하세요.';
     if(!form.useId)e.useId='용도를 선택하세요.';
     if(!form.space)e.space='공간을 선택하세요.';
+   if(isReg){
+    if(!form.spec.trim())e.spec='규격을 입력하세요.';
+    if(!form.received)e.received='입고 시기를 선택하세요.';
+    if(form.qty==='')e.qty='수량은 필수입니다.';
+    if(!form.unit)e.unit='단위를 선택하세요.';
+  } else {
     if(!form.group)e.group='구역을 선택하세요.';
     if(!form.cell)e.cell='셀을 선택하세요.';
-    if(rq){if(form.qty==='')e.qty='수량은 필수입니다.';if(form.min==='')e.min='최소 재고는 필수입니다.';}
-    setErrs(e);return !Object.keys(e).length;
+  } 
+  setErrs(e);return !Object.keys(e).length;
   };
   const submit=()=>{
     if(!validate())return;
@@ -1119,41 +1128,46 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
               <Field label="용도 분류" required err={errs.useId}><UseSelect value={form.useId} onChange={v=>setF('useId',v)} editing={ef==='useId'}/></Field>
             </div>
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginTop:16,minWidth:0}}>
-              <Field label="규격"><input className={`input ${ef==='spec'?'is-editing':''}`} placeholder="예: 250 mL" value={form.spec} onChange={e=>setF('spec',e.target.value)} style={{minWidth:0}}/></Field>
-              <Field label="입고 시기" ><MonthPicker value={form.received} onChange={v=>setF('received',v)} editing={ef==='received'}/></Field>
+              <Field label="규격" required={isReg} err={errs.spec}><input className={`input ${ef==='spec'?'is-editing':''}`} placeholder="예: 250 mL" value={form.spec} onChange={e=>setF('spec',e.target.value)} style={{minWidth:0}}/></Field>
+              <Field label="입고 시기" required={isReg} err={errs.received}><MonthPicker value={form.received} onChange={v=>setF('received',v)} editing={ef==='received'}/></Field>
             </div>
-            <div style={{marginTop:16}}>
-              <label className="field-label">구분</label>
-              <div style={{display:'flex',gap:24,marginTop:4}}>
-                <label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer'}}>
-                  <input type="checkbox" checked={!!form.isAsset} onChange={e=>setF('isAsset',e.target.checked)} style={{width:15,height:15,accentColor:'var(--primary)',cursor:'pointer'}}/>
-                  <span style={{fontSize:'var(--fs-body)',fontWeight:500}}>자산</span>
-                  <span className="mobile-hide" style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}>고정 자산으로 관리</span>
-                </label>
-                <label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer'}}>
-                  <input type="checkbox" checked={!!form.isEquipment} onChange={e=>setF('isEquipment',e.target.checked)} style={{width:15,height:15,accentColor:'var(--brand-teal)',cursor:'pointer'}}/>
-                  <span style={{fontSize:'var(--fs-body)',fontWeight:500}}>비품</span>
-                  <span className="mobile-hide" style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}>비품대장 등록 대상</span>
-                </label>
-              </div>
+           <div style={{marginTop:16}}>
+             <label className="field-label">구분</label>
+             <div className="col" style={{gap:10,marginTop:4}}>
+              <label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer'}}>
+               <input type="checkbox" checked={!!form.isAsset} onChange={e=>setF('isAsset',e.target.checked)} style={{width:15,height:15,accentColor:'var(--primary)',cursor:'pointer',flexShrink:0}}/>
+               <span style={{fontSize:'var(--fs-body)',fontWeight:500,whiteSpace:'nowrap'}}>등재 자산</span>
+               <span className="mobile-hide" style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}>회계 처리 상 자산으로 등록되는 구매단가 100만원 이상의 중요자원</span>
+              </label>
+              <label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer'}}>
+               <input type="checkbox" checked={!!form.isEquipment} onChange={e=>setF('isEquipment',e.target.checked)} style={{width:15,height:15,accentColor:'var(--brand-teal)',cursor:'pointer',flexShrink:0}}/>
+               <span style={{fontSize:'var(--fs-body)',fontWeight:500,whiteSpace:'nowrap'}}>관리 비품/소모품</span>
+               <span className="mobile-hide" style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}>사용 부서에서 구매/폐기를 결정할 수 있는 구매단가 10만원 이상의 자원(모바일 기기 포함)</span>
+              </label>
             </div>
+           </div>
           </div>
           <div className="card" style={{padding:24}}>
             <div style={{fontSize:'var(--fs-section)',fontWeight:600,marginBottom:16}}>위치</div>
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:16}}>
               <Field label="공간" required err={errs.space}><select className={`select ${ef==='space'?'is-editing':''}`} value={form.space} onChange={e=>setF('space',e.target.value)}><option value="">선택…</option>{SPACES.map(s=><option key={s} value={s}>{s}</option>)}</select></Field>
-              <Field label="구역" required err={errs.group}><select className={`select ${ef==='group'?'is-editing':''}`} value={form.group} onChange={e=>setF('group',e.target.value)} disabled={!form.space}><option value="">{form.space?'선택…':'공간을 먼저 선택'}</option>{groups.map(g=><option key={g} value={g}>{g}</option>)}</select></Field>
-              <Field label="셀" required err={errs.cell}><select className={`select ${ef==='cell'?'is-editing':''}`} value={form.cell} onChange={e=>setF('cell',e.target.value)} disabled={!form.group}><option value="">{form.group?'선택…':'구역을 먼저 선택'}</option>{cells.map(c=><option key={c} value={c}>{c}</option>)}</select></Field>
+              <Field label="구역" required={!isReg} err={errs.group}><select className={`select ${ef==='group'?'is-editing':''}`} value={form.group} onChange={e=>setF('group',e.target.value)} disabled={!form.space}><option value="">{form.space?'선택…':'공간을 먼저 선택'}</option>{groups.map(g=><option key={g} value={g}>{g}</option>)}</select></Field>
+              <Field label="셀" required={!isReg} err={errs.cell}><select className={`select ${ef==='cell'?'is-editing':''}`} value={form.cell} onChange={e=>setF('cell',e.target.value)} disabled={!form.group}><option value="">{form.group?'선택…':'구역을 먼저 선택'}</option>{cells.map(c=><option key={c} value={c}>{c}</option>)}</select></Field>
             </div>
           </div>
           <div className="card" style={{padding:24}}>
             <div className="row between" style={{marginBottom:16}}>
               <div style={{fontSize:'var(--fs-section)',fontWeight:600}}>수량 정보</div>
-              {rq&&<span className="badge" style={{background:'var(--tint-peach)',color:'var(--brand-orange-deep)'}}>수량 필수</span>}
             </div>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16}}>
-              <Field label={`수량${rq?' *':''}`} err={errs.qty}><input className={`input ${ef==='qty'?'is-editing':''}`} type="number" placeholder="0" value={form.qty??''} onChange={e=>setF('qty',e.target.value)}/></Field>
-              <Field label={`최소 재고${rq?' *':''}`} err={errs.min}><input className={`input ${ef==='min'?'is-editing':''}`} type="number" placeholder={rq?'필수':'선택'} value={form.min??''} onChange={e=>setF('min',e.target.value)}/></Field>
+           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:16}}>
+            <Field label="수량" required={isReg} err={errs.qty}><input className={`input ${ef==='qty'?'is-editing':''}`} type="number" placeholder="0" value={form.qty??''} onChange={e=>setF('qty',e.target.value)}/></Field>
+            <Field label="단위" required={isReg} err={errs.unit}>
+             <select className={`select ${ef==='unit'?'is-editing':''}`} value={form.unit} onChange={e=>setF('unit',e.target.value)}>
+              <option value="">선택…</option>
+              {UNITS.map(u=><option key={u} value={u}>{u}</option>)}
+             </select>
+            </Field>
+            <Field label="최소 재고" err={errs.min}><input className={`input ${ef==='min'?'is-editing':''}`} type="number" placeholder="선택" value={form.min??''} onChange={e=>setF('min',e.target.value)}/></Field>
             </div>
           </div>
           <div className="card" style={{padding:24}}>
@@ -1254,10 +1268,11 @@ function MiniMapPrep({itemGroup,itemCell,itemColor}:{itemGroup:string,itemCell:s
       <div style={{transform:`scale(${scale})`,transformOrigin:'top left',width:ORIG_W,height:ORIG_H,position:'absolute',top:0,left:0,pointerEvents:'none'}}>
         {/* 선반 */}
         <div style={{position:'absolute',left:60,top:40,width:70,height:330,border:'1.5px solid #1A1916',borderRadius:4}}/>
-        <MiniCell {...c('선반','1',60,40,70,82,'1',true)}/>
-        <MiniCell {...c('선반','2',60,122,70,82,'2',true)}/>
-        <MiniCell {...c('선반','3',60,204,70,82,'3',true)}/>
-        <MiniCell {...c('선반','4',60,286,70,84,'4',true)}/>
+        <MiniCell {...c('선반','1',60,40,70,66,'1',true)}/>
+        <MiniCell {...c('선반','2',60,106,70,66,'2',true)}/>
+        <MiniCell {...c('선반','3',60,172,70,66,'3',true)}/>
+        <MiniCell {...c('선반','4',60,238,70,66,'4',true)}/>
+        <MiniCell {...c('선반','5',60,304,70,66,'5',true)}/>
         {/* 실험대 위 */}
         <div style={{position:'absolute',left:325,top:40,width:620,height:110,border:'1.5px solid #1A1916',borderRadius:4}}/>
         <MiniCell {...c('실험대 위','1',325,40,124,110)}/>
@@ -1404,21 +1419,21 @@ function MiniMapStore({itemGroup,itemCell,itemColor}:{itemGroup:string,itemCell:
   return (
     <div ref={wrapRef} style={{borderRadius:8,border:'1px solid #ECEBE8',background:'#F7F6F3',overflow:'hidden',position:'relative',height:rh}}>
       <div style={{transform:`scale(${scale})`,transformOrigin:'top left',width:ORIG_W,height:ORIG_H,position:'absolute',top:0,left:0,pointerEvents:'none'}}>
-        {/* 수납장 */}
-        <div style={{position:'absolute',left:50,top:80,width:240,height:400,border:'1.5px solid #1A1916',borderRadius:4}}/>
-        {['1','2','3','4','5','6','7','8'].map((ce,i)=><MiniCell key={ce} {...p} group="수납장" cell={ce} label={ce} x={50+(i%2)*120} y={80+Math.floor(i/2)*100} w={120} h={100}/>)}
-        {/* 박스 */}
-        <div style={{position:'absolute',left:360,top:80,width:180,height:400,border:'1.5px solid #1A1916',borderRadius:4}}/>
-        {['1','2','3'].map((ce,i)=><MiniCell key={ce} {...p} group="박스" cell={ce} label={ce} x={360} y={80+i*133} w={180} h={133}/>)}
-        {/* 선반 */}
-        <div style={{position:'absolute',left:610,top:80,width:120,height:400,border:'1.5px solid #1A1916',borderRadius:4}}/>
-        {['1','2','3','4','5','6','7','8'].map((ce,i)=><MiniCell key={ce} {...p} group="선반" cell={ce} label={ce} x={610} y={80+i*50} w={120} h={50}/>)}
+      {/* 수납장 */}
+      <div style={{position:'absolute',left:50,top:80,width:240,height:400,border:'1.5px solid #1A1916',borderRadius:4}}/>
+      {['1','2','3','4'].map((ce,i)=><MiniCell key={ce} {...p} group="수납장" cell={ce} label={ce} x={50} y={80+i*100} w={240} h={100}/>)}
+      {/* 박스 */}
+      <div style={{position:'absolute',left:360,top:214,width:180,height:266,border:'1.5px solid #1A1916',borderRadius:4}}/>
+      <MiniCell {...p} group="박스" cell="1" label="1" x={360} y={214} w={180} h={266}/>
+      {/* 선반 */}
+      <div style={{position:'absolute',left:610,top:80,width:120,height:400,border:'1.5px solid #1A1916',borderRadius:4}}/>
+      {['1','2','3','4','5','6','7','8','9'].map((ce,i)=><MiniCell key={ce} {...p} group="선반" cell={ce} label={ce} x={610} y={80+i*(400/9)} w={120} h={400/9}/>)}
       </div>
     </div>
   );
 }
 
-function ItemMiniMap({item,u}:{item:any,u:any}) {
+function ItemMiniMap({item,u}:{item:any,u:any}) {if (!item.group || !item.cell) return null;
   const props={itemGroup:item.group,itemCell:item.cell,itemColor:u.color};
   if(item.space==='준비') return <MiniMapPrep {...props}/>;
   if(item.space==='서빙1'||item.space==='서빙2') return <MiniMapSimple space={item.space} {...props}/>;
@@ -1434,7 +1449,7 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
   const isMobile=useMediaQuery('(max-width:768px)');
   return (
     <div className="col" style={{height:'100%'}}>
-      <Topbar title="품목 상세" sub={`${item.name} · #${item.id} · ${item.space} / ${item.group} / ${item.cell}`} action={
+      <Topbar title="품목 상세" sub={`${item.name} · #${item.id} · ${item.space}${item.group ? ' / '+item.group : ''}${item.cell ? ' / '+item.cell : ''}`} action={
         <div className="row" style={{gap:12}}>
           <button className="btn btn-danger btn-sm" onClick={()=>setDelM(true)}>
             <IC.trash/><span>삭제</span>
@@ -1452,7 +1467,7 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
           <div className="card" style={{padding:24}}>
             <span className="badge" style={{background:u.color,color:'#fff'}}>{u.name}</span>
             <h2 className="mobile-h2" style={{margin:'12px 0 6px',fontSize:28,fontWeight:600,color:'var(--ink-deep)'}}>{item.name}</h2>
-            <div style={{fontSize:'var(--fs-body)',color:'var(--charcoal)'}}><span style={{color:'var(--slate)'}}>위치</span> <b>{item.space} / {item.group} / {item.cell}</b></div>
+            <div style={{fontSize:'var(--fs-body)',color:'var(--charcoal)'}}><span style={{color:'var(--slate)'}}>위치</span> <b>{item.space}{item.group ? ' / ' + item.group : ''}{item.cell ? ' / ' + item.cell : ''}</b></div>
             <div style={{marginTop:12,borderTop:'1px solid var(--hairline)',paddingTop:14}}>
               <ItemMiniMap item={item} u={u}/>
               <div style={{marginTop:14,display:'flex',alignItems:'center',gap:6}}>
@@ -1476,8 +1491,8 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
               <div>
                 <div style={{fontSize:'var(--fs-label)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>구분</div>
                 <div style={{marginTop:4,display:'flex',gap:6,flexWrap:'wrap'}}>
-                  {item.isAsset&&<span style={{display:'inline-flex',alignItems:'center',padding:'2px 10px',borderRadius:'var(--r-full)',fontSize:'var(--fs-label)',fontWeight:600,background:'var(--primary-soft)',color:'var(--primary-deep)',border:'1px solid var(--brand-purple-300)'}}>자산</span>}
-                  {item.isEquipment&&<span style={{display:'inline-flex',alignItems:'center',padding:'2px 10px',borderRadius:'var(--r-full)',fontSize:'var(--fs-label)',fontWeight:600,background:'var(--tint-mint)',color:'var(--brand-teal)',border:'1px solid var(--brand-teal)'}}>비품</span>}
+                  {item.isAsset&&<span style={{display:'inline-flex',alignItems:'center',padding:'2px 10px',borderRadius:'var(--r-full)',fontSize:'var(--fs-label)',fontWeight:600,background:'var(--primary-soft)',color:'var(--primary-deep)',border:'1px solid var(--brand-purple-300)'}}>등재자산</span>}
+                  {item.isEquipment&&<span style={{display:'inline-flex',alignItems:'center',padding:'2px 10px',borderRadius:'var(--r-full)',fontSize:'var(--fs-label)',fontWeight:600,background:'var(--tint-mint)',color:'var(--brand-teal)',border:'1px solid var(--brand-teal)'}}>관리 비품/소모품</span>}
                   {!item.isAsset&&!item.isEquipment&&<span style={{fontSize:'var(--fs-body)',color:'var(--stone)'}}>–</span>}
                 </div>
               </div>
