@@ -864,8 +864,8 @@ function StorePlan(p) {
       <FBox title="수납장" x={50} y={80} w={240} h={400}>
         {['1','2','3','4'].map((ce,i)=><Cell key={ce} {...c('수납장',ce,50,80+i*100,240,100)}/>)}
       </FBox>
-      <FBox title="박스" x={360} y={80} w={180} h={266}>
-        <Cell {...c('박스','1',360,80,180,266)}/>
+      <FBox title="박스" x={360} y={214} w={180} h={266}>
+        <Cell {...c('박스','1',360,214,180,266)}/>
       </FBox>
       <FBox title="선반" x={610} y={80} w={120} h={400}>
         {['1','2','3','4','5','6','7','8','9'].map((ce,i)=><Cell key={ce} {...c('선반',ce,610,80+i*(400/9),120,400/9)}/>)}
@@ -1411,8 +1411,8 @@ function MiniMapStore({itemGroup,itemCell,itemColor}:{itemGroup:string,itemCell:
       <div style={{position:'absolute',left:50,top:80,width:240,height:400,border:'1.5px solid #1A1916',borderRadius:4}}/>
       {['1','2','3','4'].map((ce,i)=><MiniCell key={ce} {...p} group="수납장" cell={ce} label={ce} x={50} y={80+i*100} w={240} h={100}/>)}
       {/* 박스 */}
-      <div style={{position:'absolute',left:360,top:80,width:180,height:266,border:'1.5px solid #1A1916',borderRadius:4}}/>
-      <MiniCell {...p} group="박스" cell="1" label="1" x={360} y={80} w={180} h={266}/>
+      <div style={{position:'absolute',left:360,top:214,width:180,height:266,border:'1.5px solid #1A1916',borderRadius:4}}/>
+      <MiniCell {...p} group="박스" cell="1" label="1" x={360} y={214} w={180} h={266}/>
       {/* 선반 */}
       <div style={{position:'absolute',left:610,top:80,width:120,height:400,border:'1.5px solid #1A1916',borderRadius:4}}/>
       {['1','2','3','4','5','6','7','8','9'].map((ce,i)=><MiniCell key={ce} {...p} group="선반" cell={ce} label={ce} x={610} y={80+i*(400/9)} w={120} h={400/9}/>)}
