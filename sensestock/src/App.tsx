@@ -138,7 +138,7 @@ const QTY_REQ = [1,2,4,7,11];
 const SPACES = ['준비','서빙1','서빙2','토론1','토론2','창고'];
 const ZONES = {
   '준비':[
-    {group:'선반',cells:['1','2','3','4']},
+    {group:'선반',cells:['1','2','3','4','5']},
     {group:'실험대 위',cells:['1','2','3','4','5']},
     {group:'실험대 아래',cells:['1','2','3','4','5','6']},
     {group:'실험대 아래',cells:['서랍 1','서랍 2','서랍 3','서랍 4','서랍 5','서랍 6']},
@@ -792,7 +792,7 @@ function PrepPlan(p) {
   return (
     <div style={{position:'relative',width:1280,height:760,background:'var(--canvas)',border:'1px solid var(--hairline)',borderRadius:'var(--r-lg)',margin:'0 auto'}}>
       <FBox title="선반" x={60} y={40} w={70} h={330} tp="left">
-        {['1','2','3','4'].map((ce,i)=><Cell key={ce} {...c('선반',ce,60,40+i*82.5,70,82.5,ce,true)}/>)}
+        {['1','2','3','4','5'].map((ce,i)=><Cell key={ce} {...c('선반',ce,60,40+i*66,70,66,ce,true)}/>)}
       </FBox>
       <FBox title="실험대 위" x={325} y={40} w={620} h={110} tp="right">
         {['1','2','3','4','5'].map((ce,i)=><Cell key={ce} {...c('실험대 위',ce,325+i*124,40,124,110,ce)}/>)}
@@ -1256,10 +1256,11 @@ function MiniMapPrep({itemGroup,itemCell,itemColor}:{itemGroup:string,itemCell:s
       <div style={{transform:`scale(${scale})`,transformOrigin:'top left',width:ORIG_W,height:ORIG_H,position:'absolute',top:0,left:0,pointerEvents:'none'}}>
         {/* 선반 */}
         <div style={{position:'absolute',left:60,top:40,width:70,height:330,border:'1.5px solid #1A1916',borderRadius:4}}/>
-        <MiniCell {...c('선반','1',60,40,70,82,'1',true)}/>
-        <MiniCell {...c('선반','2',60,122,70,82,'2',true)}/>
-        <MiniCell {...c('선반','3',60,204,70,82,'3',true)}/>
-        <MiniCell {...c('선반','4',60,286,70,84,'4',true)}/>
+        <MiniCell {...c('선반','1',60,40,70,66,'1',true)}/>
+        <MiniCell {...c('선반','2',60,106,70,66,'2',true)}/>
+        <MiniCell {...c('선반','3',60,172,70,66,'3',true)}/>
+        <MiniCell {...c('선반','4',60,238,70,66,'4',true)}/>
+        <MiniCell {...c('선반','5',60,304,70,66,'5',true)}/>
         {/* 실험대 위 */}
         <div style={{position:'absolute',left:325,top:40,width:620,height:110,border:'1.5px solid #1A1916',borderRadius:4}}/>
         <MiniCell {...c('실험대 위','1',325,40,124,110)}/>
