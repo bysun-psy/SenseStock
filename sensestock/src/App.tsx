@@ -1125,21 +1125,21 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
               <Field label="규격"><input className={`input ${ef==='spec'?'is-editing':''}`} placeholder="예: 250 mL" value={form.spec} onChange={e=>setF('spec',e.target.value)} style={{minWidth:0}}/></Field>
               <Field label="입고 시기" ><MonthPicker value={form.received} onChange={v=>setF('received',v)} editing={ef==='received'}/></Field>
             </div>
-            <div style={{marginTop:16}}>
-              <label className="field-label">구분</label>
-              <div style={{display:'flex',gap:24,marginTop:4}}>
-                <label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer'}}>
-                  <input type="checkbox" checked={!!form.isAsset} onChange={e=>setF('isAsset',e.target.checked)} style={{width:15,height:15,accentColor:'var(--primary)',cursor:'pointer'}}/>
-                  <span style={{fontSize:'var(--fs-body)',fontWeight:500}}>등재자산</span>
-                  <span className="mobile-hide" style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}>회계 처리 상 자산으로 등록되는 구매단가 100만원 이상의 중요자원</span>
-                </label>
-                <label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer'}}>
-                  <input type="checkbox" checked={!!form.isEquipment} onChange={e=>setF('isEquipment',e.target.checked)} style={{width:15,height:15,accentColor:'var(--brand-teal)',cursor:'pointer'}}/>
-                  <span style={{fontSize:'var(--fs-body)',fontWeight:500}}>관리비품/관리소모품</span>
-                  <span className="mobile-hide" style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}>사용 부서에서 구매/폐기를 결정할 수 있는 구매단가 10만원 이상의 자원(모바일 기기 포함)</span>
-                </label>
-              </div>
+           <div style={{marginTop:16}}>
+             <label className="field-label">구분</label>
+             <div className="col" style={{gap:10,marginTop:4}}>
+              <label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer'}}>
+               <input type="checkbox" checked={!!form.isAsset} onChange={e=>setF('isAsset',e.target.checked)} style={{width:15,height:15,accentColor:'var(--primary)',cursor:'pointer',flexShrink:0}}/>
+               <span style={{fontSize:'var(--fs-body)',fontWeight:500,whiteSpace:'nowrap'}}>등재 자산</span>
+               <span className="mobile-hide" style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}>회계 처리 상 자산으로 등록되는 구매단가 100만원 이상의 중요자원</span>
+              </label>
+              <label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer'}}>
+               <input type="checkbox" checked={!!form.isEquipment} onChange={e=>setF('isEquipment',e.target.checked)} style={{width:15,height:15,accentColor:'var(--brand-teal)',cursor:'pointer',flexShrink:0}}/>
+               <span style={{fontSize:'var(--fs-body)',fontWeight:500,whiteSpace:'nowrap'}}>관리비품/관리소모품</span>
+               <span className="mobile-hide" style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}>사용 부서에서 구매/폐기를 결정할 수 있는 구매단가 10만원 이상의 자원(모바일 기기 포함)</span>
+              </label>
             </div>
+           </div>
           </div>
           <div className="card" style={{padding:24}}>
             <div style={{fontSize:'var(--fs-section)',fontWeight:600,marginBottom:16}}>위치</div>
