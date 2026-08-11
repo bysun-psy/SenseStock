@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { supabase } from "./supabaseClient";
+import imageCompression from 'browser-image-compression';
 
 function useMediaQuery(query:string):boolean {
   const [matches,setMatches]=useState(()=>typeof window!=='undefined'?window.matchMedia(query).matches:false);
@@ -1073,13 +1074,54 @@ function MonthPicker({value,onChange,editing}:{value:string,onChange:(v:string)=
     </div>
   );
 }
-function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||'',group:pre.group||'',cell:pre.cell||'',spec:'',qty:'',min:'',unit:'',received:'',note:'',isAsset:false,isEquipment:false};}function RegisterEdit({mode,item,prefill,onCancel,onSave,onDelete}) {
+function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||'',group:pre.group||'',cell:pre.cell||'',spec:'',qty:'',min:'',unit:'',received:'',note:'',isAsset:false,isEquipment:false,imageUrls:[]};}function RegisterEdit({mode,item,prefill,onCancel,onSave,onDelete}) {
   const isEdit=mode==='edit';
-  const [form,setForm]=useState(()=>isEdit&&item?{...item,unit:item.unit||''}:blank(prefill||{}));
+  const [form,setForm]=useState(()=>isEdit&&item?{...item,unit:item.unit||'',imageUrls:item.imageUrls||[]}:blank(prefill||{}));
   const [ef,setEf]=useState(null);
   const [errs,setErrs]=useState({});
   const [delM,setDelM]=useState(false);
   const [saved,setSaved]=useState(false);
+  const [uploading,setUploading]=useState(false);
+  const [uploadErr,setUploadErr]=useState('');
+  const fileInputRef=useRef(null);
+  const MAX_PHOTOS=5;
+
+  const handleFileChange=async(e)=>{
+    const files=Array.from(e.target.files||[]);
+    if(!files.length)return;
+    const cur=form.imageUrls||[];
+    if(cur.length+files.length>MAX_PHOTOS){
+      setUploadErr(`사진은 최대 ${MAX_PHOTOS}장까지 등록할 수 있습니다.`);
+      if(fileInputRef.current)fileInputRef.current.value='';
+      return;
+    }
+    setUploadErr('');
+    setUploading(true);
+    try{
+      const uploaded=[];
+      for(const file of files){
+        const compressed=await imageCompression(file,{maxSizeMB:0.5,maxWidthOrHeight:1024,useWebWorker:true});
+        const ext=(file.name.split('.').pop()||'jpg').toLowerCase();
+        const fileName=`${crypto.randomUUID()}.${ext}`;
+        const{error}=await supabase.storage.from('item-photos').upload(fileName,compressed,{contentType:compressed.type});
+        if(error)throw error;
+        const{data:urlData}=supabase.storage.from('item-photos').getPublicUrl(fileName);
+        uploaded.push(urlData.publicUrl);
+      }
+      setForm(f=>({...f,imageUrls:[...(f.imageUrls||[]),...uploaded]}));
+    }catch(err){
+      setUploadErr('업로드 실패: '+(err?.message||'알 수 없는 오류'));
+    }finally{
+      setUploading(false);
+      if(fileInputRef.current)fileInputRef.current.value='';
+    }
+  };
+
+  const handleRemovePhoto=async(url)=>{
+    const path=url.split('/').pop();
+    setForm(f=>({...f,imageUrls:(f.imageUrls||[]).filter(u=>u!==url)}));
+    await supabase.storage.from('item-photos').remove([path]);
+  };
   const isReg = !!form.isAsset || !!form.isEquipment;
   const setF=(k,v)=>{setForm(f=>{const n={...f,[k]:v};if(k==='space'){n.group='';n.cell='';}if(k==='group')n.cell='';return n;});setEf(k);};
   const validate=()=>{
@@ -1173,6 +1215,27 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
           <div className="card" style={{padding:24}}>
             <div style={{fontSize:'var(--fs-section)',fontWeight:600,marginBottom:12}}>비고</div>
             <textarea className={`textarea ${ef==='note'?'is-editing':''}`} placeholder="추가 메모" value={form.note} onChange={e=>setF('note',e.target.value)} rows={3}/>
+            <div style={{marginTop:20,paddingTop:20,borderTop:'1px solid var(--hairline)'}}>
+              <div className="row between" style={{marginBottom:8}}>
+                <label className="field-label" style={{marginBottom:0}}>사진 (선택, 최대 {MAX_PHOTOS}장)</label>
+                <span style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}>{(form.imageUrls||[]).length}/{MAX_PHOTOS}</span>
+              </div>
+              <div style={{display:'flex',gap:10,flexWrap:'wrap'}}>
+                {(form.imageUrls||[]).map((url,i)=>(
+                  <div key={url} style={{position:'relative',width:76,height:76,borderRadius:'var(--r-md)',overflow:'hidden',border:'1px solid var(--hairline-strong)',flexShrink:0}}>
+                    <img src={url} alt={`사진 ${i+1}`} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
+                    <button type="button" onClick={()=>handleRemovePhoto(url)} style={{position:'absolute',top:3,right:3,width:20,height:20,borderRadius:'50%',background:'rgba(0,0,0,.6)',color:'#fff',border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,padding:0,lineHeight:1}}>✕</button>
+                  </div>
+                ))}
+                {(form.imageUrls||[]).length<MAX_PHOTOS&&(
+                  <button type="button" onClick={()=>fileInputRef.current?.click()} disabled={uploading} style={{width:76,height:76,borderRadius:'var(--r-md)',border:'1px dashed var(--hairline-strong)',background:'var(--surface)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:4,cursor:uploading?'default':'pointer',color:'var(--slate)',fontSize:11,flexShrink:0}}>
+                    {uploading?<span>업로드중…</span>:<><IC.plus/><span>추가</span></>}
+                  </button>
+                )}
+                <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleFileChange} style={{display:'none'}}/>
+              </div>
+              {uploadErr&&<div style={{marginTop:8,fontSize:'var(--fs-sm)',color:'var(--error)'}}>{uploadErr}</div>}
+            </div>
           </div>
           {isEdit&&item&&(
             <div className="card" style={{padding:16,background:'var(--surface)'}}>
