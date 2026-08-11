@@ -1545,6 +1545,44 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
     </div>
   );
 }
+const fromDb = (row) => ({
+  id: row.id,
+  name: row.name,
+  useId: row.use_id,
+  space: row.space,
+  group: row.group_name,
+  cell: row.cell,
+  qty: row.qty,
+  min: row.min_qty,
+  spec: row.spec || '',
+  note: row.note || '',
+  received: row.received || '',
+  isAsset: row.is_asset,
+  isEquipment: row.is_equipment,
+  unit: row.unit || '',
+  imageUrls: row.image_urls || [],
+  createdAt: row.created_at ? row.created_at.slice(0,10) : '',
+  updatedAt: row.updated_at ? row.updated_at.slice(0,10) : '',
+  updatedBy: row.updated_by || '',
+});
+
+const toDbPayload = (data, userName) => ({
+  name: data.name,
+  use_id: data.useId,
+  space: data.space,
+  group_name: data.group || null,
+  cell: data.cell || null,
+  qty: data.qty,
+  min_qty: data.min,
+  spec: data.spec || null,
+  note: data.note || null,
+  received: data.received || null,
+  is_asset: !!data.isAsset,
+  is_equipment: !!data.isEquipment,
+  unit: data.unit || null,
+  image_urls: data.imageUrls || [],
+  updated_by: userName,
+});
 
 export default function App() {
   const [authed,setAuthed]=useState(false);
@@ -1552,7 +1590,8 @@ export default function App() {
   const [authLoading,setAuthLoading]=useState(true);
   const [accessDenied,setAccessDenied]=useState(false);
   const [route,setRoute]=useState({name:'search'});
-  const [items,setItems]=useState(SEED);
+  const [items,setItems]=useState([]);
+  const [itemsLoading,setItemsLoading]=useState(false);
   const [activity,setActivity]=useState(SEED_ACT);
 
   useEffect(()=>{
@@ -1580,32 +1619,60 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
+useEffect(() => {
+    if (!authed) return;
+    const loadItems = async () => {
+      setItemsLoading(true);
+      const { data, error } = await supabase.from('items').select('*').order('id', { ascending: true });
+      if (error) {
+        console.error('품목 불러오기 실패:', error);
+      } else {
+        setItems((data || []).map(fromDb));
+      }
+      setItemsLoading(false);
+    };
+    loadItems();
+  }, [authed]);
+  
   const nav=(name,params={})=>setRoute({name,...params});
   const openItem=(it,fromSpace=null)=>{if(it&&it.id!=null)setRoute({name:'detail',itemId:it.id,fromSpace});};
   const logout=async()=>{ await supabase.auth.signOut(); setAuthed(false); setUser(null); };
 
-  const upsert=data=>{
-    setItems(prev=>{
-      const idx=prev.findIndex(p=>p.id===data.id);
-      if(idx>=0){const n=[...prev];n[idx]={...data,updatedAt:'오늘',updatedBy:user.name};return n;}
-      const newId=Math.max(...prev.map(p=>p.id),0)+1;
-      return [{...data,id:newId,createdAt:'오늘',updatedAt:'오늘',updatedBy:user.name},...prev];
-    });
-    setActivity(a=>[{id:Date.now(),action:data.id?'update':'create',name:data.name,user:user.name,time:'방금'},...a].slice(0,8));
-    const savedId=data.id??Math.max(...items.map(p=>p.id),0)+1;
-    setRoute({name:'detail',itemId:savedId,fromSpace:route.fromSpace});
+  const upsert=async(data)=>{
+    const payload=toDbPayload(data,user.name);
+    if(data.id!=null){
+      const{data:row,error}=await supabase.from('items').update({...payload,updated_at:new Date().toISOString()}).eq('id',data.id).select().single();
+      if(error){alert('저장 실패: '+error.message);return;}
+      const saved=fromDb(row);
+      setItems(prev=>prev.map(p=>p.id===saved.id?saved:p));
+      setActivity(a=>[{id:Date.now(),action:'update',name:saved.name,user:user.name,time:'방금'},...a].slice(0,8));
+      setRoute({name:'detail',itemId:saved.id,fromSpace:route.fromSpace});
+    }else{
+      const{data:row,error}=await supabase.from('items').insert(payload).select().single();
+      if(error){alert('등록 실패: '+error.message);return;}
+      const saved=fromDb(row);
+      setItems(prev=>[saved,...prev]);
+      setActivity(a=>[{id:Date.now(),action:'create',name:saved.name,user:user.name,time:'방금'},...a].slice(0,8));
+      setRoute({name:'detail',itemId:saved.id,fromSpace:route.fromSpace});
+    }
   };
 
-  const remove=id=>{
+  const remove=async(id)=>{
     const it=items.find(i=>i.id===id);
+    const{error}=await supabase.from('items').delete().eq('id',id);
+    if(error){alert('삭제 실패: '+error.message);return;}
     setItems(p=>p.filter(i=>i.id!==id));
     if(it) setActivity(a=>[{id:Date.now(),action:'delete',name:it.name,user:user.name,time:'방금'},...a].slice(0,8));
     nav('search');
   };
 
-  const removeMany=ids=>{setItems(p=>p.filter(i=>!ids.includes(i.id)));};
+  const removeMany=async(ids)=>{
+    const{error}=await supabase.from('items').delete().in('id',ids);
+    if(error){alert('삭제 실패: '+error.message);return;}
+    setItems(p=>p.filter(i=>!ids.includes(i.id)));
+  };
 
-  if(authLoading) {
+  if(authLoading || itemsLoading) {
     return (
       <>
         <style>{SIDEBAR_CSS}{STYLE_SHEET}</style>
