@@ -1158,7 +1158,6 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
           <div className="card" style={{padding:24}}>
             <div className="row between" style={{marginBottom:16}}>
               <div style={{fontSize:'var(--fs-section)',fontWeight:600}}>수량 정보</div>
-              {isReg&&<span className="badge" style={{background:'var(--tint-peach)',color:'var(--brand-orange-deep)'}}>수량 필수</span>}
             </div>
            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:16}}>
             <Field label="수량" required={isReg} err={errs.qty}><input className={`input ${ef==='qty'?'is-editing':''}`} type="number" placeholder="0" value={form.qty??''} onChange={e=>setF('qty',e.target.value)}/></Field>
