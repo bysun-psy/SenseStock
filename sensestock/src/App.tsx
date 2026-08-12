@@ -1509,6 +1509,7 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
   const u=useById(item.useId);
   const isLow=item.min!=null&&item.qty<item.min;
   const [delM,setDelM]=useState(false);
+  const [photoView,setPhotoView]=useState(null);
   const isMobile=useMediaQuery('(max-width:768px)');
   return (
     <div className="col" style={{height:'100%'}}>
@@ -1524,13 +1525,52 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
             <IC.edit/><span>수정</span>
           </button>
         </div>}/>
+      {photoView!=null && (
+        <Modal open={true} onClose={()=>setPhotoView(null)} width={560}>
+          <div style={{padding:16}}>
+            <div className="row between" style={{marginBottom:10}}>
+              <span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}>{photoView+1} / {(item.imageUrls||[]).length}</span>
+              <button type="button" onClick={()=>setPhotoView(null)} style={{border:'none',background:'none',cursor:'pointer',color:'var(--slate)'}}><IC.x/></button>
+            </div>
+            <img src={(item.imageUrls||[])[photoView]} alt="사진" style={{width:'100%',borderRadius:8,display:'block'}}/>
+            <div className="row between" style={{marginTop:12}}>
+              <button type="button" className="btn btn-secondary btn-sm" disabled={photoView===0} onClick={()=>setPhotoView(v=>v-1)}>이전</button>
+              <button type="button" className="btn btn-secondary btn-sm" disabled={photoView>=(item.imageUrls||[]).length-1} onClick={()=>setPhotoView(v=>v+1)}>다음</button>
+            </div>
+          </div>
+        </Modal>
+      )}
       <div className="mobile-content mobile-pad" style={{flex:1,overflow:'auto',padding:32,paddingBottom:100}}>
         <div style={{maxWidth:860,margin:'0 auto',display:'flex',flexDirection:'column',gap:16}}>
           {/* 카드 1: 품목명 + 미니맵 */}
           <div className="card" style={{padding:24}}>
-            <span className="badge" style={{background:u.color,color:'#fff'}}>{u.name}</span>
-            <h2 className="mobile-h2" style={{margin:'12px 0 6px',fontSize:28,fontWeight:600,color:'var(--ink-deep)'}}>{item.name}</h2>
-            <div style={{fontSize:'var(--fs-body)',color:'var(--charcoal)'}}><span style={{color:'var(--slate)'}}>위치</span> <b>{item.space}{item.group ? ' / ' + item.group : ''}{item.cell ? ' / ' + item.cell : ''}</b></div>
+            <div className="row between" style={{alignItems:'flex-start',gap:16}}>
+              <div style={{flex:1,minWidth:0}}>
+                <span className="badge" style={{background:u.color,color:'#fff'}}>{u.name}</span>
+                <h2 className="mobile-h2" style={{margin:'12px 0 6px',fontSize:28,fontWeight:600,color:'var(--ink-deep)'}}>{item.name}</h2>
+                <div style={{fontSize:'var(--fs-body)',color:'var(--charcoal)'}}><span style={{color:'var(--slate)'}}>위치</span> <b>{item.space}{item.group ? ' / ' + item.group : ''}{item.cell ? ' / ' + item.cell : ''}</b></div>
+              </div>
+              <div style={{display:'flex',gap:6,flexShrink:0}}>
+                {(item.imageUrls||[]).length===0 ? (
+                  <button type="button" className="btn btn-secondary btn-sm" onClick={onEdit}>
+                    <IC.plus/><span>사진 추가</span>
+                  </button>
+                ) : (
+                  <>
+                    {(item.imageUrls||[]).slice(0,3).map((url,i)=>(
+                      <div key={url} onClick={()=>setPhotoView(i)} style={{width:52,height:52,borderRadius:8,overflow:'hidden',border:'1px solid var(--hairline-strong)',cursor:'pointer',flexShrink:0}}>
+                        <img src={url} alt={`사진 ${i+1}`} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
+                      </div>
+                    ))}
+                    {(item.imageUrls||[]).length>3 && (
+                      <div onClick={()=>setPhotoView(3)} style={{width:52,height:52,borderRadius:8,background:'var(--surface)',border:'1px solid var(--hairline-strong)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,color:'var(--slate)',cursor:'pointer',flexShrink:0}}>
+                        +{(item.imageUrls||[]).length-3}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
             <div style={{marginTop:12,borderTop:'1px solid var(--hairline)',paddingTop:14}}>
               <ItemMiniMap item={item} u={u}/>
               <div style={{marginTop:14,display:'flex',alignItems:'center',gap:6}}>
