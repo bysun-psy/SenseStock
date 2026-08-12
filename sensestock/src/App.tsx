@@ -425,6 +425,8 @@ function Donut({data,total,size=160}) {
 function Dashboard({items,activity,onNav,onItemClick}) {
   const isMobile=useMediaQuery('(max-width:768px)');
   const total=items.length;
+  const thisMonth=new Date().toISOString().slice(0,7);
+  const newThisMonth=items.filter(i=>i.createdAt&&i.createdAt.slice(0,7)===thisMonth).length;
   const spaceC=['#6457E7','#E48F50','#3BA063','#2382E2','#E2557F','#9B6F47'];
   const useData=USES.map(u=>({c:u.color,v:items.filter(i=>i.useId===u.id).length,name:u.name})).sort((a,b)=>b.v-a.v);
   const spData=SPACES.map((s,i)=>({c:spaceC[i],v:items.filter(i=>i.space===s).length,name:s}));
@@ -438,7 +440,7 @@ function Dashboard({items,activity,onNav,onItemClick}) {
             <div style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}>총 등록 품목</div>
             <div style={{fontSize:45,fontWeight:600,color:'var(--ink-deep)',letterSpacing:'-1px',marginTop:8}}>{total}</div>
             <div className="row" style={{gap:6,marginTop:12}}>
-              <span style={{padding:'2px 8px',borderRadius:'var(--r-full)',background:'var(--tint-lavender)',color:'var(--brand-purple-800)',fontSize:'var(--fs-label)',fontWeight:600}}>+12</span>
+              <span style={{padding:'2px 8px',borderRadius:'var(--r-full)',background:'var(--tint-lavender)',color:'var(--brand-purple-800)',fontSize:'var(--fs-label)',fontWeight:600}}>+{newThisMonth}</span>
               <span style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}>이번 달</span>
             </div>
           </div>
