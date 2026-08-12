@@ -66,8 +66,8 @@ const STYLE_SHEET = `
   --slate:#787774; --steel:#9B9A97; --stone:#B5B3AD;
   --on-dark:#FFFFFF; --on-dark-muted:rgba(255,255,255,0.72);
   --error:#D03A3A; --link-blue:#2382E2;
-  --use-1:#E63946; --use-2:#C42E2E; --use-3:#A8231F; --use-4:#F4A23B; --use-5:#F0B82E;
-  --use-6:#E69A1F; --use-7:#F4D31E; --use-8:#2BAA50; --use-9:#2B7FD3; --use-10:#1A2E5C; --use-11:#A1318C;
+  --use-1:#2BAA50; --use-2:#2B7FD3; --use-3:#E69A1F; --use-4:#F4D31E;
+  --use-5:#1A2E5C; --use-6:#A1318C; --use-7:#C42E2E;
   --r-sm:6px; --r-md:8px; --r-lg:12px; --r-full:9999px;
   --shadow-2:0 4px 12px rgba(15,15,15,.08); --shadow-3:0 24px 48px -8px rgba(15,15,15,.20); --shadow-4:0 16px 48px -8px rgba(15,15,15,.16);
   --fs-body:14px; --fs-sm:12px; --fs-label:12px; --fs-btn:14px; --fs-nav:14px; --fs-input:14px; --fs-section:16px; --fs-topbar:22px; --fs-table:13px;
@@ -121,17 +121,13 @@ body,#root{margin:0;padding:0}
 `;
 
 const USES = [
-  {id:1,name:'평가/훈련-소모품',color:'var(--use-1)',short:'평가·소모품'},
-  {id:2,name:'평가/훈련-일회용품',color:'var(--use-2)',short:'평가·일회용'},
-  {id:3,name:'평가/훈련-교구',color:'var(--use-3)',short:'평가·교구'},
-  {id:4,name:'실험/분석-소모품',color:'var(--use-4)',short:'실험·소모품'},
-  {id:5,name:'실험/분석-기구',color:'var(--use-5)',short:'실험·기구'},
-  {id:6,name:'실험/분석-장비',color:'var(--use-6)',short:'실험·장비'},
-  {id:7,name:'청소/안전',color:'var(--use-7)',short:'청소·안전'},
-  {id:8,name:'조리/그릇',color:'var(--use-8)',short:'조리·그릇'},
-  {id:9,name:'사무/공구',color:'var(--use-9)',short:'사무·공구'},
-  {id:10,name:'기타 장비',color:'var(--use-10)',short:'기타 장비'},
-  {id:11,name:'기타 소모품',color:'var(--use-11)',short:'기타 소모품'},
+  {id:1,name:'관능평가·시식용품',color:'var(--use-1)',short:'평가·시식'},
+  {id:2,name:'조리장비·그릇',color:'var(--use-2)',short:'조리·그릇'},
+  {id:3,name:'실험장비·소모품·시약',color:'var(--use-3)',short:'실험·장비'},
+  {id:4,name:'시료·원료',color:'var(--use-4)',short:'시료·원료'},
+  {id:5,name:'훈련교구',color:'var(--use-5)',short:'훈련교구'},
+  {id:6,name:'사무·IT',color:'var(--use-6)',short:'사무·IT'},
+  {id:7,name:'청소·시설·안전',color:'var(--use-7)',short:'청소·안전'},
 ];
 const FALLBACK_USE = {id:0,name:'미분류',color:'var(--steel)',short:'미분류'};
 const useById = id => USES.find(u=>u.id===id) || FALLBACK_USE;
@@ -681,7 +677,7 @@ function Cell({space,group,cell,label,x,y,w,h,vert,itemMap,selected,onToggle}) {
   const isSel=selected.has(key);
   const empty=its.length===0;
   const fill=empty?'#FAFAF8':(dom?.color||'#FAFAF8');
-  const darkColors=['var(--use-2)','var(--use-3)','var(--use-9)','var(--use-10)','var(--use-11)','var(--use-8)','var(--use-1)','var(--use-6)'];
+  const darkColors=['var(--use-1)','var(--use-2)','var(--use-3)','var(--use-5)','var(--use-6)','var(--use-7)'];
   const tc=darkColors.includes(fill)?'rgba(255,255,255,.9)':'var(--ink)';
   const displayLabel=label;
   return (
@@ -1217,7 +1213,7 @@ function Profile({user,onLogout}) {
 function MiniCell({group,cell,label,x,y,w,h,vert,itemGroup,itemCell,itemColor}:{group:string,cell:string,label:string,x:number,y:number,w:number,h:number,vert?:boolean,itemGroup:string,itemCell:string,itemColor:string}) {
   const isTarget=group===itemGroup&&cell===itemCell;
   const bg=isTarget?itemColor:'#FFFFFF';
-  const darkColors=['var(--use-2)','var(--use-3)','var(--use-9)','var(--use-10)','var(--use-11)','var(--use-8)','var(--use-1)','var(--use-6)'];
+  const darkColors=['var(--use-1)','var(--use-2)','var(--use-3)','var(--use-5)','var(--use-6)','var(--use-7)'];
   const tc=isTarget?(darkColors.includes(itemColor)?'rgba(255,255,255,.9)':'var(--ink)'):'#9B9A97';
   return (
     <div style={{position:'absolute',left:x,top:y,width:w,height:h,background:bg,border:isTarget?'2.5px solid #1A1916':'1px solid #DEDCD7',borderRadius:4,display:'flex',alignItems:vert?'flex-end':'flex-start',justifyContent:vert?'center':'flex-start',padding:vert?5:5,boxSizing:'border-box',boxShadow:isTarget?'0 4px 12px rgba(15,15,15,.18)':'none'}}>
