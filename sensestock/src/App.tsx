@@ -988,6 +988,7 @@ function MonthPicker({value,onChange,editing}:{value:string,onChange:(v:string)=
 }
 function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||'',group:pre.group||'',cell:pre.cell||'',spec:'',qty:'',min:'',unit:'',received:'',note:'',isAsset:false,isEquipment:false,imageUrls:[]};}function RegisterEdit({mode,item,prefill,onCancel,onSave,onDelete}) {
   const isEdit=mode==='edit';
+  const isMobile=useMediaQuery('(max-width:768px)');
   const [form,setForm]=useState(()=>isEdit&&item?{...item,unit:item.unit||'',imageUrls:item.imageUrls||[]}:blank(prefill||{}));
   const [ef,setEf]=useState(null);
   const [errs,setErrs]=useState({});
@@ -1079,7 +1080,11 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
             <div style={{fontSize:'var(--fs-section)',fontWeight:600,marginBottom:16}}>기본 정보</div>
             <div style={{display:'grid',gridTemplateColumns:'1.4fr 1fr',gap:16}}>
               <Field label="품목명" required err={errs.name}><input className={`input ${ef==='name'?'is-editing':''}`} placeholder="예: 정량 피펫" value={form.name} onChange={e=>setF('name',e.target.value)}/></Field>
-              <Field label="용도 분류" required err={errs.useId}><UseSelect value={form.useId} onChange={v=>setF('useId',v)} editing={ef==='useId'}/></Field>
+              <Field label="용도 분류" required err={errs.useId}>
+                {isMobile
+                  ?<select className={`select ${ef==='useId'?'is-editing':''}`} value={form.useId??''} onChange={e=>setF('useId',e.target.value?+e.target.value:null)}><option value="">선택…</option>{USES.map(o=><option key={o.id} value={o.id}>{o.name}</option>)}</select>
+                  :<UseSelect value={form.useId} onChange={v=>setF('useId',v)} editing={ef==='useId'}/>}
+              </Field>
             </div>
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginTop:16,minWidth:0}}>
               <Field label="규격" required={isReg} err={errs.spec}><input className={`input ${ef==='spec'?'is-editing':''}`} placeholder="예: 250 mL" value={form.spec} onChange={e=>setF('spec',e.target.value)} style={{minWidth:0}}/></Field>
