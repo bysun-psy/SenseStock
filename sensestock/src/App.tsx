@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { supabase } from "./supabaseClient";
+import imageCompression from 'browser-image-compression';
 
 function useMediaQuery(query:string):boolean {
   const [matches,setMatches]=useState(()=>typeof window!=='undefined'?window.matchMedia(query).matches:false);
@@ -1073,13 +1074,54 @@ function MonthPicker({value,onChange,editing}:{value:string,onChange:(v:string)=
     </div>
   );
 }
-function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||'',group:pre.group||'',cell:pre.cell||'',spec:'',qty:'',min:'',unit:'',received:'',note:'',isAsset:false,isEquipment:false};}function RegisterEdit({mode,item,prefill,onCancel,onSave,onDelete}) {
+function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||'',group:pre.group||'',cell:pre.cell||'',spec:'',qty:'',min:'',unit:'',received:'',note:'',isAsset:false,isEquipment:false,imageUrls:[]};}function RegisterEdit({mode,item,prefill,onCancel,onSave,onDelete}) {
   const isEdit=mode==='edit';
-  const [form,setForm]=useState(()=>isEdit&&item?{...item,unit:item.unit||''}:blank(prefill||{}));
+  const [form,setForm]=useState(()=>isEdit&&item?{...item,unit:item.unit||'',imageUrls:item.imageUrls||[]}:blank(prefill||{}));
   const [ef,setEf]=useState(null);
   const [errs,setErrs]=useState({});
   const [delM,setDelM]=useState(false);
   const [saved,setSaved]=useState(false);
+  const [uploading,setUploading]=useState(false);
+  const [uploadErr,setUploadErr]=useState('');
+  const fileInputRef=useRef(null);
+  const MAX_PHOTOS=5;
+
+  const handleFileChange=async(e)=>{
+    const files=Array.from(e.target.files||[]);
+    if(!files.length)return;
+    const cur=form.imageUrls||[];
+    if(cur.length+files.length>MAX_PHOTOS){
+      setUploadErr(`사진은 최대 ${MAX_PHOTOS}장까지 등록할 수 있습니다.`);
+      if(fileInputRef.current)fileInputRef.current.value='';
+      return;
+    }
+    setUploadErr('');
+    setUploading(true);
+    try{
+      const uploaded=[];
+      for(const file of files){
+        const compressed=await imageCompression(file,{maxSizeMB:0.5,maxWidthOrHeight:1024,useWebWorker:true});
+        const ext=(file.name.split('.').pop()||'jpg').toLowerCase();
+        const fileName=`${crypto.randomUUID()}.${ext}`;
+        const{error}=await supabase.storage.from('item-photos').upload(fileName,compressed,{contentType:compressed.type});
+        if(error)throw error;
+        const{data:urlData}=supabase.storage.from('item-photos').getPublicUrl(fileName);
+        uploaded.push(urlData.publicUrl);
+      }
+      setForm(f=>({...f,imageUrls:[...(f.imageUrls||[]),...uploaded]}));
+    }catch(err){
+      setUploadErr('업로드 실패: '+(err?.message||'알 수 없는 오류'));
+    }finally{
+      setUploading(false);
+      if(fileInputRef.current)fileInputRef.current.value='';
+    }
+  };
+
+  const handleRemovePhoto=async(url)=>{
+    const path=url.split('/').pop();
+    setForm(f=>({...f,imageUrls:(f.imageUrls||[]).filter(u=>u!==url)}));
+    await supabase.storage.from('item-photos').remove([path]);
+  };
   const isReg = !!form.isAsset || !!form.isEquipment;
   const setF=(k,v)=>{setForm(f=>{const n={...f,[k]:v};if(k==='space'){n.group='';n.cell='';}if(k==='group')n.cell='';return n;});setEf(k);};
   const validate=()=>{
@@ -1173,6 +1215,27 @@ function blank(pre={}) {return{name:'',useId:pre.useId||null,space:pre.space||''
           <div className="card" style={{padding:24}}>
             <div style={{fontSize:'var(--fs-section)',fontWeight:600,marginBottom:12}}>비고</div>
             <textarea className={`textarea ${ef==='note'?'is-editing':''}`} placeholder="추가 메모" value={form.note} onChange={e=>setF('note',e.target.value)} rows={3}/>
+            <div style={{marginTop:20,paddingTop:20,borderTop:'1px solid var(--hairline)'}}>
+              <div className="row between" style={{marginBottom:8}}>
+                <label className="field-label" style={{marginBottom:0}}>사진 (선택, 최대 {MAX_PHOTOS}장)</label>
+                <span style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}>{(form.imageUrls||[]).length}/{MAX_PHOTOS}</span>
+              </div>
+              <div style={{display:'flex',gap:10,flexWrap:'wrap'}}>
+                {(form.imageUrls||[]).map((url,i)=>(
+                  <div key={url} style={{position:'relative',width:76,height:76,borderRadius:'var(--r-md)',overflow:'hidden',border:'1px solid var(--hairline-strong)',flexShrink:0}}>
+                    <img src={url} alt={`사진 ${i+1}`} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
+                    <button type="button" onClick={()=>handleRemovePhoto(url)} style={{position:'absolute',top:3,right:3,width:20,height:20,borderRadius:'50%',background:'rgba(0,0,0,.6)',color:'#fff',border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,padding:0,lineHeight:1}}>✕</button>
+                  </div>
+                ))}
+                {(form.imageUrls||[]).length<MAX_PHOTOS&&(
+                  <button type="button" onClick={()=>fileInputRef.current?.click()} disabled={uploading} style={{width:76,height:76,borderRadius:'var(--r-md)',border:'1px dashed var(--hairline-strong)',background:'var(--surface)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:4,cursor:uploading?'default':'pointer',color:'var(--slate)',fontSize:11,flexShrink:0}}>
+                    {uploading?<span>업로드중…</span>:<><IC.plus/><span>추가</span></>}
+                  </button>
+                )}
+                <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleFileChange} style={{display:'none'}}/>
+              </div>
+              {uploadErr&&<div style={{marginTop:8,fontSize:'var(--fs-sm)',color:'var(--error)'}}>{uploadErr}</div>}
+            </div>
           </div>
           {isEdit&&item&&(
             <div className="card" style={{padding:16,background:'var(--surface)'}}>
@@ -1446,6 +1509,7 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
   const u=useById(item.useId);
   const isLow=item.min!=null&&item.qty<item.min;
   const [delM,setDelM]=useState(false);
+  const [photoView,setPhotoView]=useState(null);
   const isMobile=useMediaQuery('(max-width:768px)');
   return (
     <div className="col" style={{height:'100%'}}>
@@ -1461,13 +1525,52 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
             <IC.edit/><span>수정</span>
           </button>
         </div>}/>
+      {photoView!=null && (
+        <Modal open={true} onClose={()=>setPhotoView(null)} width={560}>
+          <div style={{padding:16}}>
+            <div className="row between" style={{marginBottom:10}}>
+              <span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}>{photoView+1} / {(item.imageUrls||[]).length}</span>
+              <button type="button" onClick={()=>setPhotoView(null)} style={{border:'none',background:'none',cursor:'pointer',color:'var(--slate)'}}><IC.x/></button>
+            </div>
+            <img src={(item.imageUrls||[])[photoView]} alt="사진" style={{width:'100%',borderRadius:8,display:'block'}}/>
+            <div className="row between" style={{marginTop:12}}>
+              <button type="button" className="btn btn-secondary btn-sm" disabled={photoView===0} onClick={()=>setPhotoView(v=>v-1)}>이전</button>
+              <button type="button" className="btn btn-secondary btn-sm" disabled={photoView>=(item.imageUrls||[]).length-1} onClick={()=>setPhotoView(v=>v+1)}>다음</button>
+            </div>
+          </div>
+        </Modal>
+      )}
       <div className="mobile-content mobile-pad" style={{flex:1,overflow:'auto',padding:32,paddingBottom:100}}>
         <div style={{maxWidth:860,margin:'0 auto',display:'flex',flexDirection:'column',gap:16}}>
           {/* 카드 1: 품목명 + 미니맵 */}
           <div className="card" style={{padding:24}}>
-            <span className="badge" style={{background:u.color,color:'#fff'}}>{u.name}</span>
-            <h2 className="mobile-h2" style={{margin:'12px 0 6px',fontSize:28,fontWeight:600,color:'var(--ink-deep)'}}>{item.name}</h2>
-            <div style={{fontSize:'var(--fs-body)',color:'var(--charcoal)'}}><span style={{color:'var(--slate)'}}>위치</span> <b>{item.space}{item.group ? ' / ' + item.group : ''}{item.cell ? ' / ' + item.cell : ''}</b></div>
+            <div className="row between" style={{alignItems:'flex-start',gap:16}}>
+              <div style={{flex:1,minWidth:0}}>
+                <span className="badge" style={{background:u.color,color:'#fff'}}>{u.name}</span>
+                <h2 className="mobile-h2" style={{margin:'12px 0 6px',fontSize:28,fontWeight:600,color:'var(--ink-deep)'}}>{item.name}</h2>
+                <div style={{fontSize:'var(--fs-body)',color:'var(--charcoal)'}}><span style={{color:'var(--slate)'}}>위치</span> <b>{item.space}{item.group ? ' / ' + item.group : ''}{item.cell ? ' / ' + item.cell : ''}</b></div>
+              </div>
+              <div style={{display:'flex',gap:6,flexShrink:0}}>
+                {(item.imageUrls||[]).length===0 ? (
+                  <button type="button" className="btn btn-secondary btn-sm" onClick={onEdit}>
+                    <IC.plus/><span>사진 추가</span>
+                  </button>
+                ) : (
+                  <>
+                    {(item.imageUrls||[]).slice(0,3).map((url,i)=>(
+                      <div key={url} onClick={()=>setPhotoView(i)} style={{width:52,height:52,borderRadius:8,overflow:'hidden',border:'1px solid var(--hairline-strong)',cursor:'pointer',flexShrink:0}}>
+                        <img src={url} alt={`사진 ${i+1}`} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
+                      </div>
+                    ))}
+                    {(item.imageUrls||[]).length>3 && (
+                      <div onClick={()=>setPhotoView(3)} style={{width:52,height:52,borderRadius:8,background:'var(--surface)',border:'1px solid var(--hairline-strong)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,color:'var(--slate)',cursor:'pointer',flexShrink:0}}>
+                        +{(item.imageUrls||[]).length-3}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
             <div style={{marginTop:12,borderTop:'1px solid var(--hairline)',paddingTop:14}}>
               <ItemMiniMap item={item} u={u}/>
               <div style={{marginTop:14,display:'flex',alignItems:'center',gap:6}}>
@@ -1545,6 +1648,44 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
     </div>
   );
 }
+const fromDb = (row) => ({
+  id: row.id,
+  name: row.name,
+  useId: row.use_id,
+  space: row.space,
+  group: row.group_name,
+  cell: row.cell,
+  qty: row.qty,
+  min: row.min_qty,
+  spec: row.spec || '',
+  note: row.note || '',
+  received: row.received || '',
+  isAsset: row.is_asset,
+  isEquipment: row.is_equipment,
+  unit: row.unit || '',
+  imageUrls: row.image_urls || [],
+  createdAt: row.created_at ? row.created_at.slice(0,10) : '',
+  updatedAt: row.updated_at ? row.updated_at.slice(0,10) : '',
+  updatedBy: row.updated_by || '',
+});
+
+const toDbPayload = (data, userName) => ({
+  name: data.name,
+  use_id: data.useId,
+  space: data.space,
+  group_name: data.group || null,
+  cell: data.cell || null,
+  qty: data.qty,
+  min_qty: data.min,
+  spec: data.spec || null,
+  note: data.note || null,
+  received: data.received || null,
+  is_asset: !!data.isAsset,
+  is_equipment: !!data.isEquipment,
+  unit: data.unit || null,
+  image_urls: data.imageUrls || [],
+  updated_by: userName,
+});
 
 export default function App() {
   const [authed,setAuthed]=useState(false);
@@ -1552,7 +1693,8 @@ export default function App() {
   const [authLoading,setAuthLoading]=useState(true);
   const [accessDenied,setAccessDenied]=useState(false);
   const [route,setRoute]=useState({name:'search'});
-  const [items,setItems]=useState(SEED);
+  const [items,setItems]=useState([]);
+  const [itemsLoading,setItemsLoading]=useState(false);
   const [activity,setActivity]=useState(SEED_ACT);
 
   useEffect(()=>{
@@ -1580,32 +1722,60 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
+useEffect(() => {
+    if (!authed) return;
+    const loadItems = async () => {
+      setItemsLoading(true);
+      const { data, error } = await supabase.from('items').select('*').order('id', { ascending: true });
+      if (error) {
+        console.error('품목 불러오기 실패:', error);
+      } else {
+        setItems((data || []).map(fromDb));
+      }
+      setItemsLoading(false);
+    };
+    loadItems();
+  }, [authed]);
+  
   const nav=(name,params={})=>setRoute({name,...params});
   const openItem=(it,fromSpace=null)=>{if(it&&it.id!=null)setRoute({name:'detail',itemId:it.id,fromSpace});};
   const logout=async()=>{ await supabase.auth.signOut(); setAuthed(false); setUser(null); };
 
-  const upsert=data=>{
-    setItems(prev=>{
-      const idx=prev.findIndex(p=>p.id===data.id);
-      if(idx>=0){const n=[...prev];n[idx]={...data,updatedAt:'오늘',updatedBy:user.name};return n;}
-      const newId=Math.max(...prev.map(p=>p.id),0)+1;
-      return [{...data,id:newId,createdAt:'오늘',updatedAt:'오늘',updatedBy:user.name},...prev];
-    });
-    setActivity(a=>[{id:Date.now(),action:data.id?'update':'create',name:data.name,user:user.name,time:'방금'},...a].slice(0,8));
-    const savedId=data.id??Math.max(...items.map(p=>p.id),0)+1;
-    setRoute({name:'detail',itemId:savedId,fromSpace:route.fromSpace});
+  const upsert=async(data)=>{
+    const payload=toDbPayload(data,user.name);
+    if(data.id!=null){
+      const{data:row,error}=await supabase.from('items').update({...payload,updated_at:new Date().toISOString()}).eq('id',data.id).select().single();
+      if(error){alert('저장 실패: '+error.message);return;}
+      const saved=fromDb(row);
+      setItems(prev=>prev.map(p=>p.id===saved.id?saved:p));
+      setActivity(a=>[{id:Date.now(),action:'update',name:saved.name,user:user.name,time:'방금'},...a].slice(0,8));
+      setRoute({name:'detail',itemId:saved.id,fromSpace:route.fromSpace});
+    }else{
+      const{data:row,error}=await supabase.from('items').insert(payload).select().single();
+      if(error){alert('등록 실패: '+error.message);return;}
+      const saved=fromDb(row);
+      setItems(prev=>[saved,...prev]);
+      setActivity(a=>[{id:Date.now(),action:'create',name:saved.name,user:user.name,time:'방금'},...a].slice(0,8));
+      setRoute({name:'detail',itemId:saved.id,fromSpace:route.fromSpace});
+    }
   };
 
-  const remove=id=>{
+  const remove=async(id)=>{
     const it=items.find(i=>i.id===id);
+    const{error}=await supabase.from('items').delete().eq('id',id);
+    if(error){alert('삭제 실패: '+error.message);return;}
     setItems(p=>p.filter(i=>i.id!==id));
     if(it) setActivity(a=>[{id:Date.now(),action:'delete',name:it.name,user:user.name,time:'방금'},...a].slice(0,8));
     nav('search');
   };
 
-  const removeMany=ids=>{setItems(p=>p.filter(i=>!ids.includes(i.id)));};
+  const removeMany=async(ids)=>{
+    const{error}=await supabase.from('items').delete().in('id',ids);
+    if(error){alert('삭제 실패: '+error.message);return;}
+    setItems(p=>p.filter(i=>!ids.includes(i.id)));
+  };
 
-  if(authLoading) {
+  if(authLoading || itemsLoading) {
     return (
       <>
         <style>{SIDEBAR_CSS}{STYLE_SHEET}</style>
