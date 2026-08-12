@@ -606,7 +606,7 @@ function Search({items,onItemClick,onDelete}) {
                   <td><span style={{fontSize:'var(--fs-table)',color:'var(--slate)',whiteSpace:'nowrap'}}>{it.spec||'–'}</span></td>
                   <td><span style={{fontSize:'var(--fs-table)'}}><b>{it.space}</b><span style={{color:'var(--slate)'}}> / {it.group} / {it.cell}</span></span></td>
                   <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color,flexShrink:0}}/><span style={{fontSize:'var(--fs-table)',color:'var(--charcoal)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{u.short}</span></span></td>
-                  <td style={{textAlign:'right'}}><span style={{fontSize:'var(--fs-table)',color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}> / {it.min}</span>}{isLow&&<div style={{fontSize:'var(--fs-label)',color:'var(--error)',fontWeight:600}}>재고 부족</div>}</td>
+                  <td style={{textAlign:'right'}}><span style={{fontSize:'var(--fs-table)',color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}{it.min==null&&it.unit&&<span style={{fontSize:'var(--fs-sm)',fontWeight:400}}>{it.unit}</span>}</span>{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--steel)'}}> / {it.min}{it.unit}</span>}{isLow&&<div style={{fontSize:'var(--fs-label)',color:'var(--error)',fontWeight:600}}>재고 부족</div>}</td>
                   <td><span style={{fontSize:'var(--fs-table)',color:'var(--slate)',whiteSpace:'nowrap'}}>{it.received}</span></td>
                   <td>
                     {it.isAsset&&<span style={{display:'inline-flex',alignItems:'center',padding:'2px 8px',borderRadius:'var(--r-full)',fontSize:'var(--fs-label)',fontWeight:600,background:'var(--primary-soft)',color:'var(--primary-deep)',border:'1px solid var(--brand-purple-300)',marginRight:3}}>등재자산</span>}
@@ -647,7 +647,7 @@ function Search({items,onItemClick,onDelete}) {
                   </div>
                 </div>
                 <div style={{textAlign:'right',flexShrink:0}}>
-                  <div style={{fontWeight:600,fontSize:15,color:isLow?'var(--error)':'var(--ink-deep)'}}>{it.qty}{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--slate)',fontWeight:400}}> / {it.min}</span>}</div>
+                  <div style={{fontWeight:600,fontSize:15,color:isLow?'var(--error)':'var(--ink-deep)'}}>{it.qty}{it.min==null&&it.unit&&<span style={{fontSize:'var(--fs-sm)',fontWeight:400}}>{it.unit}</span>}{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--slate)',fontWeight:400}}> / {it.min}{it.unit}</span>}</div>
                   {isLow&&<div style={{fontSize:'var(--fs-label)',color:'var(--error)',fontWeight:600}}>재고 부족</div>}
                 </div>
               </div>
@@ -860,7 +860,7 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
                           <td style={{fontSize:'var(--fs-table)',color:'var(--slate)'}}>{it.spec||'–'}</td>
                           <td style={{fontSize:'var(--fs-table)'}}><b>{it.group}</b> / {it.cell}</td>
                           <td><span className="row" style={{gap:6}}><span className="swatch" style={{background:u.color}}/><span className="mobile-hide" style={{fontSize:'var(--fs-table)',color:'var(--charcoal)'}}>{u.short}</span></span></td>
-                          <td><span style={{fontSize:'var(--fs-table)',color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}> / {it.min}</span>}</td>
+                          <td><span style={{fontSize:'var(--fs-table)',color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}{it.min==null&&it.unit&&<span style={{fontSize:'var(--fs-sm)',fontWeight:400}}>{it.unit}</span>}</span>{it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}> / {it.min}{it.unit}</span>}</td>
                           <td>
                             {it.isAsset&&<span style={{display:'inline-flex',alignItems:'center',padding:'2px 8px',borderRadius:'var(--r-full)',fontSize:'var(--fs-label)',fontWeight:600,background:'var(--primary-soft)',color:'var(--primary-deep)',border:'1px solid var(--brand-purple-300)',marginRight:3}}>등재자산</span>}
                             {it.isEquipment&&<span style={{display:'inline-flex',alignItems:'center',padding:'2px 8px',borderRadius:'var(--r-full)',fontSize:'var(--fs-label)',fontWeight:600,background:'var(--tint-mint)',color:'var(--brand-teal)',border:'1px solid var(--brand-teal)'}}>관리 비품/소모품</span>}
@@ -893,8 +893,8 @@ function SpaceView({items,onNav,onItemClick,initialSpace}) {
                             </div>
                           </div>
                           <div style={{textAlign:'right',flexShrink:0}}>
-                            <span style={{fontWeight:700,fontSize:'var(--fs-section)',color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}</span>
-                            {it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}> / {it.min}</span>}
+                            <span style={{fontWeight:700,fontSize:'var(--fs-section)',color:isLow?'var(--error)':'var(--ink)'}}>{it.qty}{it.min==null&&it.unit&&<span style={{fontSize:'var(--fs-sm)',fontWeight:400}}>{it.unit}</span>}</span>
+                            {it.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--slate)'}}> / {it.min}{it.unit}</span>}
                             {isLow&&<div style={{fontSize:'var(--fs-label)',color:'var(--error)',fontWeight:500}}>재고 부족</div>}
                           </div>
                         </div>
@@ -1521,7 +1521,7 @@ function ItemDetail({item,onBack,onEdit,onDelete}) {
               <div>
                 <div style={{fontSize:'var(--fs-label)',color:'var(--steel)',textTransform:'uppercase',letterSpacing:.4}}>현재 수량</div>
                 <div style={{fontSize:'var(--fs-body)',fontWeight:600,marginTop:4,color:isLow?'var(--error)':'var(--ink)'}}>
-                  {item.qty}{item.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--steel)',fontWeight:400}}> / {item.min} 최소</span>}
+                  {item.qty}{item.min==null&&item.unit&&<span style={{fontSize:'var(--fs-sm)',fontWeight:400}}>{item.unit}</span>}{item.min!=null&&<span style={{fontSize:'var(--fs-sm)',color:'var(--steel)',fontWeight:400}}> / {item.min}{item.unit} 최소</span>}
                 </div>
               </div>
               <div>
