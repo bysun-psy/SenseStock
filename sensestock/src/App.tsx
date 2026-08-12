@@ -1606,6 +1606,25 @@ const toDbPayload = (data, userName) => ({
   updated_by: userName,
 });
 
+const timeAgo = (iso) => {
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const min = Math.floor(diffMs / 60000);
+  if (min < 1) return '방금';
+  if (min < 60) return `${min}분 전`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return `${hr}시간 전`;
+  const day = Math.floor(hr / 24);
+  return `${day}일 전`;
+};
+
+const fromDbActivity = (row) => ({
+  id: row.id,
+  action: row.action,
+  name: row.item_name,
+  user: row.user_name,
+  time: timeAgo(row.created_at),
+});
+
 export default function App() {
   const [authed,setAuthed]=useState(false);
   const [user,setUser]=useState(null);
@@ -1655,11 +1674,28 @@ useEffect(() => {
     };
     loadItems();
   }, [authed]);
+
+  useEffect(() => {
+    if (!authed) return;
+    const loadActivity = async () => {
+      const { data, error } = await supabase.from('activity_log').select('*').order('created_at', { ascending: false }).limit(8);
+      if (error) {
+        console.error('활동 로그 불러오기 실패:', error);
+      } else {
+        setActivity((data || []).map(fromDbActivity));
+      }
+    };
+    loadActivity();
+  }, [authed]);
   
   const nav=(name,params={})=>setRoute({name,...params});
   const openItem=(it,fromSpace=null)=>{if(it&&it.id!=null)setRoute({name:'detail',itemId:it.id,fromSpace});};
   const logout=async()=>{ await supabase.auth.signOut(); setAuthed(false); setUser(null); };
 
+  const logActivity=async(action,name)=>{
+    const{data:row,error}=await supabase.from('activity_log').insert({action,item_name:name,user_name:user.name}).select().single();
+    if(!error&&row) setActivity(a=>[fromDbActivity(row),...a].slice(0,8));
+  };
   const upsert=async(data)=>{
     const payload=toDbPayload(data,user.name);
     if(data.id!=null){
@@ -1667,24 +1703,24 @@ useEffect(() => {
       if(error){alert('저장 실패: '+error.message);return;}
       const saved=fromDb(row);
       setItems(prev=>prev.map(p=>p.id===saved.id?saved:p));
-      setActivity(a=>[{id:Date.now(),action:'update',name:saved.name,user:user.name,time:'방금'},...a].slice(0,8));
+      await logActivity('update',saved.name);
       setRoute({name:'detail',itemId:saved.id,fromSpace:route.fromSpace});
     }else{
       const{data:row,error}=await supabase.from('items').insert(payload).select().single();
       if(error){alert('등록 실패: '+error.message);return;}
       const saved=fromDb(row);
       setItems(prev=>[saved,...prev]);
-      setActivity(a=>[{id:Date.now(),action:'create',name:saved.name,user:user.name,time:'방금'},...a].slice(0,8));
+      await logActivity('create',saved.name);
       setRoute({name:'detail',itemId:saved.id,fromSpace:route.fromSpace});
     }
   };
-
+  
   const remove=async(id)=>{
     const it=items.find(i=>i.id===id);
     const{error}=await supabase.from('items').delete().eq('id',id);
     if(error){alert('삭제 실패: '+error.message);return;}
     setItems(p=>p.filter(i=>i.id!==id));
-    if(it) setActivity(a=>[{id:Date.now(),action:'delete',name:it.name,user:user.name,time:'방금'},...a].slice(0,8));
+    if(it) await logActivity('delete',it.name);
     nav('search');
   };
 
