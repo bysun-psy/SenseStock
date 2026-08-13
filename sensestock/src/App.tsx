@@ -482,7 +482,7 @@ function Dashboard({items,activity,onNav,onItemClick}) {
                   <div key={a.id} className="row" style={{gap:12,padding:'12px 0',borderBottom:i<activity.length-1?'1px solid var(--hairline-soft)':'none',alignItems:'flex-start'}}>
                     <div style={{width:24,height:24,borderRadius:'50%',background:d.bg,color:d.fg,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'var(--fs-body)',fontWeight:700,flexShrink:0,marginTop:1}}>{d.l}</div>
                     <div style={{minWidth:0}}>
-                      <div style={{fontSize:'var(--fs-body)',color:'var(--charcoal)',overflow:'hidden'}}><b>{a.user}</b>님이 <b>{a.name}</b>{a.action==='create'?'을 등록':a.action==='update'?'을 수정':'을 삭제'}했습니다.</div>
+                      <div style={{fontSize:'var(--fs-body)',color:'var(--charcoal)',overflow:'hidden'}}><b>{a.user}</b>님이 <b>{a.name}</b>{a.action==='create'?' 등록':a.action==='update'?' 수정':' 삭제'}했습니다.</div>
                       <div style={{fontSize:'var(--fs-sm)',color:'var(--steel)',marginTop:2}}>{a.time}</div>
                     </div>
                   </div>
