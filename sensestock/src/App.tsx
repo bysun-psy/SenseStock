@@ -123,7 +123,7 @@ body,#root{margin:0;padding:0}
 const USES = [
   {id:1,name:'관능평가·시식용품',color:'var(--use-1)',short:'평가·시식'},
   {id:2,name:'조리장비·그릇',color:'var(--use-2)',short:'조리·그릇'},
-  {id:3,name:'실험장비·소모품·시약',color:'var(--use-3)',short:'실험·장비'},
+  {id:3,name:'실험장비·소모품·시약',color:'var(--use-3)',short:'실험·소모품'},
   {id:4,name:'시료·원료',color:'var(--use-4)',short:'시료·원료'},
   {id:5,name:'훈련교구',color:'var(--use-5)',short:'훈련교구'},
   {id:6,name:'사무·IT',color:'var(--use-6)',short:'사무·IT'},
