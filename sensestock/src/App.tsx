@@ -148,8 +148,8 @@ const ZONES = {
   ],
   '서빙1':[{group:'조리대',cells:['서랍 1','서랍 2','서랍 3','4']}],
   '서빙2':[{group:'조리대',cells:['서랍 1','서랍 2','서랍 3','4']}],
-  '토론1':[{group:'서랍',cells:['서랍 1','서랍 2','서랍 3']}],
-  '토론2':[{group:'서랍',cells:['서랍 1','서랍 2','서랍 3']}],
+  '토론1':[{group:'서랍',cells:['서랍 1','서랍 2','서랍 3','서랍 4']}],
+  '토론2':[{group:'서랍',cells:['서랍 1','서랍 2','서랍 3','서랍 4']}],
   '창고':[
     {group:'수납장',cells:['1','2','3','4']},
     {group:'박스',cells:['1']},
@@ -749,10 +749,11 @@ function SimplePlan({space,title,p}) {
 function DiscPlan({space,title,p}) {
   const g=ZONES[space]&&ZONES[space][0]?ZONES[space][0]:null;
   if(!g) return null;
+  const boxH=g.cells.length*60;
   return (
-    <div style={{position:'relative',width:600,height:320,background:'var(--canvas)',border:'1px solid var(--hairline)',borderRadius:'var(--r-lg)',margin:'0 auto'}}>
+    <div style={{position:'relative',width:600,height:380,background:'var(--canvas)',border:'1px solid var(--hairline)',borderRadius:'var(--r-lg)',margin:'0 auto'}}>
       <div style={{position:'absolute',left:32,top:20,fontSize:22,fontWeight:600,color:'var(--ink-deep)'}}>{title}</div>
-      <FBox x={180} y={100} w={240} h={180}>
+      <FBox x={180} y={100} w={240} h={boxH}>
         {g.cells.map((ce,i)=><Cell key={ce} {...p} group={g.group} cell={ce} label={ce} x={180} y={100+i*60} w={240} h={60}/>)}
       </FBox>
     </div>
@@ -1346,7 +1347,7 @@ function MiniMapDisc({space,itemGroup,itemCell,itemColor}:{space:string,itemGrou
   const p={itemGroup,itemCell,itemColor};
   const g=ZONES[space]?.[0];
   if(!g) return null;
-  const ORIG_W=500,ORIG_H=280;
+  const ORIG_W=500,ORIG_H=340;
   const wrapRef=useRef<HTMLDivElement>(null);
   const [scale,setScale]=useState(0.47);
   useEffect(()=>{
